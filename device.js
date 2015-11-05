@@ -11,8 +11,8 @@ function Device(info) {
         type: 1,
         v: 3.3
     };
-    this.time = 00001;
-    this.uptime = 00001;
+    this.time = 1;
+    this.uptime = 1;
     this.cfg = {
         services: [],   // mandatory
         stack: {        // mandatory

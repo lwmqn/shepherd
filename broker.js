@@ -1,23 +1,36 @@
-var server;
+'use strict';
+
+const util = require('util'),
+      Server = require('mosca').Server;
 
 function Broker(settings) {
-    this.server = server = new mosca.Server(settings);
-    this.server.on('ready', () => {
-        
-    });
+    Server.call(this);
+    // this.server = server = new mosca.Server(settings);
 }
 
-Broker.prototype.init = function () {
-    return setAuthenticate()
-            .then(setAuthorizePublish)
-            .then(setAuthorizeSubscribe)
-            .then(setSubscribeAuthorizer)
-            .then(setAuthForward)
-            .then(startClientComingListener)
-            .done(callback);
+util.inherits(Broker, Server);
+
+Broker.prototype.setAuthenticate = function (fn) {
+
 };
 
+Broker.prototype.setAuthorizePublish = function (fn) {
 
+};
+
+Broker.prototype.setAuthorizeSubscribe = function (fn) {
+
+};
+
+Broker.prototype.setAuthForward = function (fn) {
+
+};
+
+Broker.prototype.init = function () {
+
+};
+
+// Events
 server.on('ready', function () {
     // excute  _initBroker()
 });
