@@ -1,2 +1,2 @@
-# mcute
+# mqtt-shepherd
 mqtt device manager
