@@ -1,36 +1,101 @@
 // Interfaces
 
-var registerData = {
+var reg_data = {
     clientId: 'string',
-    lifetime: 86400,    // seconds, uint32
+    lifetime: 86400,        // seconds, uint32
     version: 'string',
-    objList: [ objInfo1, objInfo2, objInfo3 ]         // objList
+    objList: [ oiid_pair1, oiid_pair2, oiid_pair3 ]         // objList
 };  // rspCode: 201 Created, 400 Bad Request, 409 Conflict
 
-var objInfo = {
-    objId: 1,   // uint16
-    instId: 2   // uint16, if instId is null, this is an object itself
+var oiid_pair1 = {
+    oid: 1,   // uint16
+    iid: 2    // uint16, if iid is null, this is an object itself
 };
 
-var deregisterData = {
+var dereg_data = {
     clientId: 'string'
 };  // rspCode: 202 Deleted, 404 Not Found
 
-var updateData = {
+var update_data = {
     clientId: 'string',
-    lifeTime: 1111,         // optional
-    objList: [ objInfoX ],  // optional
-    ip: 'ip_string',        // optional
+    lifeTime: 1111,          // optional
+    objList: [ oiid_pair ],  // optional
+    ip: 'ip_string',         // optional
+    port: 1234               // optional
 };  // 204 Changed, 400 Bad Request, 404 Not Found
 
-
-var notifyData = {
+var notify_data = {
     clientId: 'string',
-    objId: 1,       
-    instId: 1,
-    rId: 1,     // uint16, optional, if null, value belongs to instance, else belongs to that instance
-    value: x
+    oid: 1,       
+    iid: 1,
+    rid: 1,     // uint16, optional, if null, value belongs to instance, else belongs to that instance
+    data: x
 };  // 204 Changed
+
+// (oid + iid + rid)
+var data = value;
+var data = {
+    riid1: value,
+    riid2: vaule
+};
+
+// (oid + iid)
+var data = {
+    rid1: value,
+    rid2: {
+        riid1: value,
+        riid2: value
+    }
+};
+
+// (oid)
+var data = {
+    iid1: {
+        rid1: value,
+        rid2: value,
+        rid3: {
+            riid1: value,
+            riid2: value
+        }
+    },
+    iid2: {
+        // ...
+    }
+};
+
+// REQ
+var read_data = {
+    transId: 2,
+    clientId: 'string',
+    cmdId: 3,
+    oid: 33,
+    iid: 1,
+    rid: 0,
+    data: value_data
+};
+
+// write
+var value_data = 'some value';
+var value_data = {
+    '0': 'somen_value'
+};
+
+// writeAttrs
+var value_data = {
+    pmin: 1,
+    pmax: 2,
+    gt: 3,
+    lt: 4,
+    step: 6,
+    cancel: false
+};
+
+// execute
+var value_data = {
+    arg1: 1,
+    arg2: 2
+};
+
 
 this.emit('register', data);    // { clientId, lifeTime, version, objList }
 this.emit('deregister', data);  // { clientId }
