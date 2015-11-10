@@ -1,4 +1,8 @@
-var x = {};
+var x = {
+	x1: 3,
+	x2: (function () {
+		return this.x1;
+	}())
+};
 
-x[4] = 0;
 console.log(x);
