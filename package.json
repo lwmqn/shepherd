@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/simenkid/mcute/issues"
   },
-  "homepage": "https://github.com/simenkid/mcute"
+  "homepage": "https://github.com/simenkid/mcute",
+  "dependencies": {
+    "enum": "^2.2.0",
+    "lodash": "^3.10.1",
+    "nedb": "^1.4.0",
+    "q": "^1.4.1"
+  }
 }
