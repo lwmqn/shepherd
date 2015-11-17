@@ -1,5 +1,5 @@
 {
-  "name": "mcute",
+  "name": "mqtt-shepherd",
   "version": "0.0.0",
   "description": "mqtt device manager",
   "main": "index.js",
@@ -8,15 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/simenkid/mcute.git"
+    "url": "https://github.com/simenkid/mqtt-shepherd.git"
   },
   "author": "Simen Li",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/simenkid/mcute/issues"
+    "url": "https://github.com/simenkid/mqtt-shepherd/issues"
   },
-  "homepage": "https://github.com/simenkid/mcute",
+  "homepage": "https://github.com/simenkid/mqtt-shepherd",
   "dependencies": {
+    "deep-diff": "^0.3.3",
     "enum": "^2.2.0",
     "lodash": "^3.10.1",
     "nedb": "^1.4.0",

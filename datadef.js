@@ -134,3 +134,40 @@ var resrcTempalte = {
     units: 'cm',            // if any
     description: 'string'   // description
 };
+
+
+var smartObject = {
+    device: {
+        '0': {
+            manuf: 'shepherd',
+            model: 'demo-1'
+        }
+    },
+    connMonitor: {
+        '0': {
+
+        }
+    },
+    connStatistics: {
+
+    }
+};
+
+var smartObject = {
+    '3': {
+        '0': {
+            '0': 'shepherd',
+            '1': 'demo-1'
+        }
+    },
+    '4': {
+        '0': {
+
+        }
+    },
+    '7': {
+        
+    }
+};
+
+// objList = [ { oid: 3, iid: 0 }, { oid: 4, iid: 0 }, { oid: 7, iid: 0 } ]
