@@ -1,43 +1,57 @@
-var _ = require('lodash');
+var util = require('util'),
+    _ = require('lodash');
 
-var diff = require('deep-diff').diff;
-var observableDiff = require('deep-diff').observableDiff,
-    applyChange = require('deep-diff').applyChange;
+var message = '{"x":3}',
+    msg;
 
-var x1 = {
-    'barney': {
-        kelly: {
-            john: 'doe',
-            '1': [ 220, 110 ]
-        },
-        yoman: 'pppp'
-    },
-    'fred': 40,
-    hey: {
-        man: 'here'
-    }
-};
+if (message instanceof Buffer)
+    message = message.toString();
 
-var x2 = {
-    'barney': {
-        kelly: {
-            john: 'doe1',
-            '1': [ 220, 60 ]
-        },
-        yoman: 'pppp'
-    },
-    'fred3': 40,
-    hey1: {
-        man: 'here'
-    }
-};
+if (message[0] === '{' && message[message.length-1] === '}')
+    msg = JSON.parse(message);
+else
+    msg = message;
 
-var y1 = 8;
-var y2 = 10;
 
-var deff = diff(x1, x2);
-var deff2 = diff(y1, y2);
-console.log(deff2);
+console.log(msg);
+// var diff = require('deep-diff').diff;
+// var observableDiff = require('deep-diff').observableDiff,
+//     applyChange = require('deep-diff').applyChange;
+
+// var x1 = {
+//     'barney': {
+//         kelly: {
+//             john: 'doe',
+//             '1': [ 220, 110 ]
+//         },
+//         yoman: 'pppp'
+//     },
+//     'fred': 40,
+//     hey: {
+//         man: 'here'
+//     }
+// };
+
+// var x2 = {
+//     'barney': {
+//         kelly: {
+//             john: 'doe1',
+//             '1': [ 220, 60 ]
+//         },
+//         yoman: 'pppp'
+//     },
+//     'fred3': 40,
+//     hey1: {
+//         man: 'here'
+//     }
+// };
+
+// var y1 = 8;
+// var y2 = 10;
+
+// var deff = diff(x1, x2);
+// var deff2 = diff(y1, y2);
+// console.log(deff2);
 
 // var p = 'barney.kelly';
 // var y = _.get(x, p);
