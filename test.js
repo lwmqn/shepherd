@@ -1,19 +1,23 @@
 var util = require('util'),
     _ = require('lodash');
 
-var message = '{"x":3}',
-    msg;
+var clientId = 'client-12-32';
 
-if (message instanceof Buffer)
-    message = message.toString();
+var subics = {
+        register: `register/response/${clientId}`,
+        deregister: `deregister/response/${clientId}`,
+        notify: `notify/response/${clientId}`,
+        update: `update/response/${clientId}`,
+        ping: `ping/response/${clientId}`,
+        request: `request/${clientId}`,
+        announce: 'announce'
+    };
 
-if (message[0] === '{' && message[message.length-1] === '}')
-    msg = JSON.parse(message);
-else
-    msg = message;
+var subTopics = _.map(subics, function (t) {
+            return t;
+        });
 
-
-console.log(msg);
+console.log(subTopics);
 // var diff = require('deep-diff').diff;
 // var observableDiff = require('deep-diff').observableDiff,
 //     applyChange = require('deep-diff').applyChange;
