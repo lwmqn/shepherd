@@ -17,9 +17,10 @@
   },
   "homepage": "https://github.com/simenkid/mqtt-shepherd",
   "dependencies": {
-    "deep-diff": "^0.3.3",
     "enum": "^2.2.0",
     "lodash": "^3.10.1",
+    "mosca": "^0.32.1",
+    "mqtt": "^1.5.0",
     "nedb": "^1.4.0",
     "q": "^1.4.1"
   }
