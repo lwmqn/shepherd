@@ -1,0 +1,8 @@
+{"clientId":"Im-client-node","lifetime":60000,"ip":"140.117.11.1","mac":"11:22:AA:BB:CC:DD","version":"v0.0.1","objList":{},"so":{"name":"myso","y":{"3":{"y31":"hello"}},"z":{"0":{"z11":"hello","z12":"world"},"1":{"z11":"hello","z12":"XXX"}},"x":{"0":{"x1":1,"x2":2},"1":{"y1":3,"y2":4}}},"_id":"1yC72GY9kqxRxH9m"}
+{"$$indexCreated":{"fieldName":"clientId","unique":true,"sparse":false}}
+{"$$deleted":true,"_id":"1yC72GY9kqxRxH9m"}
+{"clientId":"Im-client-node","lifetime":60000,"ip":"140.117.11.1","mac":"11:22:AA:BB:CC:DD","version":"v0.0.1","objList":{},"so":{"name":"myso","y":{"3":{"y31":"hi"}},"z":{"0":{"z11":"hello","z12":"world"},"1":{"z11":"hello","z12":"world"}},"x":{"0":{"x1":1,"x2":2},"1":{"y1":3,"y2":4}}},"_id":"urM2ebbamawnnfuB"}
+{"clientId":"Im-client-node","lifetime":60000,"ip":"140.117.11.1","mac":"11:22:AA:BB:CC:DD","version":"v0.0.1","objList":{},"so":{"name":"myso","y":{"3":{"y31":"hello"}},"z":{"0":{"z11":"hello","z12":"world"},"1":{"z11":"hello","z12":"world"}},"x":{"0":{"x1":1,"x2":2},"1":{"y1":3,"y2":4}}},"_id":"urM2ebbamawnnfuB"}
+{"$$deleted":true,"_id":"urM2ebbamawnnfuB"}
+{"clientId":"Im-client-node","lifetime":60000,"ip":"140.117.11.1","mac":"11:22:AA:BB:CC:DD","version":"v0.0.1","objList":{},"so":{"name":"myso","y":{"3":{"y31":"hello"}},"z":{"0":{"z11":"hello","z12":"world"},"1":{"z11":"hello","z12":"world"}},"x":{"0":{"x1":1,"x2":2},"1":{"y1":3,"y2":4}}},"_id":"HUqdO6o37vZJzcyW"}
+{"clientId":"Im-client-node","lifetime":60000,"ip":"140.117.11.1","mac":"11:22:AA:BB:CC:DD","version":"v0.0.1","objList":{},"so":{"name":"myso","y":{"3":{"y31":"hello"}},"z":{"0":{"z11":"hello","z12":"world"},"1":{"x1":3,"z11":"hello","z12":"XXX"}},"x":{"0":{"x1":1,"x2":2},"1":{"y1":3,"y2":4}}},"_id":"HUqdO6o37vZJzcyW"}
