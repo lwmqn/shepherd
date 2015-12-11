@@ -41,7 +41,7 @@ shepherd.on('registered', function (node) {
 
     setTimeout(function () {
 //     setInterval(function () {
-            node.writeAttrsReq('/device/manuf', {
+            node.writeAttrsReq('/device/0/manufx', {
                 pmin: 20,
                 pmax: 100,
                 // gt: 1000,
@@ -57,35 +57,35 @@ shepherd.on('registered', function (node) {
 
     }, 5000);
 
-    // node.readReq('tempSensor/').done(function (r) {
-    // 	console.log('>>>>>>>> read tempSensor Object');
-    // 	console.log(r);
-    // }, function (err) {
-    // 	console.log(err);
-    // });
+    node.readReq('tempSensor/').done(function (r) {
+    	console.log('>>>>>>>> read tempSensor Object');
+    	console.log(r);
+    }, function (err) {
+    	console.log(err);
+    });
 
-    // setTimeout(function () {
-    // 	setInterval(function () {
-		  //   node.readReq('tempSensor/0/').done(function (r) {
-		  //   	console.log('>>>>>>>> read tempSensor Instance');
-		  //   	console.log(r);
-		  //   }, function (err) {
-		  //   	console.log(err);
-		  //   });
-    // 	}, 3200);
+    setTimeout(function () {
+    	setInterval(function () {
+		    node.readReq('tempSensor/0/').done(function (r) {
+		    	console.log('>>>>>>>> read tempSensor Instance');
+		    	console.log(r);
+		    }, function (err) {
+		    	console.log(err);
+		    });
+    	}, 3200);
 
-    // }, 12000);
+    }, 12000);
 
-    // setTimeout(function () {
-    // 	setInterval(function () {
-		  //   node.readReq('tempSensor/0/sensorValue').done(function (r) {
-		  //   	console.log('>>>>>>>> read tempSensor Resource');
-		  //   	console.log(r);
-		  //   }, function (err) {
-		  //   	console.log(err);
-		  //   });
-    // 	}, 4000);
+    setTimeout(function () {
+    	setInterval(function () {
+		    node.readReq('tempSensor/0/sensorValue').done(function (r) {
+		    	console.log('>>>>>>>> read tempSensor Resource');
+		    	console.log(r);
+		    }, function (err) {
+		    	console.log(err);
+		    });
+    	}, 4000);
 
-    // }, 15000);
+    }, 15000);
 
 });
