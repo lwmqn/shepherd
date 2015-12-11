@@ -26,35 +26,66 @@ shepherd.on('registered', function (node) {
     console.log(node.clientId);
     console.log(node.status);
 
-    node.readReq('tempSensor/').done(function (r) {
-    	console.log('>>>>>>>> read tempSensor Object');
-    	console.log(r);
-    }, function (err) {
-    	console.log(err);
-    });
+//.writeAttrsReq(path, attrs, callback)
+
+    // this.attrs = {
+    //     mute: true,
+    //     cancel: true,
+    //     pmin: 10,
+    //     pmax: 60,
+    //     gt: null,                 // only valid for number
+    //     lt: null,                 // only valid for number
+    //     step: null,               // only valid for number
+    //     // lastReportedValue: xxx // optional
+    // };
 
     setTimeout(function () {
-    	setInterval(function () {
-		    node.readReq('tempSensor/0/').done(function (r) {
-		    	console.log('>>>>>>>> read tempSensor Instance');
-		    	console.log(r);
-		    }, function (err) {
-		    	console.log(err);
-		    });
-    	}, 3200);
+//     setInterval(function () {
+            node.writeAttrsReq('/device/manuf', {
+                pmin: 20,
+                pmax: 100,
+                // gt: 1000,
+                // lt: 50,
+                //step: 200
+            }).done(function (r) {
+             console.log('>>>>>>>> Write Attrs');
+             console.log(r);
+            }, function (err) {
+             console.log(err);
+            });
+     // }, 3200);
 
-    }, 12000);
+    }, 5000);
 
-    setTimeout(function () {
-    	setInterval(function () {
-		    node.readReq('tempSensor/0/sensorValue').done(function (r) {
-		    	console.log('>>>>>>>> read tempSensor Resource');
-		    	console.log(r);
-		    }, function (err) {
-		    	console.log(err);
-		    });
-    	}, 4000);
+    // node.readReq('tempSensor/').done(function (r) {
+    // 	console.log('>>>>>>>> read tempSensor Object');
+    // 	console.log(r);
+    // }, function (err) {
+    // 	console.log(err);
+    // });
 
-    }, 15000);
+    // setTimeout(function () {
+    // 	setInterval(function () {
+		  //   node.readReq('tempSensor/0/').done(function (r) {
+		  //   	console.log('>>>>>>>> read tempSensor Instance');
+		  //   	console.log(r);
+		  //   }, function (err) {
+		  //   	console.log(err);
+		  //   });
+    // 	}, 3200);
+
+    // }, 12000);
+
+    // setTimeout(function () {
+    // 	setInterval(function () {
+		  //   node.readReq('tempSensor/0/sensorValue').done(function (r) {
+		  //   	console.log('>>>>>>>> read tempSensor Resource');
+		  //   	console.log(r);
+		  //   }, function (err) {
+		  //   	console.log(err);
+		  //   });
+    // 	}, 4000);
+
+    // }, 15000);
 
 });
