@@ -41,7 +41,7 @@ shepherd.on('registered', function (node) {
 
     setTimeout(function () {
 //     setInterval(function () {
-            node.writeAttrsReq('/device/0/manufx', {
+            node.writeAttrsReq('/device/0/manuf', {
                 pmin: 20,
                 pmax: 100,
                 // gt: 1000,
