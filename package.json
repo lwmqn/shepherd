@@ -1,6 +1,6 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "mqtt device manager",
   "main": "index.js",
   "scripts": {
