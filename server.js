@@ -1,9 +1,10 @@
 var util = require('util'),
+    moment = require('moment'),
     Shepherd = require('./index');
 
 var shepherd = new Shepherd('my_shepherd');
-
-
+var preUnix = null,
+    nowUnix = null;
 shepherd.start(function (err, res) {
     if (err) console.log(err);
 });
@@ -21,9 +22,23 @@ shepherd.on('error', function (err) {
     console.log(err);
 });
 
-shepherd.on('notified', function (diff) {
-    console.log('%%%%%%%%%%%%%% NOTIFIED %%%%%%%%%%%%%%%%%%%%');
-    console.log(diff);
+var t = 0;
+shepherd.on('notified', function (msg) {
+    preUnix = nowUnix;
+    nowUnix = moment().unix();
+
+    t++;
+    if (t > 5) {
+        shepherd._responseSender('notify', msg.clientId, { status: 204, cancel: true });
+        t = 0;
+    }
+
+    var tdf = nowUnix - preUnix;
+    tdf  = tdf > 10000 ? 0 : tdf;
+    console.log('>>>>>>>>>> NOTIFIED');
+    console.log(tdf);
+    console.log(msg.data);
+
 });
 
 shepherd.on('registered', function (node) {
@@ -47,14 +62,26 @@ shepherd.on('registered', function (node) {
     setTimeout(function () {
 //     setInterval(function () {
             node.writeAttrsReq('/tempSensor/0/sensorValue', {
-                pmin: 5,
-                pmax: 15,
-                // gt: 1000,
+                pmin: 1,
+                pmax: 4,
+                // gt: 100,
                 // lt: 50,
-                //step: 200
+                // step: 20
             }).done(function (r) {
-
-                node.observeReq('/tempSensor/0/sensorValue').done();
+                // setTimeout(function () {
+                //     node.writeAttrsReq('/tempSensor/0/sensorValue', {
+                //                     cancel: true
+                //                 }).done(function (r) {
+                //                     console.log('cancel observe');
+                //                     console.log(r);
+                //                 });
+                // }, 10000);
+                node.observeReq('/tempSensor/0/sensorValue').done(function (x) {
+                    console.log('OBSERVER RSP');
+                    console.log(x);
+                }, function (err) {
+                    console.log(err);
+                });
 
              console.log('>>>>>>>> Write Attrs');
              console.log(r);
@@ -62,9 +89,7 @@ shepherd.on('registered', function (node) {
                     shepherd.announce('Announce to the world!!!');
                 }, 3000);
 
-                setTimeout(function () {
-                    console.log(node.shepherd._rspsToResolve.mnode_1);
-                }, 16000);
+
             }, function (err) {
                 console.log('>>>>>>>> Write Attrs ERR');
                 console.log(err);
@@ -90,7 +115,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/', { pmax: 333 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq Root');
+    //         console.log('>>>>>>>> writeAttrsReq Root');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
@@ -99,7 +124,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/device', { pmax: 333 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq device');
+    //         console.log('>>>>>>>> writeAttrsReq device');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
@@ -108,7 +133,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/device1', { pmax: 333 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq device1');
+    //         console.log('>>>>>>>> writeAttrsReq device1');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
@@ -117,7 +142,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/device/0', { pmax: 321, pmin: 1 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq device 0 ');
+    //         console.log('>>>>>>>> writeAttrsReq device 0 ');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
@@ -126,7 +151,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/device/1', { pmax: 321, pmin: 1 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq device 1 ');
+    //         console.log('>>>>>>>> writeAttrsReq device 1 ');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
@@ -135,7 +160,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/device/0/pwrSrcVoltage', { lt: 500, gt: 1000, step: 60 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq device 0 pwrSrcVoltage ');
+    //         console.log('>>>>>>>> writeAttrsReq device 0 pwrSrcVoltage ');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
@@ -144,7 +169,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/tempSensor/1x/sensorValue', { pmin: 20, gt: 300 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq device 1 sensorValue ');
+    //         console.log('>>>>>>>> writeAttrsReq device 1 sensorValue ');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
@@ -153,7 +178,7 @@ shepherd.on('registered', function (node) {
 
     // setTimeout(function () {
     //     node.writeAttrsReq('/tempSensor/1/sensorValue', { pminx: 20, gt: 300 }).done(function (r) {
-    //         console.log('>>>>>>>> writeReq device 1 sensorValue ');
+    //         console.log('>>>>>>>> writeAttrsReq device 1 sensorValue ');
     //         console.log(r);
     //     }, function (err) {
     //         console.log(err);
