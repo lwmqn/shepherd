@@ -19,25 +19,27 @@ The light-weight MQTT machine network ([**LWMQN**](https://www.www.com)) is an a
 
 [`mqtt-shepherd`](https://www.npmjs.com/package/mqtt-shepherd) is an implementation of the LWMQN Server and [`mqtt-node`](https://www.npmjs.com/package/mqtt-node) is an implementation of the LWMQN Client on node.js. They are working together into an IoT application framework. This server-side module `mqtt-shepherd` can run on platfroms equipped with node.js.  
 
-The LWMQN Client and Server benefits from the IPSO object model. This leads to a very comprehensive way for the Server to allocate and query Resources from Client Devices. It's similar to URI style ([RFC3986 - and Shelby IPSO](http://tools.ietf.org/pdf/rfc3986.pdf)) to identify a resource on a server. For exmaple,  
+The LWMQN Client and Server benefits from the IPSO object model. This leads to a very comprehensive way for the Server to use a *path* to allocate and query Resources from Client Devices. It's similar to URI style to identify a resource on a Server. For exmaple,  
 
 
-    qnode.readReq('humidSensor/0/sensorValue', function (err, rsp) { ... })
-
-and  
-  
-    qnode.readReq('3304/0/5700', function (err, rsp) { ... })
+```js
+qnode.readReq('humidSensor/0/sensorValue', function (err, rsp) { ... });
+qnode.readReq('3304/0/5700', function (err, rsp) { ... });
+```
 
 , both of these two requests is to read the sensed value from the Object Instance of a humidity sensor on a Client Device.
    
-The goal of `mqtt-shepherd` is to let you build and manage an MQTT machine network with less efforts, e.g., permission of device joining, device authentication, reading and writing resources on a remote device, observing the changes of remote resources, remote execution of a procedure on the device. Furthermore, thanks to the power of node.js http server, making your own RESTful APIs to interact with your machines is also possible. Machines are in your hands, not on the cloud.
+The goal of `mqtt-shepherd` is to let you build and manage an MQTT machine network with less efforts, e.g., permission of device joining, device authentication, reading and writing resources on a remote device, observing the changes of remote resources, remote execution of a procedure on the device. Furthermore, thanks to the power of node.js http server, making your own RESTful APIs to interact with your machines is also possible.
   
 Note: This project is planning to privode a web-client library based on websocket for front-end users.
 
 #### Acronym
+* **Server**: the LWMQN Server
+* **Client** or **Client Device**: the LWMQN Client 
 * **MqttShepherd**: the class exposed by `require('mqtt-shepherd')`  
-* **server**: the instance of the MqttShepherd class
-* **qnode**: the instance of the MqttNode class  
+* **MqttNode**: the class to create a software endpoint of the remote Client Device on the Server
+* **qserver**: the instance of the MqttShepherd
+* **qnode**: the instance of the MqttNode  
 * **oid**: identifier of an Object  
 * **iid**: identifier of an Object Instance  
 * **rid**: indetifier of a Resource  
