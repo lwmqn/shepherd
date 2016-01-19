@@ -27,11 +27,11 @@ shepherd.on('notified', function (msg) {
     preUnix = nowUnix;
     nowUnix = moment().unix();
 
-    t++;
-    if (t > 5) {
-        shepherd._responseSender('notify', msg.clientId, { status: 204, cancel: true });
-        t = 0;
-    }
+    // t++;
+    // if (t > 5) {
+    //     shepherd._responseSender('notify', msg.clientId, { status: 204, cancel: true });
+    //     t = 0;
+    // }
 
     var tdf = nowUnix - preUnix;
     tdf  = tdf > 10000 ? 0 : tdf;
