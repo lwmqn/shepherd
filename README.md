@@ -3,56 +3,54 @@ mqtt-shepherd
 
 ## Table of Contents
 
-1. [Overiew](#Overiew)    
-2. [Features](#Features) 
-3. [Installation](#Installation) 
-4. [Basic Usage](#Basic)
-5. [APIs and Events](#APIs)
-6. [Message Encryption](#Auth)
-7. [Auth Policy](#Auth)
-8. [Example with websocket](#example)
+1. [Overiew](#Overiew)  
+2. [Features](#Features)  
+3. [Installation](#Installation)  
+4. [Basic Usage](#Basic)  
+5. [APIs and Events](#APIs)  
+6. [Message Encryption](#Encryption)  
+7. [Auth Policy](#Auth)  
+8. [Example with websocket](#example)  
 
 <a name="Overiew"></a>
 ## 1. Overview
 
-The light-weight MQTT machine network ([**LWMQN**](https://www.www.com)) is an architecture that follows part of the [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
+The lightweight MQTT machine network ([**LWMQN**](https://simenkid.github.io/lwmqn)) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
-[`mqtt-shepherd`](https://www.npmjs.com/package/mqtt-shepherd) is an implementation of the LWMQN Server and [`mqtt-node`](https://www.npmjs.com/package/mqtt-node) is an implementation of the LWMQN Client on node.js. They are working together into an IoT application framework. This server-side module `mqtt-shepherd` can run on platfroms equipped with node.js.  
+This module, [**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd), is an implementation of LWMQN Server on node.js. This server-side module can run on platfroms equipped with node.js.  
 
-The LWMQN Client and Server benefits from the IPSO object model. This leads to a very comprehensive way for the Server to use a *path* to allocate and query Resources from Client Devices. It's similar to URI style to identify a resource on a Server. For exmaple,  
-
-
+The LWMQN Client and Server benefits from the IPSO data model. This leads to a very comprehensive way for the Server to use a *path* to allocate and query Resources on Client Devices. It's similar to URI style to allocate a specific resource. In the following example, both of these two requests is to read the sensed value from a humidity sensor on a Client Device.  
+  
 ```js
 qnode.readReq('humidSensor/0/sensorValue', function (err, rsp) { ... });
 qnode.readReq('3304/0/5700', function (err, rsp) { ... });
 ```
-
-both of these two requests is to read the sensed value from a humidity sensor on a Client Device.
-   
-The goal of `mqtt-shepherd` is to let you build and manage an MQTT machine network with less efforts, e.g., permission of device joining, device authentication, reading and writing resources on a remote device, observing the changes of remote resources, remote execution of a procedure on the device. Furthermore, thanks to the power of node.js http server, making your own RESTful APIs to interact with your machines is also possible.
   
-Note: This project is planning to privode a web-client library based on websocket for front-end users.
+The goal of `mqtt-shepherd` is to let you build and manage an MQTT machine network with less efforts, e.g., permission of device joining, device authentication, reading and writing resources on a remote device, observing the changes of remote resources, remote execution of a procedure on the device. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.  
+  
+Note: This project is planning to provide a web-client library based on websocket for front-end users.  
 
 #### Acronym
-* **Server**: the LWMQN Server
-* **Client** or **Client Device**: the LWMQN Client 
-* **MqttShepherd**: the class exposed by `require('mqtt-shepherd')`  
-* **MqttNode**: the class to create a software endpoint of the remote Client Device on the Server
-* **qserver**: the instance of the MqttShepherd
-* **qnode**: the instance of the MqttNode  
+* **Server**: LWMQN Server
+* **Client** or **Client Device**: LWMQN Client 
+* **MqttShepherd**: class exposed by `require('mqtt-shepherd')`  
+* **MqttNode**: class to create a software endpoint of a remote Client Device on the Server
+* **qserver**: instance of MqttShepherd
+* **qnode**: instance of MqttNode  
 * **oid**: identifier of an Object  
 * **iid**: identifier of an Object Instance  
 * **rid**: indetifier of a Resource  
 
-Note: Object, Object Instance and Resource are used by the IPSO specification to describe the hierarchical structure of resources. The Server can use oid, iid and rid to  allocate the resource on a Client Device.  
+Note: IPSO uses _Object_, _Object Instance_ and _Resource_ to describe the hierarchical structure of resources on a Client Device. The Server can use oid, iid and rid to allocate resources on a Client Device.  
 
 <a name="Features"></a>
 ## 2. Features
 
-* Based on the [Mosca](https://github.com/mcollina/mosca/wiki) which is an MQTT broker on node.js, and the [mqtt.js](https://www.npmjs.com/package/mqtt).
-* Follows the IPSO definitions  
-* Ea....
-* LWM2M-like interfaces  
+* Communication based on MQTT protocol and [Mosca](https://github.com/mcollina/mosca/wiki) which is an MQTT broker on node.js.  
+* Structuring the device resources in a hierarchical Smart-Object-style (IPSO)  
+* Easy to query resources on a Client Device  
+* LWM2M-like interfaces for Client/Server interaction  
+* Machine netwrok managment is simple  
   
 <a name="Installation"></a>
 ## 3. Installation
@@ -72,8 +70,8 @@ qserver.on('ready', function () {
     console.log('Server is ready.');
 });
 
-qserver.permitJoin(180); // open for device joining in 180 secs
-qserver.start(function (err) {
+qserver.permitJoin(180);        // open for devices to join the network within 180 secs
+qserver.start(function (err) {  // start the sever
     if (err)
         console.log(err);
 });
