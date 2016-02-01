@@ -37,11 +37,11 @@ shepherd.on('notify_update', function (msg) {
     // preUnix = nowUnix;
     // nowUnix = moment().unix();
 
-    t++;
-    if (t > 5) {
-        shepherd._responseSender('notify', msg.clientId, { transId: msg.transId, status: 204, cancel: true });
-        t = 0;
-    }
+    // t++;
+    // if (t > 5) {
+    //     shepherd._responseSender('notify', msg.clientId, { transId: msg.transId, status: 204, cancel: true });
+    //     t = 0;
+    // }
 
     // var tdf = nowUnix - preUnix;
     // tdf  = tdf > 10000 ? 0 : tdf;
@@ -278,8 +278,8 @@ shepherd.on('registered', function (node) {
         var attrs = {
             pmin: 1,
             pmax: 30,
-            gt: 60,
-            lt: 20,
+            gt: 20,
+            lt: 80,
             step: 20
         };
 

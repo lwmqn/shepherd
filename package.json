@@ -1,6 +1,6 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "mqtt device manager",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   "dependencies": {
     "enum": "^2.2.0",
     "lodash": "^3.10.1",
-    "lwm2m-id": "0.0.6",
+    "lwm2m-id": "1.0.2",
     "moment": "^2.10.6",
     "mosca": "^0.32.1",
     "mqtt": "^1.5.0",
