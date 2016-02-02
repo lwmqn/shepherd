@@ -17,18 +17,23 @@ mqtt-shepherd
 
 The lightweight MQTT machine network ([**LWMQN**](https://simenkid.github.io/lwmqn)) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
-This module, [**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd), is an implementation of LWMQN Server on node.js. This server-side module can run on platfroms equipped with node.js.  
+This module, **mqtt-shepherd**, is an implementation of LWMQN Server which can run on platfroms equipped with node.js.  
 
-The LWMQN Client and Server benefits from the IPSO data model. This leads to a very comprehensive way for the Server to use a *path* to allocate and query Resources on Client Devices. It's similar to URI style to allocate a specific resource. In the following example, both of these two requests is to read the sensed value from a humidity sensor on a Client Device.  
+LWMQN Client and Server benefits from the IPSO data model, which leads to a very comprehensive way for the Server to use a *path* with URI-style to allocate and query Resources on Client Devices. In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.  
   
 ```js
-qnode.readReq('humidSensor/0/sensorValue', function (err, rsp) { ... });
-qnode.readReq('3304/0/5700', function (err, rsp) { ... });
+qnode.readReq('tempSensor/0/sensorValue', function (err, rsp) {
+    console.log(rsp); // { status: 205, data: 18 }
+});
+
+qnode.readReq('3304/0/5700', function (err, rsp) {
+    console.log(rsp); // { status: 205, data: 18 }
+});
 ```
   
-The goal of `mqtt-shepherd` is to let you build and manage an MQTT machine network with less efforts, e.g., permission of device joining, device authentication, reading and writing resources on a remote device, observing the changes of remote resources, remote execution of a procedure on the device. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.  
+The goal of **mqtt-shepherd** is to let you build and manage an MQTT machine network with less efforts, it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, device authentication, reading, writing and observing resources on a remote device, remotely executing a procedure on the Device. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.  
   
-Note: This project is planning to provide a web-client library based on websocket for front-end users.  
+Note: This project is planning to provide a web-client library for front-end users in the near future.  
 
 #### Acronym
 * **Server**: LWMQN Server
@@ -46,11 +51,12 @@ Note: IPSO uses _Object_, _Object Instance_ and _Resource_ to describe the hiera
 <a name="Features"></a>
 ## 2. Features
 
-* Communication based on MQTT protocol and [Mosca](https://github.com/mcollina/mosca/wiki) which is an MQTT broker on node.js.  
-* Structuring the device resources in a hierarchical Smart-Object-style (IPSO)  
+* MQTT protocol
+* Based on [Mosca](https://github.com/mcollina/mosca/wiki) which is an MQTT broker on node.js.  
+* Hierarchical data model in Smart-Object-style (IPSO)  
 * Easy to query resources on a Client Device  
 * LWM2M-like interfaces for Client/Server interaction  
-* Machine netwrok managment is simple  
+* Simple machine network managment  
   
 <a name="Installation"></a>
 ## 3. Installation
@@ -68,20 +74,22 @@ var qserver = new MqttShepherd();
 
 qserver.on('ready', function () {
     console.log('Server is ready.');
+    qserver.permitJoin(180);    // open for devices to join the network within 180 secs
 });
 
-qserver.permitJoin(180);        // open for devices to join the network within 180 secs
 qserver.start(function (err) {  // start the sever
     if (err)
         console.log(err);
 });
 
-// That's all to start a LWMQN server.
-// Now the server is going to auotmatically tackle most of the network managing things.
+// That's all to start a LWMQN Server.
+// Now the Server is going to auotmatically tackle most of the network managing things.
 ```
   
 <a name="APIs"></a>
 ## 5. APIs
+  
+This moudle provides you with two classes of MqttShepherd and MqttNode. The MqttShepherd class brings you a LWMQN Server with network managing facilities, i.e., start/stop the Server, permit device joining, find an joined node. This document uses `qserver` to denote the instance of this Server class. The MqttNode is the class for creating a software endpoint which represents the remote Client Device at server-side. This document uses `qnode` to denote the instance of this Client class. You can invoke methods on a `qnode` to operate the remote Device.  
 
 * MqttShepherd APIs
     * [(ok) new MqttShepherd()](#API_MqttShepherd)
@@ -117,9 +125,8 @@ Create a new instance of the `MqttShepherd` class.
   
 **Arguments:**  
 
-1. `name` (_String_): Name of your server. A default name will be used if not given.
-2. `settings` (_Object_): This is the settings for the Mosca MQTT broker. If not given, the MqttShepherd will use port 1883 and LevelUp for presistence by default. 
-    You can set up your backend, like mongoDB, Redis, Mosquitto or RabbitMQ, through this option. Please refer to the [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage) for details.
+1. `name` (_String_): Name your server. A default name `'mqtt_shepherd'` will be used if not given.
+2. `settings` (_Object_): Settings for the Mosca MQTT broker. If not given, the default settings will be applied, e.g.port 1883 for the broker, LevelUp for presistence. You can set up your backend, like mongoDB, Redis, Mosquitto or RabbitMQ, through this option. Please refer to the [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage) for details.  
 
     
 **Returns:**  
@@ -128,16 +135,24 @@ Create a new instance of the `MqttShepherd` class.
 
 **Examples:**  
 
+* Create a server and name it
+
 ```js
 var MqttShepherd = require('mqtt-shepherd');
-
-// create a server and name it
 var qserver= new MqttShepherd('my_iot_server');
+```
 
-// create a server that starts on a specified port
-var qserver= new MqttShepherd('my_iot_server', { port: 9000 });
+* Create a server that starts on a specified port
 
-// create a server with other backend (example from Mosca wiki)
+```js
+var qserver= new MqttShepherd('my_iot_server', {
+    port: 9000
+});
+```
+
+* Create a server with other backend (example from Mosca wiki)
+
+```js
 var qserver= new MqttShepherd('my_iot_server', {
     port: 1883,
     backend: {
@@ -148,6 +163,7 @@ var qserver= new MqttShepherd('my_iot_server', {
     }
 });
 ```
+
 *************************************************
 <a name="API_start"></a>
 ### .start([callback])
@@ -197,7 +213,7 @@ Open for devices to join the network.
 
 **Arguments:**  
 
-1. `time` (_Number_): Interval in seconds for qsever openning for devices to join the network. Set `time` to `0` can immediately close the admission.
+1. `time` (_Number_): Interval in seconds for qsever openning for devices to join the network. Set `time` to `0` can immediately close the admission.  
 
   
 **Returns:**  
@@ -222,19 +238,19 @@ Returns the qserver infomation.
   
 **Returns:**  
   
-* (_Object_): An object that contains the information about this server. The fields in this object are shown in the following table.
+* (_Object_): An object that contains the information about the Server. The fields in this object are shown in the following table.
 
-| Property     | Type    | Description                          |
-|--------------|---------|--------------------------------------|
-| `name`       | String  | Name of the server                   |
-| `ip`         | String  | Ip address of the server             |
-| `mac`        | String  | Mac address                          |
-| `routerIp`   | String  | Router IP address                    |
-| `manuf`      | String  | Manufacturer name                    |
-| `devNum`     | Number  | Number of devices joined the network |
-| `status`     | String  | `online`, `offline`                  |
-| `permitJoin` | Boolean | Is the server opened for joining     |
-| `startTime`  | Number  | Unix Time (secs)                     |
+| Property     | Type    | Description                                   |
+|--------------|---------|-----------------------------------------------|
+| `name`       | String  | Name of the server                            |
+| `ip`         | String  | Ip address of the server                      |
+| `mac`        | String  | Mac address                                   |
+| `routerIp`   | String  | Router IP address                             |
+| `manuf`      | String  | Manufacturer name                             |
+| `devNum`     | Number  | Number of devices joined the network          |
+| `status`     | String  | `online`, `offline`                           |
+| `permitJoin` | Boolean | Indicates if the Server is opened for joining |
+| `startTime`  | Number  | Unix Time (secs)                              |
 
 **Examples:**  
     
@@ -242,18 +258,16 @@ Returns the qserver infomation.
 console.log(qserver.info());
 
 {
-    name: 'xxxx',
-    ip: 'xxx.xxx.xxx.xxx',
-    mac: 'xx:xx:xx:xx:xx:xx',
-    routerIp: 'xxx.xxx.xxx.xxx',
-    manuf: 'xxx',
-    devNum: 10,
+    name: 'my_iot_server',
+    ip: '192.168.1.99',
+    mac: '00:0c:29:6b:fe:e7',
+    routerIp: '192.168.1.1',
+    manuf: 'sivann',
+    devNum: 36,
     status: 'online',
     permitJoin: false,
-    startTime: 5656556 
+    startTime: 1454419506
 }  
-
-
 ```
 
 *************************************************
