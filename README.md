@@ -22,7 +22,7 @@ This module, **mqtt-shepherd**, is an implementation of LWMQN Server which can r
 LWMQN Client and Server benefits from the IPSO data model, which leads to a very comprehensive way for the Server to use a *path* with URI-style to allocate and query Resources on Client Devices. In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.  
   
 ```js
-qnode.readReq('tempSensor/0/sensorValue', function (err, rsp) {
+qnode.readReq('temperature/0/sensorValue', function (err, rsp) {
     console.log(rsp); // { status: 205, data: 18 }
 });
 
@@ -482,7 +482,7 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
         ```js
         // example of a Resource notification
         {
-            oid: 'humidSensor',
+            oid: 'humidity',
             iid: 0,
             rid: 'sensorValue',
             data: 32
@@ -490,7 +490,7 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
 
         // example of an Object Instance notification
         {
-            oid: 'humidSensor',
+            oid: 'humidity',
             iid: 0,
             data: {
                 sensorValue: 32
@@ -508,7 +508,7 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
         ```js
         // changes of an Object Instance
         {
-            oid: 'tempSensor',
+            oid: 'temperature',
             iid: 0,
             data: {
                 sensorValue: 12,
@@ -518,7 +518,7 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
 
         // change of a Resource 
         {
-            oid: 'tempSensor',
+            oid: 'temperature',
             iid: 1,
             rid: 'sensorValue',
             data: 18
@@ -565,7 +565,7 @@ Remotely read the target. The response will pass through the callback.
 **Examples:**  
     
 ```js
-qnode.readReq('tempSensor/1/sensedValue', function (err, rsp) {
+qnode.readReq('temperature/1/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: 205, data: 87 }
 });
 
@@ -574,7 +574,7 @@ qnode.readReq('/noSuchObject/0/foo', function (err, rsp) {
     console.log(rsp);   // { status: 404, data: undefined }
 });
 
-qnode.readReq('/tempSensor/0/noSuchResource/', function (err, rsp) {
+qnode.readReq('/temperature/0/noSuchResource/', function (err, rsp) {
     console.log(rsp);   // { status: 404, data: undefined }
 });
 ```
@@ -613,7 +613,7 @@ qnode.writeReq('digitalOutput/0/dOutState', 0, function (err, rsp) {
 });
 
 // target not found
-qnode.writeReq('tempSensor/0/noSuchResource', 1, function (err, rsp) {
+qnode.writeReq('temperature/0/noSuchResource', 1, function (err, rsp) {
     console.log(rsp);   // { status: 404, data: undefined }
 });
 
@@ -626,14 +626,15 @@ qnode.writeReq('digitalInput/1/dInState', 1, function (err, rsp) {
 ***********************************************
 <a name="API_writeAttrsReq"></a>
 ### qnode.writeAttrsReq(path, attrs[, callback])
-Configure the parameters of the report settings upon a Resource, an Object Instance or an Object. This method can also used to cancel the observation by assgin the `cancel` property with `true` to `attrs`. This API won't start the report of notifications. Use observe() if you want to turn on reporting.
+Configure the parameters of the report settings upon a Resource, an Object Instance or an Object. This method can also used to cancel the observation by assgin the `cancel` property with `true` to `attrs`. This API won't start the report of notifications. Use observe() if you want to turn on reporting.  
 
 **Arguments:**  
 
-1. `path` (_String_): Path of the allocated Resource, Object Instance or Object on the remote Client Device.
-2. `attrs` (_Object_): Parameters of report settings.
-    | Property | Type    | Mandatory | Description                                                                                                                                                                                             |
-    |----------|---------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+1. `path` (_String_): Path of the allocated Resource, Object Instance or Object on the remote Client Device.  
+2. `attrs` (_Object_): Parameters of report settings.  
+
+    | Property | Type    | Mandatory | Description |
+    |----------|---------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | pmin     | Number  | optional  | Minimum Period. Minimum time in seconds the Client Device should wait from the time when sending the last notification to the time when sending a new notification.                                     |
     | pmax     | Number  | optional  | Maximum Period. Maximum time in seconds the Client Device should wait from the time when sending the last notification to the time sending the next notification (regardless if the value has changed). |
     | gt       | Number  | optional  | Greater Than. The Client Device should notify its value when the value is greater than this setting. Only valid for the Resource typed as a number.                                                     |
@@ -643,7 +644,8 @@ Configure the parameters of the report settings upon a Resource, an Object Insta
 
 3. `callback` (_Function_):  `function (err, rsp) { }`
     `err` (_Object_): error object
-    `rsp` (_Object_): The response is an object that has the status code to indicate whether the operation is successful. 
+    `rsp` (_Object_): The response is an object that has the status code to indicate whether the operation is successful.  
+
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
     | `status` | Number  | Status code of the response. See [Status Code](#).                      |
@@ -657,7 +659,7 @@ Configure the parameters of the report settings upon a Resource, an Object Insta
     
 ```js
 // set successfully
-qnode.writeAttributes('tempSensor/0/sensedValue', {
+qnode.writeAttributes('temperature/0/sensedValue', {
     pmin: 10,
     pmax: 600,
     gt: 45
@@ -666,14 +668,14 @@ qnode.writeAttributes('tempSensor/0/sensedValue', {
 });
 
 // taget not found
-qnode.writeAttributes('tempSensor/0/noSuchResource', {
+qnode.writeAttributes('temperature/0/noSuchResource', {
     gt: 20
 }, function (err, rsp) {
     console.log(rsp);   // { status: 404 }
 });
 
 // parameter cannot be recognized
-qnode.writeAttributes('tempSensor/0/noSuchResource', {
+qnode.writeAttributes('temperature/0/noSuchResource', {
     foo: 60
 }, function (err, rsp) {
     console.log(rsp);   // { status: 400 }
@@ -690,11 +692,12 @@ Discover report settings of a Resource or, an Object Instance or an Object on th
 1. `path` (_String_):  Path of the allocated Resource, Object Instance or Object on the remote Client Device.
 2. `callback` (_Function_):   `function (err, rsp) { }`
     `err` (_Object_): error object
-    `rsp` (_Object_): The response is an object that has the status code along with the parameters of report settings. 
-    | Property | Type    | Description                                                             |
-    |----------|---------|-------------------------------------------------------------------------|
-    | `status` | Number  | Status code of the response. See [Status Code](#).                      |
-    | `data`   | Object  | The field `attrs` is the object contains the parameter. If the discoved target is an Object, there will be another field `resrcList`                      |
+    `rsp` (_Object_): The response is an object that has the status code along with the parameters of report settings.  
+
+    | Property | Type    | Description                                                                                                                          |
+    |----------|---------|--------------------------------------------------------------------------------------------------------------------------------------|
+    | `status` | Number  | Status code of the response. See [Status Code](#).                                                                                   |
+    | `data`   | Object  | The field `attrs` is the object contains the parameter. If the discoved target is an Object, there will be another field `resrcList` |
   
 
 ^^^^^^^^^^^^^
@@ -707,7 +710,7 @@ Discover report settings of a Resource or, an Object Instance or an Object on th
     
 ```js
 // discover a Resource successfully
-qnode.discoverReq('tempSensor/0/sensedValue', function (err, rsp) {
+qnode.discoverReq('temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: 205, data: {
                         //                    attrs: { pmin: 10, pmax: 600, gt: 45 }
                         //                }
@@ -715,7 +718,7 @@ qnode.discoverReq('tempSensor/0/sensedValue', function (err, rsp) {
 });
 
 // discover an Object successfully
-qnode.discoverReq('tempSensor/', function (err, rsp) {
+qnode.discoverReq('temperature/', function (err, rsp) {
     console.log(rsp);   // { status: 205, data: {
                         //                    attrs: { pmin: 10, pmax: 600, gt: 45 },
                         //                    resrcList: {
@@ -737,7 +740,8 @@ Invoke an excutable Resource on the Client Device.
 2. `args` (_Array_): The arguments to the procedure.
 3. `callback` (_Function_): `function (err, rsp) { }`
     `err` (_Object_): error object
-    `rsp` (_Object_): The response is an object that has the status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back. Regarding the `data`, it depends on the implementation at Client-side.
+    `rsp` (_Object_): The response is an object that has the status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back. Regarding the `data`, it depends on the implementation at Client-side.  
+
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
     | `status` | Number  | Status code of the response. See [Status Code](#).                      |
@@ -775,12 +779,12 @@ qnode.execReq('button/0/blink', [ 'up', 20 ] ,function (err, rsp) {
 });
 
 // Resource not found
-qnode.execReq('tempSensor/0/noSuchResource', function (err, rsp) {
+qnode.execReq('temperature/0/noSuchResource', function (err, rsp) {
     console.log(rsp);   // { status: 404 }
 });
 
 // invoke an unexecutable Resource
-qnode.execReq('tempSensor/0/sensedValue', function (err, rsp) {
+qnode.execReq('temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: 405 }
 });
 ```
@@ -809,22 +813,22 @@ Start observing a Resource on the Client Device.
     
 ```js
 // observation starts successfully
-qnode.observeReq('tempSensor/0/sensedValue', function (err, rsp) {
+qnode.observeReq('temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: 205 }
 });
 
 // An Object is not allowed for observation
-qnode.observeReq('tempSensor/', function (err, rsp) {
+qnode.observeReq('temperature/', function (err, rsp) {
     console.log(rsp);   // { status: 400 }
 });
 
 // target is not allowed for observation
-qnode.observeReq('tempSensor/0', function (err, rsp) {
+qnode.observeReq('temperature/0', function (err, rsp) {
     console.log(rsp);   // { status: 405 }
 });
 
 // target not found
-qnode.observeReq('tempSensor/0/noSuchResource', function (err, rsp) {
+qnode.observeReq('temperature/0/noSuchResource', function (err, rsp) {
     console.log(rsp);   // { status: 404 }
 });
 ```
@@ -866,7 +870,7 @@ console.log(qnode.dump());
     lifetime: 12345,
     version: '',
     joinTime: xxxx,
-    tempSensor: {
+    temperature: {
         0: {
             sensedValue: 18,
             appType: 'home'
@@ -876,7 +880,7 @@ console.log(qnode.dump());
             appType: 'fireplace'
         }
     },
-    humidSensor: {
+    humidity: {
         0: {
             sensedValue: 26,
             appType: 'home'
