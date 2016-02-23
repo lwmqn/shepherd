@@ -56,10 +56,15 @@ shepherd.on('notify_update', function (msg) {
     console.log(msg);
 
     var n = shepherd.find(msg.clientId);
-    n.pingReq(function (err, rsp) {
-        console.log('>>>>>>>>>> PINING');
-        console.log(rsp);
-    });
+    setTimeout(function () {
+        n.pingReq(function (err, rsp) {
+            console.log('>>>>>>>>>> PINING');
+            if (err)
+                console.log(err);
+            console.log(rsp);
+        });
+    }, 3000);
+
 
 });
 
@@ -68,6 +73,11 @@ shepherd.on('notify_update', function (msg) {
 //     console.log(msg);
 
 // });
+shepherd.on('IND:STATUS_CHANGED', function (c, s) {
+    console.log('IND:STATUS_CHANGED');
+    console.log(c);
+    console.log(s);
+});
 
 shepherd.on('registered', function (node) {
     console.log('REGISTERED');
