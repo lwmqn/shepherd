@@ -19,7 +19,7 @@
   "homepage": "https://github.com/simenkid/mqtt-shepherd",
   "dependencies": {
     "enum": "^2.2.0",
-    "lodash": "^3.10.1",
+    "lodash": "^4.5.1",
     "lwm2m-id": "^1.2.2",
     "lwmqn-util": "0.0.5",
     "moment": "^2.10.6",

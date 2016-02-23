@@ -22,6 +22,12 @@ shepherd.start(function (err, res) {
 shepherd.on('ready', function () {
     console.log('shepherd ready');
     //console.log(shepherd);
+    shepherd.on('priphDisconnected', function (c) {
+        console.log('some one disconnected');
+        console.log(c.id);
+        var n = shepherd.find(c.id);
+        console.log(n.status);
+    });
 });
 
 shepherd.on('updated', function (diff) {
