@@ -55,6 +55,12 @@ shepherd.on('notify_update', function (msg) {
     // console.log(tdf);
     console.log(msg);
 
+    var n = shepherd.find(msg.clientId);
+    n.pingReq(function (err, rsp) {
+        console.log('>>>>>>>>>> PINING');
+        console.log(rsp);
+    });
+
 });
 
 // shepherd.on('notify', function (msg) {
