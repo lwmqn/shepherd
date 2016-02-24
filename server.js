@@ -25,8 +25,8 @@ shepherd.on('ready', function () {
     shepherd.on('priphDisconnected', function (c) {
         console.log('some one disconnected');
         console.log(c.id);
-        var n = shepherd.find(c.id);
-        console.log(n.status);
+        // var n = shepherd.find(c.id);
+        // console.log(n.status);
     });
 });
 
