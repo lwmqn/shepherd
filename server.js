@@ -33,7 +33,7 @@ shepherd.on('ready', function () {
     });
 });
 
-shepherd.on('updated', function (diff) {
+shepherd.on('updated', function (qnode, diff) {
     console.log(diff);
 });
 
@@ -42,7 +42,12 @@ shepherd.on('error', function (err) {
 });
 
 var t = 0;
-shepherd.on('notify_update', function (msg) {
+shepherd.on('changed', function (msg) {
+    console.log('>>>>>>>>>> CHANGED');
+    console.log(msg);
+});
+
+shepherd.on('ind:notified', function (qnode, msg) {
     // preUnix = nowUnix;
     // nowUnix = moment().unix();
 
@@ -67,11 +72,12 @@ shepherd.on('notify_update', function (msg) {
     //         console.log(rsp);
     //     });
     // }, 3000);
-    shepherd.devListMaintain(function (err, r) {
-        console.log('########## maintain ########');
-        console.log(err);
-        console.log(r);
-    });
+
+    // shepherd.devListMaintain(function (err, r) {
+    //     console.log('########## maintain ########');
+    //     console.log(err);
+    //     console.log(r);
+    // });
 
 
 });
@@ -81,14 +87,20 @@ shepherd.on('notify_update', function (msg) {
 //     console.log(msg);
 
 // });
-shepherd.on('IND:STATUS_CHANGED', function (c, s) {
-    console.log('IND:STATUS_CHANGED');
-    console.log(c);
-    console.log(s);
+shepherd.on('ind:status', function (qnode, status) {
+    console.log('ind:status');
+    console.log(qnode.status);
+    console.log(status);
 });
 
-shepherd.on('registered', function (node) {
-    console.log('REGISTERED');
+// shepherd.on('message', function (topic, message) {
+//     console.log('>>>>>> ALL MESSAGES <<<<<<<<');
+//     console.log(topic);
+//     console.log(message);
+// });
+
+shepherd.on('ind:incoming', function (node) {
+    console.log('NODE INCOMING');
     console.log(node.clientId);
     console.log(node.status);
 
