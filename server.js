@@ -21,6 +21,9 @@ shepherd.start(function (err, res) {
 
 shepherd.on('ready', function () {
     console.log('shepherd ready');
+    setTimeout(function () {
+            shepherd.permitJoin(5);
+    }, 10000);
     //console.log(shepherd);
     shepherd.on('priphDisconnected', function (c) {
         console.log('some one disconnected');
