@@ -22,7 +22,7 @@ shepherd.start(function (err, res) {
 shepherd.on('ready', function () {
     console.log('shepherd ready');
     setTimeout(function () {
-            shepherd.permitJoin(5);
+        shepherd.permitJoin(5);
     }, 10000);
     //console.log(shepherd);
     shepherd.on('priphDisconnected', function (c) {
@@ -59,14 +59,19 @@ shepherd.on('notify_update', function (msg) {
     console.log(msg);
 
     var n = shepherd.find(msg.clientId);
-    setTimeout(function () {
-        n.pingReq(function (err, rsp) {
-            console.log('>>>>>>>>>> PINING');
-            if (err)
-                console.log(err);
-            console.log(rsp);
-        });
-    }, 3000);
+    // setTimeout(function () {
+    //     n.pingReq(function (err, rsp) {
+    //         console.log('>>>>>>>>>> PINING');
+    //         if (err)
+    //             console.log(err);
+    //         console.log(rsp);
+    //     });
+    // }, 3000);
+    shepherd.devListMaintain(function (err, r) {
+        console.log('########## maintain ########');
+        console.log(err);
+        console.log(r);
+    });
 
 
 });
