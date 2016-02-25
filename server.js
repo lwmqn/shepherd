@@ -1,10 +1,37 @@
 var util = require('util'),
+    crypto = require('crypto'),
     moment = require('moment'),
     Shepherd = require('./index');
 
 var shepherd = new Shepherd('my_shepherd');
 var preUnix = null,
     nowUnix = null;
+
+shepherd.encrypt = function (msg, clientId) {         // Overide at will
+    console.log('ENCRYPTION: His Client Id ' + clientId);
+    var msgBuf = new Buffer(msg),
+        cipher = crypto.createCipher('aes128', 'mypassword'),
+        encrypted = cipher.update(msgBuf, 'binary', 'base64');
+
+    encrypted += cipher.final('base64');
+    return encrypted;
+};
+
+shepherd.decrypt = function (msg, clientId) {         // Overide at will
+    console.log('DECRYPTION: His Client Id ' + clientId);
+    msg = msg.toString();
+    var decipher = crypto.createDecipher('aes128', 'mypassword'),
+        decrypted = decipher.update(msg, 'base64', 'utf8');
+
+    try {
+        decrypted += decipher.final('utf8');
+    } catch (e) {
+        // log 'decrytion fails'
+        console.log('decrytion fails.');
+        return msg;
+    }
+    return decrypted;
+};
 
 function runtest(cb, delay, rp) {
     setTimeout(function () {
