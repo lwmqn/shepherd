@@ -7,8 +7,7 @@ var shepherd = new Shepherd('my_shepherd');
 var preUnix = null,
     nowUnix = null;
 
-shepherd.encrypt = function (msg, clientId) {         // Overide at will
-    console.log('ENCRYPTION: His Client Id ' + clientId);
+shepherd.encrypt = function (msg, clientId) {
     var msgBuf = new Buffer(msg),
         cipher = crypto.createCipher('aes128', 'mypassword'),
         encrypted = cipher.update(msgBuf, 'binary', 'base64');
@@ -17,8 +16,7 @@ shepherd.encrypt = function (msg, clientId) {         // Overide at will
     return encrypted;
 };
 
-shepherd.decrypt = function (msg, clientId) {         // Overide at will
-    console.log('DECRYPTION: His Client Id ' + clientId);
+shepherd.decrypt = function (msg, clientId) {
     msg = msg.toString();
     var decipher = crypto.createDecipher('aes128', 'mypassword'),
         decrypted = decipher.update(msg, 'base64', 'utf8');
@@ -49,8 +47,8 @@ shepherd.start(function (err, res) {
 shepherd.on('ready', function () {
     console.log('shepherd ready');
     setTimeout(function () {
-        shepherd.permitJoin(5);
-    }, 10000);
+        shepherd.permitJoin(20);
+    }, 2000);
     //console.log(shepherd);
     shepherd.on('priphDisconnected', function (c) {
         console.log('some one disconnected');
@@ -91,6 +89,7 @@ shepherd.on('ind:notified', function (qnode, msg) {
     console.log(msg);
 
     var n = shepherd.find(msg.clientId);
+    // console.log(n.dump());
     // setTimeout(function () {
     //     n.pingReq(function (err, rsp) {
     //         console.log('>>>>>>>>>> PINING');
@@ -362,8 +361,10 @@ shepherd.on('ind:incoming', function (node) {
                 console.log(rsp);
             });
         });
-
-
     }, 2000);
 
+
+    // setInterval(function () {
+    //     shepherd.announce('Hello World!');
+    // }, 6000);
 });
