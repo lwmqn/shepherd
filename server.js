@@ -132,7 +132,7 @@ shepherd.on('ind:incoming', function (node) {
 
     // read test - resource
     // runtest(function () {
-    //     node.readReq('/tempSensor/0/sensorValue', function (err, rsp) {
+    //     node.readReq('/temperature/0/sensorValue', function (err, rsp) {
     //         console.log('>>>>> read test');
     //         console.log(rsp);
     //     });
@@ -165,6 +165,8 @@ shepherd.on('ind:incoming', function (node) {
     //         console.log(rsp);
     //     });
     // }, 5000, 2000);
+    // [TODO] >>>>>>>>>> CHANGED    dont know who changed?
+    // { clientId: 'test_node_01', data: { sensorValue: 71 } }
 
     // // read test - object
     // runtest(function () {
@@ -173,6 +175,8 @@ shepherd.on('ind:incoming', function (node) {
     //         console.log(rsp);
     //     });
     // }, 5000, 2000);
+    // [TODO] >>>>>>>>>> CHANGED    changed thing is not detected????
+    // { clientId: 'test_node_01', data: { '0': {} } }
 
     // // read test - root
     // runtest(function () {
@@ -182,7 +186,7 @@ shepherd.on('ind:incoming', function (node) {
     //     });
     // }, 5000, 2000);
 
-    // // exec test - resource
+    // exec test - resource
     // runtest(function () {
     //     node.executeReq('/3303/0/some1', 'simen', function (err, rsp) {
     //         console.log('>>>>> exec resource test');
@@ -273,9 +277,9 @@ shepherd.on('ind:incoming', function (node) {
 
     // // disover test
     // runtest(function () {
-    //     node.discoverReq('/3', function (err, rsp) {
+    //     node.discoverReq('/3/0', function (err, rsp) {
     //         console.log('>>>>> discover test');
-    //         console.log(rsp.data.resrcList);
+    //         console.log(rsp);
     //     });
     // }, 2000, 2000);
 
@@ -342,26 +346,26 @@ shepherd.on('ind:incoming', function (node) {
     // }, 2000);
 
     // observe test - lt, gt, step rules
-    runtest(function () {
-        var attrs = {
-            pmin: 1,
-            pmax: 30,
-            gt: 20,
-            lt: 80,
-            step: 20
-        };
+    // runtest(function () {
+    //     var attrs = {
+    //         pmin: 1,
+    //         pmax: 30,
+    //         gt: 20,
+    //         lt: 80,
+    //         step: 20
+    //     };
 
-        node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
-            console.log('>>>>> writeAttrs test');
-            console.log(rsp);
+    //     node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
+    //         console.log('>>>>> writeAttrs test');
+    //         console.log(rsp);
 
-            node.observeReq('/3303/0/sensorValue', function (err, rsp) {
-                console.log('>>>>> observe test');
-                console.log(err);
-                console.log(rsp);
-            });
-        });
-    }, 2000);
+    //         node.observeReq('/3303/0/sensorValue', function (err, rsp) {
+    //             console.log('>>>>> observe test');
+    //             console.log(err);
+    //             console.log(rsp);
+    //         });
+    //     });
+    // }, 2000);
 
 
     // setInterval(function () {
