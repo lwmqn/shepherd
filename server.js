@@ -301,7 +301,7 @@ shepherd.on('ind:incoming', function (node) {
     //     var attrs = {
     //         pmin: 50,
     //         pmax: 600,
-    //         step: 10,
+    //         stp: 10,
     //     };
     //     node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
     //         console.log('>>>>> writeAttrs test');
@@ -316,34 +316,34 @@ shepherd.on('ind:incoming', function (node) {
     // }, 2000, 2000);
 
     // // observe test
-    // runtest(function () {
-    //     var attrs = {
-    //         pmin: 3,
-    //         pmax: 6,
-    //         // step: 10,
-    //     };
+    runtest(function () {
+        var attrs = {
+            pmin: 3,
+            pmax: 6,
+            // stp: 10,
+        };
 
-    //     // node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
-    //     //     console.log('>>>>> discover');
-    //     //     console.log(rsp);
-    //     // });
-    //     node.writeAttrsReq('/3303/0/', attrs , function (err, rsp) {
-    //         console.log('>>>>> writeAttrs test');
-    //         console.log(rsp);
+        // node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
+        //     console.log('>>>>> discover');
+        //     console.log(rsp);
+        // });
+        node.writeAttrsReq('/3303', attrs , function (err, rsp) {
+            console.log('>>>>> writeAttrs test');
+            console.log(rsp);
 
-    //         node.observeReq('/', function (err, rsp) {
-    //             console.log('>>>>> observe test');
-    //             console.log(err);
-    //             console.log(rsp);
-    //                     node.discoverReq('/3303/0/', function (err, rsp) {
-    //                         console.log('>>>>> discover');
-    //                         console.log(rsp);
-    //                     });
-    //         });
-    //     });
+            node.observeReq('/3303', function (err, rsp) {
+                console.log('>>>>> observe test');
+                console.log(err);
+                console.log(rsp);
+                        node.discoverReq('/3303', function (err, rsp) {
+                            console.log('>>>>> discover');
+                            console.log(rsp);
+                        });
+            });
+        });
 
 
-    // }, 2000);
+    }, 2000);
 
     // observe test - lt, gt, step rules
     // runtest(function () {
@@ -352,7 +352,7 @@ shepherd.on('ind:incoming', function (node) {
     //         pmax: 30,
     //         gt: 20,
     //         lt: 80,
-    //         step: 20
+    //         stp: 20
     //     };
 
     //     node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
