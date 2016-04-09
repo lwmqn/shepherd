@@ -187,12 +187,12 @@ shepherd.on('ind:incoming', function (node) {
     // }, 5000, 2000);
 
     // exec test - resource
-    // runtest(function () {
-    //     node.executeReq('/3303/0/some1', 'simen', function (err, rsp) {
-    //         console.log('>>>>> exec resource test');
-    //         console.log(rsp);
-    //     });
-    // }, 5000, 2000);
+    runtest(function () {
+        node.executeReq('/3303/0/some1', 'simen', function (err, rsp) {
+            console.log('>>>>> exec resource test');
+            console.log(rsp);
+        });
+    }, 5000, 2000);
 
     // // exec test - resource not found
     // runtest(function () {
