@@ -8,8 +8,10 @@ mqtt-shepherd
 3. [Installation](#Installation)  
 4. [Basic Usage](#Basic)  
 5. [APIs and Events](#APIs)  
+    * MqttShepherd Class
+    * MqttNode Class
 6. [Message Encryption](#Encryption)  
-7. [Auth Policy](#Auth)  
+7. [Auth Policies](#Auth)  
 8. [Example with websocket](#example)  
 
 <a name="Overiew"></a>
@@ -87,7 +89,7 @@ qserver.start(function (err) {  // start the sever
 ```
   
 <a name="APIs"></a>
-## 5. APIs
+## 5. APIs and Events  
   
 This moudle provides you with MqttShepherd and MqttNode classes.  
 
@@ -118,6 +120,8 @@ This moudle provides you with MqttShepherd and MqttNode classes.
     * [(join time)qnode.dump()](#API_dump)  
     
 *************************************************
+
+<br />
 
 ## MqttShepherd Class
 Exposed by `require('mqtt-shepherd')`  
@@ -864,15 +868,15 @@ Dump the record of the Client Device.
   
 * (_Object_): A data object of qnode record.
 
-| Property     | Type    | Description                          |
-|--------------|---------|--------------------------------------|
-|  clientId    | String  | Client id of the device              |
-|  ip          | String  | Ip address of the server             |
-|  mac         | String  | Mac address                          |
-|  lifetime    | Number  | Lifetime of the device               |
-|  version     | String  | LWMQN version                        |
-|  joinTime    | Number  | Unix Time (secs)                     |
-|  oid    | String \| Number  | Object Instances                  |
+| Property         | Type    | Description                          |
+|------------------|---------|--------------------------------------|
+|  clientId        | String  | Client id of the device              |
+|  ip              | String  | Ip address of the server             |
+|  mac             | String  | Mac address                          |
+|  lifetime        | Number  | Lifetime of the device               |
+|  version         | String  | LWMQN version                        |
+|  joinTime        | Number  | Unix Time (secs)                     |
+|  _oid_ (depends) | Object  | IPSO Object(s)                       |
 
 
 **Examples:**  
@@ -888,17 +892,17 @@ console.log(qnode.dump());
     lifetime: 12345,
     version: '',
     joinTime: xxxx,
-    temperature: {
-        0: {
-            sensedValue: 18,
-            appType: 'home'
+    temperature: {              // oid == 'temperature'
+        0: {                    //   iid = 0
+            sensedValue: 18,    //     rid = 'sensedValue', its value is 18
+            appType: 'home'     //     rid = 'appType', its value is 'home'
         },
         1: {
             sensedValue: 37,
             appType: 'fireplace'
         }
     },
-    humidity: {
+    humidity: {                 // oid == 'humidity'
         0: {
             sensedValue: 26,
             appType: 'home'
@@ -914,8 +918,88 @@ console.log(qnode.dump());
 <a name="Encryption"></a>
 ## 6. Message Encryption
 
-By default, the Sever won't encrypt the message. You can override the encrypt() and decrypt() methods to create your own encryption and decryption. You should implement the methods of encrypt() and decrypt() at the Client Device as well.
+By default, the Server won't encrypt the message. You can override the encrypt() and decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your Client Devices as well.  
+
+* [qserver.encrypt(msg, clientId, callback)](#method_encrypt)
+    - `msg` is a string or a buffer.  
+    - `clientId` is the Client that this message going to.  
+    - `callback(err, encrypted)` is the callback you should call and pass the encrypted message to it after encryption.  
+
+* [qserver.decrypt(msg, clientId)](#method_decrypt)
+    - `msg` is a received buffer.  
+    - `clientId` is the Client that this message coming from.  
+    - `callback(err, decrypted)` is the callback you should call and pass the decrypted message to it after decryption.  
+
+**Examples:**  
+
+```js
+var qserver = new MqttShepherd('my_iot_server');
+
+// In this example, I simply encrypt the message with a constant password 'mysecrete'
+// You may like to get the password according to different Clients by `clientId`
+
+qserver.encrypt = function (msg, clientId, callback) {
+    var msgBuf = new Buffer(msg),
+        cipher = crypto.createCipher('aes128', 'mysecrete'),
+        encrypted = cipher.update(msgBuf, 'binary', 'base64');
+
+    try {
+        encrypted += cipher.final('base64');
+        callback(null, encrypted);
+    } catch (e) {
+        callback(e);
+    }
+};
+
+qserver.decrypt = function (msg, clientId, callback) {
+    msg = msg.toString();
+    var decipher = crypto.createDecipher('aes128', 'mysecrete'),
+        decrypted = decipher.update(msg, 'base64', 'utf8');
+
+    try {
+        decrypted += decipher.final('utf8');
+        callback(null, decrypted);
+    } catch (e) {
+        callback(e);
+    }
+};
+```
+
+***********************************************
+<br />
+
+<a name="Auth"></a>
+## 7. Authentication and Authorization Policies
+
+[TBD]  
+
+* [qserver.authPolicy.authenticate(client, user, pass, cb)](#method_encrypt)
+    - `client` is a string or a buffer.  
+    - `user` is the Client that this message going to.  
+    - `pass` is the Client that this message going to.  
+    - `cb(err, authorized)` is the callback you should call and pass the encrypted message to it after encryption.  
+
+* [qserver.authPolicy.authorizePublish(client, topic, payload, cb)](#method_decrypt)
+    - `client` is a string or a buffer.  
+    - `topic` is the Client that this message going to.  
+    - `payload` is the Client that this message going to.  
+    - `cb(err, authorized)` is the callback you should call and pass the encrypted message to it after encryption.  
+
+* [qserver.authPolicy.authorizeSubscribe(client, topic, cb)](#method_decrypt)
+    - `client` is a string or a buffer.  
+    - `topic` is the Client that this message going to.  
+    - `cb(err, authorized)` is the callback you should call and pass the encrypted message to it after encryption.  
+
+* [qserver.authPolicy.authorizeForward(client, packet, cb)](#method_decrypt)
+    - `client` is a string or a buffer.  
+    - `packet` is the Client that this message going to.  
+    - `cb(err, authorized)` is the callback you should call and pass the encrypted message to it after encryption.  
 
 
-* [server.encrypt()](#method_encrypt)
-* [sever.decrypt()](#method_decrypt)
+***********************************************
+<br />
+
+<a name="example"></a>
+## 8. Example with websocket
+
+[TBD] Demonstrate how to build GUI using socket.io
