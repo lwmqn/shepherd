@@ -111,13 +111,13 @@ This moudle provides you with MqttShepherd and MqttNode classes.
     * Events: [ready](#EVT_ready), [error](#EVT_error), [ind](#EVT_ind), and [message](#EVT_message)  
 
 * MqttNode APIs (`qnode` denotes the instance of this class)  
-    * [(ok) qnode.read()](#API_readReq)  
-    * [(OK) qnode.write()](#API_writeReq)  
-    * [(OK) qnode.writeAttrs()](#API_writeAttrsReq)  
-    * [(resrcList) qnode.discover()](#API_discoverReq)  
-    * [(ok) qnode.execute()](#API_executeReq)  
-    * [(ok) qnode.observe()](#API_observeReq)  
-    * [(join time)qnode.dump()](#API_dump)  
+    * [qnode.read()](#API_readReq)  
+    * [qnode.write()](#API_writeReq)  
+    * [qnode.writeAttrs()](#API_writeAttrsReq)  
+    * [qnode.discover()](#API_discoverReq)  
+    * [qnode.execute()](#API_executeReq)  
+    * [qnode.observe()](#API_observeReq)  
+    * [qnode.dump()](#API_dump)  
     
 *************************************************
 
@@ -600,6 +600,7 @@ qnode.readReq('/noSuchObject/0/foo', function (err, rsp) {
     console.log(rsp);       // { status: 404, data: undefined }
 });
 
+// Target not found
 qnode.readReq('/temperature/0/noSuchResource/', function (err, rsp) {
     console.log(rsp);       // { status: 404, data: undefined }
 });
@@ -652,7 +653,7 @@ qnode.writeReq('digitalInput/1/dInState', 1, function (err, rsp) {
 
 <a name="API_writeAttrsReq"></a>
 ### qnode.writeAttrsReq(path, attrs[, callback])
-Configure the parameters of the report settings upon a Resource, an Object Instance, or an Object. This method can also used to cancel the observation by assgin the `cancel` property to `true` within `attrs` object.  
+Configure the report settings of a Resource, an Object Instance, or an Object. This method can also used to cancel the observation by assgin the `cancel` property to `true` within `attrs` object.  
     
 **Note**: This API won't start the report of notifications, call observe() method if you want to turn on reporting.  
 
@@ -712,7 +713,7 @@ qnode.writeAttributes('temperature/0/noSuchResource', {
 
 <a name="API_discoverReq"></a>
 ### qnode.discoverReq(path, callback)
-Discover report settings of a Resource or, an Object Instance ,or an Object on the Client Device.
+Discover report settings of a Resource or, an Object Instance ,or an Object on the Client Device.  
 
 **Arguments:**  
 
@@ -756,13 +757,13 @@ qnode.discoverReq('temperature/', function (err, rsp) {
 ***********************************************
 <a name="API_executeReq"></a>
 ### qnode.executeReq(path[, args][, callback])
-Invoke an excutable Resource on the Client Device.
+Invoke an excutable Resource on the Client Device.  
 
 **Arguments:**  
 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
 2. `args` (_Array_): The arguments to the procedure.  
-3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back. Regarding the `data`, its type depends on the implementation at Client-side.  
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back. The `data` type depends on the implementation at Client-side.  
 
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
@@ -876,8 +877,8 @@ Dump the record of the Client Device.
 |  lifetime        | Number  | Lifetime of the device               |
 |  version         | String  | LWMQN version                        |
 |  joinTime        | Number  | Unix Time (secs)                     |
-|  _oid_ (depends) | Object  | IPSO Object(s)                       |
-
+|  objList         | Object  | Resource ids of each Object          |
+|  so              | Object  | Contains IPSO Object(s)              |
 
 **Examples:**  
     
@@ -887,25 +888,61 @@ console.log(qnode.dump());
 /* 
 {
     clientId: 'foo_id',
-    ip: 'xxx',
-    mac: 'xxx',
-    lifetime: 12345,
-    version: '',
-    joinTime: xxxx,
-    temperature: {              // oid == 'temperature'
-        0: {                    //   iid = 0
-            sensedValue: 18,    //     rid = 'sensedValue', its value is 18
-            appType: 'home'     //     rid = 'appType', its value is 'home'
-        },
-        1: {
-            sensedValue: 37,
-            appType: 'fireplace'
-        }
+    ip: '192.168.1.114',
+    mac: '9e:65:f9:0b:24:b8',
+    lifetime: 86400,
+    version: 'v0.0.1',
+    joinTime: 1460448761,
+    objList: {
+        '1': [ 0 ],
+        '3': [ 0 ],
+        '4': [ 0 ],
+        '3303': [ 0, 1 ],
+        '3304': [ 0 ]
     },
-    humidity: {                 // oid == 'humidity'
-        0: {
-            sensedValue: 26,
-            appType: 'home'
+    so: {
+        lwm2mServer: {  // oid is 'lwm2mServer' (1)
+            '0': {
+                shortServerId: null,
+                lifetime: 86400,
+                defaultMinPeriod: 1,
+                defaultMaxPeriod: 60,
+                regUpdateTrigger: '_unreadable_'
+            }
+        },
+        device: {       // oid is 'device' (3)
+            '0': {
+                manuf: 'LWMQN_Project',
+                model: 'dragonball',
+                reboot: '_unreadable_',
+                availPwrSrc: 0,
+                pwrSrcVoltage: 5,
+                devType: 'Env Monitor',
+                hwVer: 'v0.0.1',
+                swVer: 'v0.2.1'
+            }
+        },
+        connMonitor: {  // oid is 'connMonitor' (4)
+            '0': {
+                ip: '192.168.1.114',
+                routeIp: ''
+            }
+        },
+        temperature: {              // oid is 'temperature' (3303)
+            0: {                    //   iid = 0
+                sensedValue: 18,    //     rid = 'sensedValue', its value is 18
+                appType: 'home'     //     rid = 'appType', its value is 'home'
+            },
+            1: {
+                sensedValue: 37,
+                appType: 'fireplace'
+            }
+        },
+        humidity: {                 // oid is 'humidity' (3304)
+            0: {
+                sensedValue: 26,
+                appType: 'home'
+            }
         }
     }
 }
@@ -913,6 +950,7 @@ console.log(qnode.dump());
 ```
 
 ***********************************************
+
 <br />
 
 <a name="Encryption"></a>

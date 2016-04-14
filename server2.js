@@ -73,6 +73,8 @@ shepherd.on('ind:notified', function (qnode, msg) {
 
     }
     var n = shepherd.find(msg.clientId);
+    console.log('---------------------');
+    console.log(n.dump().so);
 
 });
 
