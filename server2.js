@@ -42,14 +42,36 @@ shepherd.on('error', function (err) {
 
 var t = 0;
 shepherd.on('ind:changed', function (msg) {
-    console.log('>>>>>>>>>> CHANGED');
-    console.log(msg);
+    // console.log('>>>>>>>>>> CHANGED');
+    // console.log(msg);
 });
 
+var far = true;
 shepherd.on('ind:notified', function (qnode, msg) {
-    console.log('>>>>>>>>>> NOTIFIED');
-    console.log(msg);
+    // console.log('>>>>>>>>>> NOTIFIED');
+    // console.log(msg);
+    var thisfar = true;
+    if (msg.iid === 0 && msg.rid == 'sensorValue') {
+        console.log('**** Resistor Varies');
+        console.log('**** Measured: ' + msg.data);
+    } else if (msg.iid === 1 && msg.rid == 'sensorValue') {
+        //console.log('**** Proximity Sensed');
+        if (msg.data > 600) {
+            thisfar = false;
+        } else if (msg.data < 200) {
+            thisfar = true;
+        }
 
+        if (thisfar !== far) {
+            if (thisfar)
+                console.log('Something going away');
+            else
+                console.log('Something coming closer');
+
+            far = thisfar;
+        }
+
+    }
     var n = shepherd.find(msg.clientId);
 
 });
@@ -66,15 +88,15 @@ shepherd.on('ind:incoming', function (node) {
     console.log(node.status);
 
     // read test - resource
-    runtest(function () {
-        node.readReq('/generic/0/sensorValue', function (err, rsp) {
-            console.log('>>>>> read test');
-            if (err)
-                console.log(err);
+    // runtest(function () {
+    //     node.readReq('/generic/1/sensorValue', function (err, rsp) {
+    //         console.log('>>>>> read test');
+    //         if (err)
+    //             console.log(err);
 
-            console.log(rsp);
-        });
-    }, 5000, 2000);
+    //         console.log(rsp);
+    //     });
+    // }, 5000, 2000);
 
     // observe test - lt, gt, step rules
     runtest(function () {
@@ -82,7 +104,7 @@ shepherd.on('ind:incoming', function (node) {
             pmin: 5,
             pmax: 100,
             gt: 800,
-            lt: 100,
+            lt: 200,
             stp: 60
         };
 
@@ -97,6 +119,19 @@ shepherd.on('ind:incoming', function (node) {
                 console.log(rsp);
             });
         });
+
+        node.writeAttrsReq('/generic/1/sensorValue', attrs , function (err, rsp) {
+            console.log('>>>>> writeAttrs test');
+            console.log(err);
+            console.log(rsp);
+
+            node.observeReq('/generic/1/sensorValue', function (err, rsp) {
+                console.log('>>>>> observe test');
+                console.log(err);
+                console.log(rsp);
+            });
+        });
+
     }, 2000);
 
 
