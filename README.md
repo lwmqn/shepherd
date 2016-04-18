@@ -33,7 +33,7 @@ qnode.readReq('3304/0/5700', function (err, rsp) {
 });
 ```
   
-The goal of **mqtt-shepherd** is to let you build and manage an MQTT machine network with less efforts, it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, device authentication, reading, writing and observing resources on a remote device, remotely executing a procedure on the Device. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.  
+The goal of **mqtt-shepherd** is to let you build and manage an MQTT machine network with less efforts, it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, device authentication, reading, writing and observing resources, executing a procedure on the remote Devices. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.  
   
 **Note**: This project is planning to provide a web-client library for front-end users in the near future.  
 
@@ -91,11 +91,11 @@ qserver.start(function (err) {  // start the sever
 <a name="APIs"></a>
 ## 5. APIs and Events  
   
-This moudle provides you with MqttShepherd and MqttNode classes.  
+This moudle provides you with **MqttShepherd** and **MqttNode** classes.  
 
 * The MqttShepherd class brings you a LWMQN Server with network managing facilities, i.e., start/stop the Server, permit device joining, find an joined node. This document uses `qserver` to denote the instance of this Server class.  
 
-* The MqttNode is the class for creating a software endpoint which represents the remote Client Device at server-side. This document uses `qnode` to denote the instance of this Client class. You can invoke methods on a `qnode` to operate the remote Device.  
+* The MqttNode is the class for creating a software endpoint which represents the remote Client Device at server-side. This document uses `qnode` to denote the instance of this class. You can invoke methods on a `qnode` to operate the remote Device.  
 
 * MqttShepherd APIs  
     * [new MqttShepherd()](#API_MqttShepherd)  
@@ -137,7 +137,7 @@ Create a new instance of the `MqttShepherd` class.
 **Arguments:**  
 
 1. `name` (_String_): Your server name. A default name `'mqtt_shepherd'` will be used if not given.  
-2. `settings` (_Object_): Settings for the Mosca MQTT broker. If not given, the default settings will be applied, i.e. port 1883 for the broker, LevelUp for presistence. You can set up your backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. Please refer to the [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage) for details.  
+2. `settings` (_Object_): Settings for the Mosca MQTT broker. If not given, the default settings will be applied, i.e. port 1883 for the broker, LevelUp for presistence. You can set up your own backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. Please refer to the [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage) for details.  
     
 **Returns:**  
   
@@ -192,8 +192,9 @@ Start the qserver.
 **Examples:**  
     
 ```js
-qserver.start(function () {
-    console.log('server initialized.');
+qserver.start(function (err) {
+    if (!err)
+        console.log('server initialized.');
 });
 ```
 
@@ -215,8 +216,9 @@ Stop the qserver.
 **Examples:**  
     
 ```js
-qserver.stop(function () {
-    console.log('server stopped.');
+qserver.stop(function (err) {
+    if (!err)
+        console.log('server stopped.');
 });
 ```
 
@@ -224,7 +226,7 @@ qserver.stop(function () {
 
 <a name="API_permitJoin"></a>
 ### .permitJoin(time)
-Open for devices to join the network.  
+Allow or disallow devices to join the network.  [TBD] a event needed
 
 **Arguments:**  
 
@@ -259,11 +261,10 @@ Returns the qserver infomation.
 | name         | String  | Server name                                   |
 | enabled      | Boolean | Server is up(true) or down(false)             |
 | intf         | String  | Network interface, i.e. `'eth0'`              |
-| type         | String  | Network type, i.e. `'Wired'`                  |
 | ip           | String  | Server ip address                             |
 | mac          | String  | Server mac address                            |
-| routerIp     | String  | Router IP address                             |
-| devNum       | Number  | Number of devices joined the network          |
+| routerIp     | String  | Router ip address                             |
+| devNum       | Number  | Number of devices have joined the network     |
 | permitJoin   | Boolean | Indicates if the Server allows for joining    |
 | startTime    | Number  | Unix Time (secs)                              |
 
@@ -274,12 +275,12 @@ console.log(qserver.info());
 
 {
     name: 'my_iot_server',
+    enabled: true,
+    intf: 'eth0',
     ip: '192.168.1.99',
     mac: '00:0c:29:6b:fe:e7',
     routerIp: '192.168.1.1',
-    manuf: 'sivann',
     devNum: 36,
-    status: 'online',
     permitJoin: false,
     startTime: 1454419506
 }  
@@ -288,16 +289,15 @@ console.log(qserver.info());
 *************************************************
 <a name="API_listDevices"></a>
 ### .listDevices([clientIds])
-List all records of the registered Client Devices.  
+List records of the registered Client Devices.  
 
 **Arguments:**  
 
-1. `clientIds` (_Array_): It is an array of client ids to query. All device records will be returned if `clientIds` is not given.
-
+1. `clientIds` (_Array_): An array of client ids to query for their records. All device records will be returned if `clientIds` is not given.  
   
 **Returns:**  
   
-* (_Array_): Information of all the Client Devices. Each record in the array is an object with the properties shown in the following table. The entry in the array will be `undefined` if that Client Device is not found. 
+* (_Array_): Information of Client Devices. Each record in the array is an object with the properties shown in the following table. The entry in the array will be `undefined` if that Client Device is not found.  
 
 | Property     | Type    | Description                          |
 |--------------|---------|--------------------------------------|
@@ -315,50 +315,50 @@ List all records of the registered Client Devices.
     
 ```js
 console.log(qserver.listDevices([ 'foo_id', 'bar_id', 'no_such_id' ]));
-[
-    {
-        clientId: 'foo_id',
-        ip: 'xxx',
-        mac: 'xxx',
-        status: 'online',
-        lifetime: 12345,
-        version: '',
-        joinTime: xxxx,
-        objList: {
-            3: [ 1, 2, 3 ],
-            2205: [ 7, 5503 ]
-        }
-    },
-    {
-        clientId: 'bar_id',
-        ip: 'xxx',
-        mac: 'xxx',
-        status: 'online',
-        lifetime: 12345,
-        version: '',
-        joinTime: xxxx,
-        objList: {
-            3: [ 1, 2, 3 ],
-            2205: [ 7, 5503 ]
-        }
-    },
-    undefined
-]
+// [
+//     {
+//         clientId: 'foo_id',
+//         ip: '192.168.1.112',
+//         mac: 'd8:fe:e3:e5:9f:3b',
+//         status: 'online',
+//         lifetime: 12345,
+//         version: '',
+//         joinTime: 1454419506,
+//         objList: {
+//             3: [ 1, 2, 3 ],
+//             2205: [ 7, 5503 ]
+//         }
+//     },
+//     {
+//         clientId: 'bar_id',
+//         ip: '192.168.1.113',
+//         mac: '9c:d6:43:01:7e:c7',
+//         status: 'online',
+//         lifetime: 12345,
+//         version: '',
+//         joinTime: 1454419706,
+//         objList: {
+//             3: [ 1, 2, 3 ],
+//             2205: [ 7, 5503 ]
+//         }
+//     },
+//     undefined
+// ]
 ```
 
 *************************************************
 <a name="API_find"></a>
 ### .find(clientId)
-Find the Client Device (qnode) on the qserver.
+Find a registered client device(qnode) on qserver.  
 
 **Arguments:**  
 
-1. `clientId` (_String_): Client id of the device to find.   
+1. `clientId` (_String_): Client id of the device to find out.  
 
   
 **Returns:**  
   
-* (_Object_): qnode. Returns `undefined` if not found.
+* (_Object_): qnode. Returns `undefined` if not found.  
 
 **Examples:**  
     
@@ -366,7 +366,7 @@ Find the Client Device (qnode) on the qserver.
 var qnode = qserver.find('foo_id');
 
 if (qnode) {
-    // do what you wanna do upon the qnode, like qnode.read()
+    // do something upon the qnode, like qnode.read()
 }
 ```
 
@@ -374,7 +374,7 @@ if (qnode) {
 
 <a name="API_remove"></a>
 ### .remove(clientId[, callback])
-Deregister and remove the Client Device (qnode) from the server.
+Deregister and remove a qnode from qserver.
 
 **Arguments:**  
 
@@ -398,11 +398,11 @@ qserver.remove('foo', function (err, clientId) {
 
 <a name="API_announce"></a>
 ### .announce(msg[, callback])
-The Server can use this method to announce any message through the **announce channel**.  
+The Server can use this method to announce(/broadcast) any message to all Clients through the **announce channel**.  
 
 **Arguments:**  
 
-1. `msg` (_String_ | _Buffer_): The message to announce.  
+1. `msg` (_String_ | _Buffer_): The message to announce. Remember to stringify if the message is a data object.  
 2. `callback` (_Function_): `function (err) { ... }`. Get called after message announced.  
   
 **Returns:**  
@@ -418,12 +418,12 @@ qserver.announce('Rock on!');
 *************************************************
 <a name="API_maintain"></a>
 ### .maintain([clientIds,][callback])
-Maintains the network. This will refresh all Client Device records on qserver by rediscovering each remote device. Only the specified Client Device records will be refresh if calling with an array of`clientIds`.  
+Maintains the network. This will refresh all Client Device records on qserver by rediscovering each remote device. Only the specified Client Device records will be refresh if calling with an array of `clientIds`.  
 
 **Arguments:**  
 
-1. `clientIds` (_Array_): Client id of the devices to be refreshed.  
-2. `callback` (_Function_): `function (err, clientIds) { ... }`. Get called after the maintenance finished. The `clientIds` is an array indicates the Client Devices that are successfully refreshed. The entry will be `undefined` for a Client Device if there were something going wrong, e.g. Device not found.  
+1. `clientIds` (_Array_): Client id of the remote devices to refresh from.  
+2. `callback` (_Function_): `function (err, clientIds) { ... }`. Get called after the maintenance finished. The `clientIds` is an array to indicate the Client Devices that are successfully refreshed. The entry will be `undefined` for a Client Device if there were something going wrong, e.g. Device not found.  
 
   
 **Returns:**  
@@ -456,17 +456,17 @@ Fired when Server is ready.
 <a name="EVT_error"></a>
 ### Event: 'error'
 `function (err) { }`
-Fired when there is an error occurred.  
+Fired when there is an error occurs.  
 
 *************************************************
 
 <a name="EVT_ind"></a>
 ### Event: 'ind'
 `function (type, msg) { }`
-Fired when there is an incoming indication message. There are 5 kinds of indication `type` including `'devIncoming'`, `'devLeaving'`, `'devUpdate'`, `'devNotify'` and `'devChange'`.  
+Fired when there is an incoming indication message. There are 5 indication types including `'devIncoming'`, `'devLeaving'`, `'devUpdate'`, `'devNotify'` and `'devChange'`.  
 
 * ##### devIncoming    
-    When there is a Client Device incoming to the network, qserver will fire an `'ind'` event along with this type of indication. The Client Device can be a new registered one or an old Device signing in.  
+    When there is a Client Device incoming to the network, qserver will fire an `'ind'` event along with this type of indication. The Client Device can be either a new registered one or an old one that signs in again.  
 
     * type: `'devIncoming'`
     * msg (_Object_): a qnode
@@ -479,12 +479,11 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
     * msg (_String_): the clientId of which Device is leaving
 <br />
 
-* ##### 'devUpdate'
-    When there is a Client Device leaving the network, qserver will fire an `'ind'` event along this type of indication.  
+* ##### devUpdate
+    When there is a Client Device that publishes an update of its device attribute(s), qserver will fire an `'ind'` event along this type of indication.  
 
-    * type: `'devLeaving'`
-    * msg (_Object_): the updated device attributes, there may be fields of `status`, `lifetime`, `ip`, `version` in this object.
-<br />
+    * type: `'devUpdate'`
+    * msg (_Object_): the updated device attribute(s), there may be fields of `status`, `lifetime`, `ip`, `version` in this object.
 
         ```js
         // example
@@ -494,10 +493,13 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
         }
         ```
 
-* ##### 'devNotify'
-    msg (_Object_): the notification from the Client Device. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
-    If `rid` is _`null`_ or _`undefined`_, the `data` is an Object Instance.
-    If `rid` is valid, the `data` is an Resource and the data type depends on the Resource. 
+* ##### devNotify
+    When there is a Client Device that publishes an notification of its Object Instance or Resource, qserver will fire an `'ind'` event along this type of indication.  
+
+    * type: `'devNotify'`
+    * msg (_Object_): notification from the Client Device. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
+        - `data` is an Object Instance if `rid` is null or undefined  
+        - `data` is a Resource if `rid` is given (data type depends on the Resource)  
 
         ```js
         // example of a Resource notification
@@ -518,7 +520,9 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
         }
         ```
 
-* ##### 'devChange'
+* ##### 'devChange' [TBD]
+    When there is a Client Device that publishes an notification of its Object Instance or Resource, qserver will fire an `'ind'` event along this type of indication.  
+
     msg (_Object_): the changes of a Resource or an Object Instance on the Client Device. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
     If `rid` is _`null`_ or _`undefined`_, the `data` is an object that contains only the properties changed in an Object Instance. This can be thought of multi-Resource changes.  
     If `rid` is valid, the `data` is the new value of a Resource. If a Resource itself is an object, then `data` will be an object that contains only the properties changed in that Resource.  
@@ -550,7 +554,7 @@ Fired when there is an incoming indication message. There are 5 kinds of indicat
 <a name="EVT_message"></a>
 ### Event: 'message'
 `function(topic, message, packet) {}`  
-Emitted when the Server receives a published packet from all channels  
+Emitted when the Server receives any published packet from remote Devices  
 
 1. `topic` (_String_): topic of the received packet  
 2. `message` (_Buffer_): payload of the received packet  
@@ -569,14 +573,15 @@ This class provides you with methods to perform remote operations upon a registe
 
 <a name="API_readReq"></a>
 ### qnode.readReq(path, callback)
-Remotely read the target on Client Device. Response will be passed through the callback.  
+Remotely read the target from a Client Device. Response will be passed through the callback.  
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Object, Object Instance, or Resource on the remote Client Device.  
+1. `path` (_String_): Path of the allocated Object, Object Instance, or Resource on the remote Client Device.  
 2. `callback` (_Function_): `function (err, rsp) { }`
-    `err` (_Object_): error object
-    `rsp` (_Object_): The response is an object that has the status code along with the returned data from the remote Client Device.  
+
+    - `err` (_Object_): error object
+    - `rsp` (_Object_): The response is an object that has a status code along with the returned data from the remote Client Device.  
 
 | Property | Type    | Description                                                             |
 |----------|---------|-------------------------------------------------------------------------|
@@ -610,13 +615,14 @@ qnode.readReq('/temperature/0/noSuchResource/', function (err, rsp) {
 
 <a name="API_writeReq"></a>
 ### qnode.writeReq(path, val[, callback])
-Remotely write a value to the allocated Resource on the Client Device. The response will be passed through the callback.  
+Remotely write a value to the allocated Resource on a Client Device. The response will be passed through the callback.  
 
 **Arguments:**  
 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
 2. `val` (_Depends_): The value to write to the Resource.  
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object that has a status code along with the written data from the remote Client Device.  
+
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
     |  status  | Number  | Status code of the response. See [Status Code](#).                      |
@@ -653,14 +659,14 @@ qnode.writeReq('digitalInput/1/dInState', 1, function (err, rsp) {
 
 <a name="API_writeAttrsReq"></a>
 ### qnode.writeAttrsReq(path, attrs[, callback])
-Configure the report settings of a Resource, an Object Instance, or an Object. This method can also used to cancel the observation by assgin the `cancel` property to `true` within `attrs` object.  
+Configure the report settings of a Resource, an Object Instance, or an Object. This method can also cancel an observation by assigning the `cancel` property to `true` within `attrs` object.  
     
-**Note**: This API won't start the report of notifications, call observe() method if you want to turn on reporting.  
+**Note**: This API won't start the notifications reporting, call observe() method if you want to turn the report on.  
 
 **Arguments:**  
 
 1. `path` (_String_): Path of the allocated Resource, Object Instance, or Object on the remote Client Device.  
-2. `attrs` (_Object_): Parameters of report settings.  
+2. `attrs` (_Object_): Parameters of the report settings.  
 
     | Property | Type    | Mandatory | Description |
     |----------|---------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -669,7 +675,7 @@ Configure the report settings of a Resource, an Object Instance, or an Object. T
     | gt       | Number  | optional  | Greater Than. The Client Device should notify its value when the value is greater than this setting. Only valid for the Resource typed as a number.                                                     |
     | lt       | Number  | optional  | Less Than. The Client Device should notify its value when the value is smaller than this setting. Only valid for the Resource typed as a number.                                                        |
     | stp      | Number  | optional  | Step. The Client Device should notify its value when the change of the Resource value, since the last report happened, is greater than this setting.                                                    |
-    | cancel   | Boolean | optional  | It is set to `true` for the Client Device to cancel observation on the allocated Resource or Object Instance.                                                                                           |
+    | cancel   | Boolean | optional  | Set to `true` for a Client Device to cancel an observation on the allocated Resource or Object Instance.                                                                                           |
 
 3. `callback` (_Function_):  `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
@@ -723,7 +729,7 @@ Discover report settings of a Resource or, an Object Instance ,or an Object on t
     | Property | Type    | Description                                                                                                                          |
     |----------|---------|--------------------------------------------------------------------------------------------------------------------------------------|
     |  status  | Number  | Status code of the response. See [Status Code](#).                                                                                   |
-    |  data    | Object  | `data` is an object contains the report settings. If the discoved target is an Object, there will be an field `data.resrcList` to list all its Resource idetifiers in each Object Instance. |
+    |  data    | Object  | `data` is an object of the report settings. If the discoved target is an Object, there will be an additional field `data.resrcList` to list all its Resource idetifiers under each Object Instance. |
   
 **Returns:**  
   
@@ -757,18 +763,18 @@ qnode.discoverReq('temperature/', function (err, rsp) {
 ***********************************************
 <a name="API_executeReq"></a>
 ### qnode.executeReq(path[, args][, callback])
-Invoke an excutable Resource on the Client Device.  
+Invoke an excutable Resource on the Client Device. An excutable Resource is like a remote procedure call.  
 
 **Arguments:**  
 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
 2. `args` (_Array_): The arguments to the procedure.  
-3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back. The `data` type depends on the implementation at Client-side.  
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back, and the data type depends on the implementation at client-side.  
 
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
     |  status  | Number  | Status code of the response. See [Status Code](#).                      |
-    |  data    | Depends | What will be returned depends on the Client-side implementation.        |
+    |  data    | Depends | What will be returned depends on the client-side implementation.        |
 
   
 **Returns:**  
@@ -859,7 +865,7 @@ qnode.observeReq('temperature/0/noSuchResource', function (err, rsp) {
 
 <a name="API_dump"></a>
 ### qnode.dump()
-Dump the record of the Client Device.
+Dump record of the Client Device.
 
 **Arguments:**  
 
@@ -877,7 +883,7 @@ Dump the record of the Client Device.
 |  lifetime        | Number  | Lifetime of the device               |
 |  version         | String  | LWMQN version                        |
 |  joinTime        | Number  | Unix Time (secs)                     |
-|  objList         | Object  | Resource ids of each Object          |
+|  objList         | Object  | Resource ids of each Object Instance |
 |  so              | Object  | Contains IPSO Object(s)              |
 
 **Examples:**  
@@ -954,7 +960,7 @@ console.log(qnode.dump());
 <br />
 
 <a name="Encryption"></a>
-## 6. Message Encryption
+## 6. Message Encryption [TBD, callback back style]
 
 By default, the Server won't encrypt the message. You can override the encrypt() and decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your Client Devices as well.  
 
