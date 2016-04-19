@@ -586,7 +586,7 @@ Remotely read the target from a Client Device. Response will be passed through t
 | Property | Type    | Description                                                             |
 |----------|---------|-------------------------------------------------------------------------|
 |  status  | Number  | Status code of the response. See [Status Code](#).                      |
-|  data    | Depends | `data` can be the value of an Object, an Object Instance, or a Resource. Note that when an unreadable Resource is read, the returned value will be a string `'_unreadble_'`. |
+|  data    | Depends | `data` can be the value of an Object, an Object Instance, or a Resource. Note that when an unreadable Resource is read, the returned value will be a string `'_unreadable_'`. |
   
 
 **Returns:**  
@@ -745,18 +745,20 @@ qnode.discoverReq('temperature/0/sensedValue', function (err, rsp) {
 
 // discover an Object successfully
 qnode.discoverReq('temperature/', function (err, rsp) {
-    console.log(rsp);   // {
-                        //   status: 205,
-                        //   data: {
-                        //      pmin: 10,
-                        //      pmax: 600,
-                        //      gt: 45,
-                        //      resrcList: {
-                        //          0: [ 1, 3, 88 ],    // Instance 0 has Resources 1, 3, and 88
-                        //          1: [ 1, 2, 6 ]      // Instance 1 has Resources 1, 2, and 6
-                        //      }
-                        //   }
-                        // }
+    console.log(rsp);
+
+    // {
+    //   status: 205,
+    //   data: {
+    //      pmin: 10,
+    //      pmax: 600,
+    //      gt: 45,
+    //      resrcList: {
+    //          0: [ 1, 3, 88 ],    // Instance 0 has Resources 1, 3, and 88
+    //          1: [ 1, 2, 6 ]      // Instance 1 has Resources 1, 2, and 6
+    //      }
+    //   }
+    // }
 });
 ```
 
