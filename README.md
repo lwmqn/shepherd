@@ -12,16 +12,15 @@ mqtt-shepherd
     * MqttNode Class
 6. [Message Encryption](#Encryption)  
 7. [Auth Policies](#Auth)  
-8. [Example with websocket](#example)  
 
 <a name="Overiew"></a>
 ## 1. Overview
 
-The lightweight MQTT machine network ([**LWMQN**](https://simenkid.github.io/lwmqn)) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
+Lightweight MQTT machine network (**LWMQN**) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
 This module, **mqtt-shepherd**, is an implementation of LWMQN Server that can run on platfroms equipped with node.js.  
 
-LWMQN Client and Server benefits from the IPSO data model, which leads to a very comprehensive way for the Server to use a *path* with URI-style to allocate and query Resources on Client Devices. In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.  
+LWMQN Client and Server benefits from IPSO data model, which leads to a very comprehensive way for the Server to use a *path* with URI-style to allocate and query Resources on Client Devices. In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.  
   
 ```js
 qnode.readReq('temperature/0/sensorValue', function (err, rsp) {
@@ -33,9 +32,8 @@ qnode.readReq('3304/0/5700', function (err, rsp) {
 });
 ```
   
-The goal of **mqtt-shepherd** is to let you build and manage an MQTT machine network with less efforts, it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, device authentication, reading, writing and observing resources, executing a procedure on the remote Devices. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.  
+The goal of **mqtt-shepherd** is to let you build and manage an MQTT machine network with less efforts, it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, device authentication, reading, writing resources, observing resources, and executing a procedure on the remote Devices. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.  
   
-**Note**: This project is planning to provide a web-client library for front-end users in the near future.  
 
 #### Acronym
 * **Server**: LWMQN Server
@@ -48,12 +46,14 @@ The goal of **mqtt-shepherd** is to let you build and manage an MQTT machine net
 * **iid**: identifier of an Object Instance  
 * **rid**: indetifier of a Resource  
 
-**Note**: IPSO uses _Object_, _Object Instance_ and _Resource_ to describe the hierarchical structure of resources on a Client Device. The Server can use oid, iid, and rid to allocate resources on a Client Device.  
+**Note**: 
+* IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where oid, iid, and rid are identifiers of them respectively to allocate resources on a Client Device.  
+* An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an iid on each Object Instance to distinguish one entity from the other.  
 
 <a name="Features"></a>
 ## 2. Features
 
-* MQTT protocol
+* Communication based on MQTT protocol  
 * Based on [Mosca](https://github.com/mcollina/mosca/wiki), an MQTT broker on node.js.  
 * Hierarchical data model in Smart-Object-style (IPSO)  
 * Easy to query resources on a Client Device  
@@ -68,18 +68,16 @@ The goal of **mqtt-shepherd** is to let you build and manage an MQTT machine net
 <a name="Basic"></a>
 ## 4. Basic Usage
 
-Server-side example:  
-
 ```js
 var MqttShepherd = require('mqtt-shepherd');
-var qserver = new MqttShepherd();
+var qserver = new MqttShepherd();   // create a LWMQN server
 
 qserver.on('ready', function () {
     console.log('Server is ready.');
-    qserver.permitJoin(180);    // open for devices to join the network within 180 secs
+    qserver.permitJoin(180);        // allow devices to join the network within 180 secs
 });
 
-qserver.start(function (err) {  // start the sever
+qserver.start(function (err) {      // start the sever
     if (err)
         console.log(err);
 });
@@ -102,12 +100,12 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [start()](#API_start)  
     * [stop()](#API_stop)  
     * [permitJoin()](#API_permitJoin)  
-    * [(ok) info()](#API_info)  
-    * [(ok) listDevices()](#API_listDevices)  
+    * [info()](#API_info)  
+    * [listDevices()](#API_listDevices)  
     * [find()](#API_find)  
     * [remove()](#API_remove)  
     * [announce()](#API_announce)  
-    * [(OK) maintain()](#API_maintain)  
+    * [maintain()](#API_maintain)  
     * Events: [ready](#EVT_ready), [error](#EVT_error), [ind](#EVT_ind), and [message](#EVT_message)  
 
 * MqttNode APIs (`qnode` denotes the instance of this class)  
@@ -254,19 +252,16 @@ Returns the qserver infomation.
   
 **Returns:**  
   
-* (_Object_): An object that contains the information about the Server. Fields in this object are shown in the following table.  
+* (_Object_): An object that contains the information about the Server. Fields in this object are shown with the following table.  
 
-| Property     | Type    | Description                                   |
-|--------------|---------|-----------------------------------------------|
-| name         | String  | Server name                                   |
-| enabled      | Boolean | Server is up(true) or down(false)             |
-| intf         | String  | Network interface, i.e. `'eth0'`              |
-| ip           | String  | Server ip address                             |
-| mac          | String  | Server mac address                            |
-| routerIp     | String  | Router ip address                             |
-| devNum       | Number  | Number of devices have joined the network     |
-| permitJoin   | Boolean | Indicates if the Server allows for joining    |
-| startTime    | Number  | Unix Time (secs)                              |
+| Property       | Type    | Description                                                 |
+|----------------|---------|-------------------------------------------------------------|
+| name           | String  | Server name                                                 |
+| enabled        | Boolean | Server is up(true) or down(false)                           |
+| net            | Object  | Network information, `{ intf, ip, mac, routerIp }`          |
+| devNum         | Number  | Number of devices have joined the network                   |
+| startTime      | Number  | Unix Time (secs)                                            |
+| permitTimeLeft | Number  | How much time left for allowing devices to join the Network |
 
 **Examples:**  
     
@@ -276,13 +271,15 @@ console.log(qserver.info());
 {
     name: 'my_iot_server',
     enabled: true,
-    intf: 'eth0',
-    ip: '192.168.1.99',
-    mac: '00:0c:29:6b:fe:e7',
-    routerIp: '192.168.1.1',
+    net: {
+        intf: 'eth0',
+        ip: '192.168.1.99',
+        mac: '00:0c:29:6b:fe:e7',
+        routerIp: '192.168.1.1'
+    },
     devNum: 36,
-    permitJoin: false,
-    startTime: 1454419506
+    startTime: 1454419506,
+    permitTimeLeft: 36
 }  
 ```
 
@@ -418,12 +415,12 @@ qserver.announce('Rock on!');
 *************************************************
 <a name="API_maintain"></a>
 ### .maintain([clientIds,][callback])
-Maintains the network. This will refresh all Client Device records on qserver by rediscovering each remote device. Only the specified Client Device records will be refresh if calling with an array of `clientIds`.  
+Maintains the network. This will refresh all Client Devices on qserver by rediscovering each remote device. Only the specified Client Devices will be refresh if calling with an array of `clientIds`.  
 
 **Arguments:**  
 
-1. `clientIds` (_Array_): Client id of the remote devices to refresh from.  
-2. `callback` (_Function_): `function (err, clientIds) { ... }`. Get called after the maintenance finished. The `clientIds` is an array to indicate the Client Devices that are successfully refreshed. The entry will be `undefined` for a Client Device if there were something going wrong, e.g. Device not found.  
+1. `clientIds` (_String[]_): An array of Client ids.  
+2. `callback` (_Function_): `function (err, results) { ... }`. Get called after the maintenance finished. The `results` is an array to indicate whether each Client Device is successfully refreshed. Each entry in `results` is an object of `{ clientId, result }`, where `result` is a Boolean value to tell the success of refreshment.  
 
   
 **Returns:**  
@@ -435,12 +432,21 @@ Maintains the network. This will refresh all Client Device records on qserver by
 ```js
 qserver.maintain(function (err, clientIds) {
     console.log(clientIds);
-    // [ 'foo', 'bar', undefined, 'oof', 'rab', ... ]
+    // [
+    //    { clientId: 'foo', result: true },
+    //    { clientId: 'bar', result: true },
+    //     ...
+    //    { clientId: 'foobar', result: false },    // device may be offline
+    //    { clientId: 'barfoo', result: true }
+    // ]
 });
 
 server.maintain([ 'foo_id', 'no_such_id' ], function (err, clientIds) {
     console.log(clientIds);
-    // [ 'foo_id',  undefined ]
+    // [
+    //    { clientId: 'foo', result: true },
+    //    { clientId: 'no_such_id', result: false }
+    // ]
 });
 ```
 
@@ -1040,12 +1046,3 @@ qserver.decrypt = function (msg, clientId, callback) {
     - `client` is a string or a buffer.  
     - `packet` is the Client that this message going to.  
     - `cb(err, authorized)` is the callback you should call and pass the encrypted message to it after encryption.  
-
-
-***********************************************
-<br />
-
-<a name="example"></a>
-## 8. Example with websocket
-
-[TBD] Demonstrate how to build GUI using socket.io
