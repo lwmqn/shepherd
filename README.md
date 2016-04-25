@@ -1060,6 +1060,7 @@ The default implementation authorize every Client, that was successfully registe
 2. `topic` is the topic to publish to.  
 3. `payload` is the data to publish out.  
 4. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if a Client is authorized to publish the topic.  
+  
 ***********************************************
 ### qserver.authPolicy.authorizeSubscribe(client, topic, cb)  
 Method of authorizing a Client to subscribe to a topic. Override at will.  
