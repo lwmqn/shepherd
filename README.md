@@ -972,6 +972,7 @@ console.log(qnode.dump());
 
 By default, the Server won't encrypt the message. You can override the encrypt() and decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your Client Devices as well.  
 
+***********************************************
 ### qserver.encrypt(msg, clientId, cb)
 Method of encryption. Overridable.  
 
@@ -982,6 +983,7 @@ Method of encryption. Overridable.
 3. `cb(err, encrypted)` is the callback you should call and pass the encrypted message to it after encryption.  
   
 
+***********************************************
 ### qserver.decrypt(msg, clientId, cb)
 Method of decryption. Overridable.  
 
@@ -991,7 +993,8 @@ Method of decryption. Overridable.
 2. `clientId` is the Client that this message coming from.  
 3. `cb(err, decrypted)` is the callback you should call and pass the decrypted message to it after decryption.  
   
-**Examples:**  
+***********************************************
+**Encryption/Decryption Example:**  
 
 ```js
 var qserver = new MqttShepherd('my_iot_server');
@@ -1034,6 +1037,7 @@ qserver.decrypt = function (msg, clientId, cb) {
 
 Override methods within `qserver.authPolicy` to authorize a Client. These methods are `authenticate()`, `authorizePublish()`, `authorizeSubscribe()`, and `authorizeForward()`.  
 
+***********************************************
 ### qserver.authPolicy.authenticate(client, username, password, cb)  
 Method of user authentication. Override at will.  
 The default implementation authenticate the account of `{ username: 'freebird', password: 'skynyrd' }`.  
@@ -1045,7 +1049,7 @@ The default implementation authenticate the account of `{ username: 'freebird', 
 3. `password` is the password given by a Client during connection.  
 4. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if this Client is authenticated.  
   
-
+***********************************************
 ### qserver.authPolicy.authorizePublish(client, topic, payload, cb)  
 Method of authorizing a Client to publish to a topic. Override at will.  
 The default implementation authorize every Client, that was successfully registered, to publish to any topic.  
@@ -1056,7 +1060,7 @@ The default implementation authorize every Client, that was successfully registe
 2. `topic` is the topic to publish to.  
 3. `payload` is the data to publish out.  
 4. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if a Client is authorized to publish the topic.  
-  
+***********************************************
 ### qserver.authPolicy.authorizeSubscribe(client, topic, cb)  
 Method of authorizing a Client to subscribe to a topic. Override at will.  
 The default implementation authorize every Client, that was successfully registered, to subscribe to any topic.  
@@ -1066,7 +1070,8 @@ The default implementation authorize every Client, that was successfully registe
 1. `client` is a mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
 2. `topic` is the topic to subscribe to.  
 3. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if a Client is authorized to subscribe to the topic.  
-
+  
+***********************************************
 ### qserver.authPolicy.authorizeForward(client, packet, cb)  
 Method of authorizing a forwarding packet to a Client. Override at will.  
 The default implementation authorize any packet to any Client.  
