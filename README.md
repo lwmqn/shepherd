@@ -456,15 +456,15 @@ server.maintain([ 'foo_id', 'no_such_id' ], function (err, clientIds) {
 *************************************************
 
 <a name="EVT_ready"></a>
-### Event: 'ready'
-`function () { }`
+### Event: 'ready'  
+`function () { }`  
 Fired when Server is ready.  
 
 *************************************************
 
 <a name="EVT_error"></a>
-### Event: 'error'
-`function (err) { }`
+### Event: 'error'  
+`function (err) { }`  
 Fired when there is an error occurs.  
 
 *************************************************
@@ -472,7 +472,7 @@ Fired when there is an error occurs.
 <a name="EVT_permit"></a>
 ### Event: 'permitJoining'
 `function(time) {}`  
-Emitted when the Server is allowing for devices  to join the network. The event will be fired at each tick of countdown.  
+Fired when the Server is allowing for devices to join the network. The event will be triggered at each tick of countdown.  
 
 1. `time` (_Number_): seconds left to disallow devices to join the network  
 
@@ -480,44 +480,51 @@ Emitted when the Server is allowing for devices  to join the network. The event 
 
 <a name="EVT_ind"></a>
 ### Event: 'ind'
-`function (type, msg) { }`
-Fired when there is an incoming indication message. There are 5 indication types including `'incoming'`, `'devLeaving'`, `'devUpdate'`, `'devNotify'`, and `'devChange'`.  
+`function (msg) { }`  
+Fired when there is an incoming indication message. The `msg` is an object with the properties given in the table:  
+
+| Property       | Type             | Description                                                                                                                      |
+|----------------|------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| type           | String           | Indication type, can be `'devIncoming'`, `'devLeaving'`, `'devUpdate'`, `'devNotify'`, `'devChange'`, or `'devStatus'`        |
+| qnode          | Object \| String | qnode instance, except that when `type === 'devLeaving'`, qnode will be a string of the clientId (since qnode has been removed)  |
+| data           | Depends          | Data along with the indication, which depends on the type of indication                                                          |
+
 
 * ##### devIncoming  
     When there is a Client Device incoming to the network, qserver will fire an `'ind'` event along with this type of indication. The Client Device can be either a new registered one or an old one that signs in again.  
 
-    * type: `'devIncoming'`
-    * msg (_Object_): a qnode
+    * msg.type: `'devIncoming'`  
+    * msg.qnode: qnode  
+    * msg.data: `undefined`  
+
 <br />
 
 * ##### devLeaving  
     When there is a Client Device leaving the network, qserver will fire an `'ind'` event along with this type of indication.  
 
-    * type: `'devLeaving'`
-    * msg (_String_): the clientId of which Device is leaving
+    * msg.type: `'devLeaving'`  
+    * msg.qnode: `'foo_clientId'`, the clientId of which Device is leaving  
+    * msg.data: `undefined`  
+
 <br />
 
-* ##### devUpdate
+* ##### devUpdate  
     When there is a Client Device that publishes an update of its device attribute(s), qserver will fire an `'ind'` event along this type of indication.  
 
-    * type: `'devUpdate'`
-    * msg (_Object_): the updated device attribute(s), there may be fields of `status`, `lifetime`, `ip`, `version` in this object.
+    * msg.type: `'devUpdate'`  
+    * msg.qnode: qnode  
+    * msg.data: `{ ip: '192.168.0.36' }`, an object that contains the updated attribute(s). There may be fields of `status`, `lifetime`, `ip`, and `version` in this object.  
 
-        ```js
-        // example
-        {
-            status: 'online',
-            ip: '192.168.0.36'
-        }
-        ```
+<br />
 
-* ##### devNotify
+* ##### devNotify  
     When there is a Client Device that publishes an notification of its Object Instance or Resource, qserver will fire an `'ind'` event along this type of indication.  
 
-    * type: `'devNotify'`
-    * msg (_Object_): notification from the Client Device. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
-        - `data` is an Object Instance if `rid` is null or undefined  
-        - `data` is a Resource if `rid` is given (data type depends on the Resource)  
+    * msg.type: `'devNotify'`  
+    * msg.qnode: qnode  
+    * msg.data: Content of the notification. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
+        - `data` is an Object Instance if `oid` and `iid` are given but `rid` is null or undefined  
+        - `data` is a Resource if `oid`, `iid` and `rid` are given (data type depends on the Resource)  
 
         ```js
         // example of a Resource notification
@@ -525,27 +532,29 @@ Fired when there is an incoming indication message. There are 5 indication types
             oid: 'humidity',
             iid: 0,
             rid: 'sensorValue',
-            data: 32
+            data: 32            // Resource value
         }
 
         // example of an Object Instance notification
         {
             oid: 'humidity',
             iid: 0,
-            data: {
+            data: {             // Object Instance
                 sensorValue: 32
             }
         }
         ```
 
-* ##### 'devChange' [TBD]
+<br />
+
+* ##### 'devChange'  
     When there is a Client Device that publishes an notification of its Object Instance or Resource, qserver will fire an `'ind'` event along this type of indication.  
 
-    msg (_Object_): the changes of a Resource or an Object Instance on the Client Device. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
-    If `rid` is _`null`_ or _`undefined`_, the `data` is an object that contains only the properties changed in an Object Instance. This can be thought of multi-Resource changes.  
-    If `rid` is valid, the `data` is the new value of a Resource. If a Resource itself is an object, then `data` will be an object that contains only the properties changed in that Resource.  
-
-    The diffrence between `'devChange'` and `'devNotify'` is that the message of `'devNotify'` is the data whatever a Client Device like to notify even if there are no changes of it. A periodical notification is a good example, the Client Device has to report something under observation even there are no changes of that thing. If there is really something changed, the Server will then fire `'devChange'` to report it.  
+    * msg.type: `'devChange'`  
+    * msg.qnode: qnode  
+    * msg.data: Content of the changes. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
+        - `data` is an object that contains only the properties changed in an Object Instance. In this case, `oid` and `iid` are given but `rid` is null or undefined  
+        - `data` is the new value of a Resource. If a Resource itself is an object, then `data` will be an object that contains only the properties changed in that Resource. In this case, `oid`, `iid` and `rid` are given (data type depends on the Resource)  
 
         ```js
         // changes of an Object Instance
@@ -567,12 +576,25 @@ Fired when there is an incoming indication message. There are 5 indication types
         }
         ```
 
+
+**Note**:  
+    * The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is which a Client Device like to notify even if there is no change of it. A periodical notification is a good example, a Client Device has to report something under observation even there is no change of that thing. If the Server does notice there is really something changed, it will then fire `'devChange'` to report the change(s).  
+
+<br />
+
+* ##### devStatus  
+    When there is a Client Device going online or going offline, qserver will fire an `'ind'` event along this type of indication.  
+
+    * msg.type: `'devStatus'`  
+    * msg.qnode: qnode  
+    * msg.data: `'online'` or `'offline'`  
+
 *************************************************
 
 <a name="EVT_message"></a>
 ### Event: 'message'
 `function(topic, message, packet) {}`  
-Emitted when the Server receives any published packet from remote Devices  
+Emitted when the Server receives any published packet from any remote Device  
 
 1. `topic` (_String_): topic of the received packet  
 2. `message` (_Buffer_): payload of the received packet  
@@ -580,6 +602,7 @@ Emitted when the Server receives any published packet from remote Devices
 
 
 ***********************************************
+
 <br />
 
 ## MqttNode Class
@@ -591,19 +614,19 @@ This class provides you with methods to perform remote operations upon a registe
 
 <a name="API_readReq"></a>
 ### qnode.readReq(path, callback)
-Remotely read the target from a Client Device. Response will be passed through the callback.  
+Remotely read a target from the Client Device. Response will be passed through second argument of the callback.  
 
 **Arguments:**  
 
 1. `path` (_String_): Path of the allocated Object, Object Instance, or Resource on the remote Client Device.  
 2. `callback` (_Function_): `function (err, rsp) { }`
 
-    - `err` (_Object_): error object
+    - `err` (_Object_): Error object
     - `rsp` (_Object_): The response is an object that has a status code along with the returned data from the remote Client Device.  
 
 | Property | Type    | Description                                                             |
 |----------|---------|-------------------------------------------------------------------------|
-|  status  | Number  | Status code of the response. See [Status Code](#).                      |
+|  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#). |
 |  data    | Depends | `data` can be the value of an Object, an Object Instance, or a Resource. Note that when an unreadable Resource is read, the returned value will be a string `'_unreadable_'`. |
   
 
@@ -643,7 +666,7 @@ Remotely write a value to the allocated Resource on a Client Device. The respons
 
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. See [Status Code](#).                      |
+    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, 405, and 408. See [Status Code](#).                      |
     |  data    | Depends | `data` is the written value. It will be a string `'_unwritable_'` if the Resource is not allowed for writing.|
 
 **Returns:**  
@@ -679,7 +702,8 @@ qnode.writeReq('digitalInput/1/dInState', 1, function (err, rsp) {
 ### qnode.writeAttrsReq(path, attrs[, callback])
 Configure the report settings of a Resource, an Object Instance, or an Object. This method can also cancel an observation by assigning the `cancel` property to `true` within `attrs` object.  
     
-**Note**: This API won't start the notifications reporting, call observe() method if you want to turn the report on.  
+**Note**
+* This API won't start reporting of the notifications, call observe() method if you want to turn the report on.  
 
 **Arguments:**  
 
@@ -693,13 +717,13 @@ Configure the report settings of a Resource, an Object Instance, or an Object. T
     | gt       | Number  | optional  | Greater Than. The Client Device should notify its value when the value is greater than this setting. Only valid for the Resource typed as a number.                                                     |
     | lt       | Number  | optional  | Less Than. The Client Device should notify its value when the value is smaller than this setting. Only valid for the Resource typed as a number.                                                        |
     | stp      | Number  | optional  | Step. The Client Device should notify its value when the change of the Resource value, since the last report happened, is greater than this setting.                                                    |
-    | cancel   | Boolean | optional  | Set to `true` for a Client Device to cancel an observation on the allocated Resource or Object Instance.                                                                                           |
+    | cancel   | Boolean | optional  | Set to `true` for a Client Device to cancel observation on the allocated Resource or Object Instance.                                                                                                   |
 
 3. `callback` (_Function_):  `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. See [Status Code](#).                      |
+    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, and 408. See [Status Code](#).                      |
 
   
 **Returns:**  
@@ -710,7 +734,7 @@ Configure the report settings of a Resource, an Object Instance, or an Object. T
     
 ```js
 // set successfully
-qnode.writeAttributes('temperature/0/sensedValue', {
+qnode.writeAttrsReq('temperature/0/sensedValue', {
     pmin: 10,
     pmax: 600,
     gt: 45
@@ -718,15 +742,22 @@ qnode.writeAttributes('temperature/0/sensedValue', {
     console.log(rsp);       // { status: 200 }
 });
 
+// cancel the observation on a Resource
+qnode.writeAttrsReq('temperature/0/sensedValue', {
+    cancel: true
+}, function (err, rsp) {
+    console.log(rsp);       // { status: 200 }
+});
+
 // taget not found
-qnode.writeAttributes('temperature/0/noSuchResource', {
+qnode.writeAttrsReq('temperature/0/noSuchResource', {
     gt: 20
 }, function (err, rsp) {
     console.log(rsp);       // { status: 404 }
 });
 
 // parameter cannot be recognized
-qnode.writeAttributes('temperature/0/noSuchResource', {
+qnode.writeAttrsReq('temperature/0/noSuchResource', {
     foo: 60
 }, function (err, rsp) {
     console.log(rsp);       // { status: 400 }
@@ -742,11 +773,11 @@ Discover report settings of a Resource or, an Object Instance ,or an Object on t
 **Arguments:**  
 
 1. `path` (_String_):  Path of the allocated Resource, Object Instance, or Object on the remote Client Device.
-2. `callback` (_Function_):   `function (err, rsp) { }`. The `rsp` object has a status code along with the parameters of report settings.  
+2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code along with the parameters of report settings.  
 
     | Property | Type    | Description                                                                                                                          |
     |----------|---------|--------------------------------------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. See [Status Code](#).                                                                                   |
+    |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#).                                                                                   |
     |  data    | Object  | `data` is an object of the report settings. If the discoved target is an Object, there will be an additional field `data.resrcList` to list all its Resource idetifiers under each Object Instance. |
   
 **Returns:**  
@@ -789,11 +820,11 @@ Invoke an excutable Resource on the Client Device. An excutable Resource is like
 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
 2. `args` (_Array_): The arguments to the procedure.  
-3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back, and the data type depends on the implementation at client-side.  
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds. There will be a `data` field if the procedure does return something back, and the data type depends on the implementation at client-side.  
 
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. See [Status Code](#).                      |
+    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, 405, 408, and 500. See [Status Code](#). |
     |  data    | Depends | What will be returned depends on the client-side implementation.        |
 
   
@@ -804,36 +835,36 @@ Invoke an excutable Resource on the Client Device. An excutable Resource is like
 **Examples:**  
     
 ```js
-// assume there in an executable Resource (procedure) with singnatue
+// assuming there is an executable Resource (procedure) with singnatue
 // function(n) { ... } to blink an LED n times.
-qnode.execReq('led/0/blink', [ 10 ] ,function (err, rsp) {
+qnode.executeReq('led/0/blink', [ 10 ] ,function (err, rsp) {
     console.log(rsp);       // { status: 204 }
 });
 
-// assume there in an executable Resource with singnatue
-// function(edge, duration) { ... } to counts how many times the button 
-// was pressed in `duration` seconds.
-qnode.execReq('button/0/blink', [ 'falling', 20 ] ,function (err, rsp) {
+// assuming there is an executable Resource with singnatue
+// function(edge, duration) { ... } to count how many times the button 
+// was pressed within `duration` seconds.
+qnode.executeReq('button/0/blink', [ 'falling', 20 ] ,function (err, rsp) {
     console.log(rsp);       // { status: 204, data: 71 }
 });
 
 // Something went wrong at Client-side
-qnode.execReq('button/0/blink', [ 'falling', 20 ] ,function (err, rsp) {
+qnode.executeReq('button/0/blink', [ 'falling', 20 ] ,function (err, rsp) {
     console.log(rsp);       // { status: 500 }
 });
 
 // arguments cannot be recognized, in this example, 'up' is an invalid parameter
-qnode.execReq('button/0/blink', [ 'up', 20 ] ,function (err, rsp) {
+qnode.executeReq('button/0/blink', [ 'up', 20 ] ,function (err, rsp) {
     console.log(rsp);       // { status: 400 }
 });
 
 // Resource not found
-qnode.execReq('temperature/0/noSuchResource', function (err, rsp) {
+qnode.executeReq('temperature/0/noSuchResource', function (err, rsp) {
     console.log(rsp);       // { status: 404 }
 });
 
 // invoke an unexecutable Resource
-qnode.execReq('temperature/0/sensedValue', function (err, rsp) {
+qnode.executeReq('temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);       // { status: 405 }
 });
 ```
@@ -841,16 +872,16 @@ qnode.execReq('temperature/0/sensedValue', function (err, rsp) {
 ***********************************************
 <a name="API_observeReq"></a>
 ### qnode.observeReq(path[, callback])
-Start observing a Resource on the Client Device.  
+Start observing a Resource on the Client Device. Please listen to event `'ind'` with indication type `'devNotify'` to get the reports.  
 
 **Arguments:**  
 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
-2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
+2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds.  
 
     | Property | Type    | Description                                                             |
     |----------|---------|-------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. See [Status Code](#).                      |
+    |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#). |
 
   
 **Returns:**  
@@ -885,7 +916,7 @@ qnode.observeReq('temperature/0/noSuchResource', function (err, rsp) {
 
 <a name="API_dump"></a>
 ### qnode.dump()
-Dump record of the Client Device.
+Dump record of the Client Device.  
 
 **Arguments:**  
 
@@ -1006,6 +1037,7 @@ Method of decryption. Overridable.
 3. `cb(err, decrypted)` is the callback you should call and pass the decrypted message to it after decryption.  
   
 ***********************************************
+
 **Encryption/Decryption Example:**  
 
 ```js
@@ -1047,7 +1079,7 @@ qserver.decrypt = function (msg, clientId, cb) {
 <a name="Auth"></a>
 ## 7. Authentication and Authorization Policies
 
-Override methods within `qserver.authPolicy` to authorize a Client. These methods are `authenticate()`, `authorizePublish()`, `authorizeSubscribe()`, and `authorizeForward()`.  
+Override methods within `qserver.authPolicy` to authorize a Client. These methods are `authenticate()`, `authorizePublish()`, and `authorizeSubscribe()`.  
 
 ***********************************************
 ### qserver.authPolicy.authenticate(client, username, password, cb)  
@@ -1061,6 +1093,28 @@ The default implementation authenticate the account of `{ username: 'freebird', 
 3. `password` is the password given by a Client during connection.  
 4. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if this Client is authenticated.  
   
+**Example:**  
+
+```js
+qserver.authPolicy.authenticate = function (client, username, password, cb) {
+    var authorized = false,
+        clientId = client.id;
+
+    // This is just an example. 
+    queryUserFromSomewhere(username, function (err, user) {     // maybe query from a local database
+        if (err) {
+            cb(err);
+        } else if (username === user.name && password === user.password) {
+            client.user = username;
+            authorized = true;
+            cb(null, authorized);
+        } else {
+            cb(null, authorized);
+        }
+    });
+};
+```
+
 ***********************************************
 ### qserver.authPolicy.authorizePublish(client, topic, payload, cb)  
 Method of authorizing a Client to publish to a topic. Override at will.  
@@ -1071,8 +1125,23 @@ The default implementation authorize every Client, that was successfully registe
 1. `client` is a mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
 2. `topic` is the topic to publish to.  
 3. `payload` is the data to publish out.  
-4. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if a Client is authorized to publish the topic.  
+4. `cb(err, authorized)` is the callback you should call and pass a boolean flag `authorized` to tell if a Client is authorized to publish the topic.  
   
+**Example:**  
+
+```js
+qserver.authPolicy.authorizePublish = function (client, topic, payload, cb) {
+    var authorized = false,
+        clientId = client.id,
+        username = client.user;
+
+    // This is just an example. 
+    passToMyAuthorizePublishSystem(clientId, username, topic, function (err, authorized) {
+        cb(err, authorized);
+    });
+};
+```
+
 ***********************************************
 ### qserver.authPolicy.authorizeSubscribe(client, topic, cb)  
 Method of authorizing a Client to subscribe to a topic. Override at will.  
@@ -1082,17 +1151,22 @@ The default implementation authorize every Client, that was successfully registe
 
 1. `client` is a mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
 2. `topic` is the topic to subscribe to.  
-3. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if a Client is authorized to subscribe to the topic.  
+3. `cb(err, authorized)` is the callback you should call and pass a boolean flag `authorized` to tell if a Client is authorized to subscribe to the topic.  
   
-***********************************************
-### qserver.authPolicy.authorizeForward(client, packet, cb)  
-Method of authorizing a forwarding packet to a Client. Override at will.  
-The default implementation authorize any packet to any Client.  
+**Example:**  
 
-**Arguments:**  
+```js
+qserver.authPolicy.authorizeSubscribe = function (client, topic, cb) {
+    var authorized = false,
+        clientId = client.id,
+        username = client.user;
 
-1. `client` is a mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
-2. `packet` is the packet to be published.  
-3. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if a packet is authorized to forward to a Client.  
-  
-  
+    // This is just an example. 
+    passToMyAuthorizeSubscribeSystem(clientId, username, topic, function (err, authorized) {
+        cb(err, authorized);
+    });
+};
+```
+
+Please refer to Mosca Wiki to learn more about [Authentication & Authorization](https://github.com/mcollina/mosca/wiki/Authentication-&-Authorization)  
+
