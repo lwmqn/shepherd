@@ -7,31 +7,31 @@ var shepherd = new Shepherd('my_shepherd');
 var preUnix = null,
     nowUnix = null;
 
-shepherd.encrypt = function (msg, clientId, callback) {
-    var msgBuf = new Buffer(msg),
-        cipher = crypto.createCipher('aes128', 'mypassword'),
-        encrypted = cipher.update(msgBuf, 'binary', 'base64');
+// shepherd.encrypt = function (msg, clientId, callback) {
+//     var msgBuf = new Buffer(msg),
+//         cipher = crypto.createCipher('aes128', 'mypassword'),
+//         encrypted = cipher.update(msgBuf, 'binary', 'base64');
 
-    try {
-        encrypted += cipher.final('base64');
-        callback(null, encrypted);
-    } catch (e) {
-        callback(e);
-    }
-};
+//     try {
+//         encrypted += cipher.final('base64');
+//         callback(null, encrypted);
+//     } catch (e) {
+//         callback(e);
+//     }
+// };
 
-shepherd.decrypt = function (msg, clientId, callback) {
-    msg = msg.toString();
-    var decipher = crypto.createDecipher('aes128', 'mypassword'),
-        decrypted = decipher.update(msg, 'base64', 'utf8');
+// shepherd.decrypt = function (msg, clientId, callback) {
+//     msg = msg.toString();
+//     var decipher = crypto.createDecipher('aes128', 'mypassword'),
+//         decrypted = decipher.update(msg, 'base64', 'utf8');
 
-    try {
-        decrypted += decipher.final('utf8');
-        callback(null, decrypted);
-    } catch (e) {
-        callback(e);
-    }
-};
+//     try {
+//         decrypted += decipher.final('utf8');
+//         callback(null, decrypted);
+//     } catch (e) {
+//         callback(e);
+//     }
+// };
 
 function runtest(cb, delay, rp) {
     setTimeout(function () {
@@ -48,9 +48,9 @@ shepherd.start(function (err, res) {
 
 shepherd.on('ready', function () {
     console.log('shepherd ready');
-    setTimeout(function () {
+    //setTimeout(function () {
         shepherd.permitJoin(20);
-    }, 2000);
+    //}, 2000);
     //console.log(shepherd);
     shepherd.on('priphDisconnected', function (c) {
         console.log('some one disconnected');
@@ -58,6 +58,13 @@ shepherd.on('ready', function () {
         // var n = shepherd.find(c.id);
         // console.log(n.status);
     });
+});
+
+shepherd.on('permitJoining', function (t) {
+    console.log('PERMIT JOIN: ' + t);
+    console.log('PERMIT JOIN: ' + shepherd._joinable);
+    console.log('SERVER ENABLED: ' + shepherd._enabled);
+
 });
 
 shepherd.on('updated', function (qnode, diff) {
@@ -90,7 +97,7 @@ shepherd.on('ind:notified', function (qnode, msg) {
     // console.log(tdf);
     console.log(msg);
 
-    var n = shepherd.find(msg.clientId);
+    //var n = shepherd.find(msg.clientId);
     // console.log(n.dump());
     // setTimeout(function () {
     //     n.pingReq(function (err, rsp) {
@@ -189,12 +196,12 @@ shepherd.on('ind:incoming', function (node) {
     // }, 5000, 2000);
 
     // exec test - resource
-    runtest(function () {
-        node.executeReq('/3303/0/some1', 'simen', function (err, rsp) {
-            console.log('>>>>> exec resource test');
-            console.log(rsp);
-        });
-    }, 5000, 2000);
+    // runtest(function () {
+    //     node.executeReq('/3303/0/some1', 'simen', function (err, rsp) {
+    //         console.log('>>>>> exec resource test');
+    //         console.log(rsp);
+    //     });
+    // }, 5000, 2000);
 
     // // exec test - resource not found
     // runtest(function () {
@@ -360,26 +367,26 @@ shepherd.on('ind:incoming', function (node) {
     // }, 2000);
 
     // observe test - lt, gt, step rules
-    runtest(function () {
-        var attrs = {
-            pmin: 1,
-            pmax: 300,
-            gt: 80,
-            lt: 30,
-            stp: 20
-        };
+    // runtest(function () {
+    //     var attrs = {
+    //         pmin: 1,
+    //         pmax: 300,
+    //         gt: 80,
+    //         lt: 30,
+    //         stp: 20
+    //     };
 
-        node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
-            console.log('>>>>> writeAttrs test');
-            console.log(rsp);
+    //     node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
+    //         console.log('>>>>> writeAttrs test');
+    //         console.log(rsp);
 
-            node.observeReq('/3303/0/sensorValue', function (err, rsp) {
-                console.log('>>>>> observe test');
-                console.log(err);
-                console.log(rsp);
-            });
-        });
-    }, 2000);
+    //         node.observeReq('/3303/0/sensorValue', function (err, rsp) {
+    //             console.log('>>>>> observe test');
+    //             console.log(err);
+    //             console.log(rsp);
+    //         });
+    //     });
+    // }, 2000);
 
 
     // setInterval(function () {
