@@ -324,47 +324,47 @@ shepherd.on('ind:incoming', function (node) {
 
     // }, 2000, 2000);
 
-    // // observe test
-    // runtest(function () {
-    //     var attrs = {
-    //         pmin: 5,
-    //         pmax: 10,
-    //         // stp: 10,
-    //     };
+    // observe test
+    runtest(function () {
+        var attrs = {
+            pmin: 5,
+            pmax: 10,
+            // stp: 10,
+        };
 
-    //     // node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
-    //     //     console.log('>>>>> discover');
-    //     //     console.log(rsp);
-    //     // });
-    //     node.writeAttrsReq('/3303/0/', attrs , function (err, rsp) {
-    //         console.log('>>>>> writeAttrs test');
-    //         console.log(rsp);
+        // node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
+        //     console.log('>>>>> discover');
+        //     console.log(rsp);
+        // });
+        node.writeAttrsReq('/3303/0/', attrs , function (err, rsp) {
+            console.log('>>>>> writeAttrs test');
+            console.log(rsp);
 
-    //         node.observeReq('/3303/0/', function (err, rsp) {
-    //             console.log('>>>>> observe test');
-    //             console.log(err);
-    //             console.log(rsp);
-    //                     node.discoverReq('/3303/0/', function (err, rsp) {
-    //                         console.log('>>>>> discover');
-    //                         console.log(rsp);
-    //                     });
-    //         });
-    //     });
+            node.observeReq('/3303/0/', function (err, rsp) {
+                console.log('>>>>> observe test');
+                console.log(err);
+                console.log(rsp);
+                        node.discoverReq('/3303/0/', function (err, rsp) {
+                            console.log('>>>>> discover');
+                            console.log(rsp);
+                        });
+            });
+        });
 
-    //     setTimeout(function () {
-    //         node.observeReq('/3303/0/', { option: 1 }, function (err, rsp) {
-    //             console.log('>>>>> stop observing');
-    //             console.log(err);
-    //             console.log(rsp);
+        setTimeout(function () {
+            node.observeReq('/3303/0/', { option: 1 }, function (err, rsp) {
+                console.log('>>>>> stop observing');
+                console.log(err);
+                console.log(rsp);
 
-    //                     node.discoverReq('/3303/0/', function (err, rsp) {
-    //                         console.log('>>>>> discover after stop observing');
-    //                         console.log(rsp);
-    //                     });
-    //         });
-    //     }, 12000);
+                        node.discoverReq('/3303/0/', function (err, rsp) {
+                            console.log('>>>>> discover after stop observing');
+                            console.log(rsp);
+                        });
+            });
+        }, 12000);
 
-    // }, 2000);
+    }, 2000);
 
     // observe test - lt, gt, step rules
     // runtest(function () {
