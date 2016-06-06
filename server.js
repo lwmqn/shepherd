@@ -1,6 +1,5 @@
 var util = require('util'),
     crypto = require('crypto'),
-    moment = require('moment'),
     Shepherd = require('./index');
 
 var shepherd = new Shepherd('my_shepherd');
