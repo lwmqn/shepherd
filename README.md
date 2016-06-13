@@ -105,6 +105,7 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [info()](#API_info)  
     * [listDevices()](#API_listDevices)  
     * [find()](#API_find)  
+    * [findByMacAddr()](#API_findByMacAddr)  
     * [remove()](#API_remove)  
     * [announce()](#API_announce)  
     * [maintain()](#API_maintain)  
@@ -362,6 +363,30 @@ Find a registered client device(qnode) on qserver.
     
 ```js
 var qnode = qserver.find('foo_id');
+
+if (qnode) {
+    // do something upon the qnode, like qnode.readReq()
+}
+```
+
+*************************************************
+<a name="API_findByMacAddr"></a>
+### .findByMacAddr(macAddr)
+Find a registered client device(qnode) by its mac address.  
+
+**Arguments:**  
+
+1. `macAddr` (_String_): Mac address of the device to find for.  
+
+  
+**Returns:**  
+  
+* (_Object_): qnode. Returns `undefined` if not found.  
+
+**Examples:**  
+    
+```js
+var qnode = qserver.findByMacAddr('9e:65:f9:0b:24:b8');
 
 if (qnode) {
     // do something upon the qnode, like qnode.readReq()
