@@ -504,7 +504,7 @@ Fired when there is an incoming indication message. The `msg` is an object with 
 
     * msg.type: `'devLeaving'`  
     * msg.qnode: `'foo_clientId'`, the clientId of which Device is leaving  
-    * msg.data: `undefined`  
+    * msg.data: `9e:65:f9:0b:24:b8`, the mac address of which qnode is going to leave.  
 
 <br />
 
