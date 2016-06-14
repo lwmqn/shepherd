@@ -372,23 +372,23 @@ if (qnode) {
 *************************************************
 <a name="API_findByMacAddr"></a>
 ### .findByMacAddr(macAddr)
-Find a registered client device(qnode) by its mac address.  
+Find registered client devices(qnodes) by the specified mac address.  
 
 **Arguments:**  
 
-1. `macAddr` (_String_): Mac address of the device to find for.  
+1. `macAddr` (_String_): Mac address of the device(s) to find for.  
 
   
 **Returns:**  
   
-* (_Object_): qnode. Returns `undefined` if not found.  
+* (_qnode[]_): Array of found qnodes. Returns an empty array if not found.  
 
 **Examples:**  
     
 ```js
-var qnode = qserver.findByMacAddr('9e:65:f9:0b:24:b8');
+var qnodes = qserver.findByMacAddr('9e:65:f9:0b:24:b8');
 
-if (qnode) {
+if (qnodes.length) {
     // do something upon the qnode, like qnode.readReq()
 }
 ```
