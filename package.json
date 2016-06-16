@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/simenkid/mqtt-shepherd.git"
+    "url": "https://github.com/lwmqn/mqtt-shepherd.git"
   },
   "author": "Simen Li",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/simenkid/mqtt-shepherd/issues"
+    "url": "https://github.com/lwmqn/mqtt-shepherd/issues"
   },
-  "homepage": "https://github.com/simenkid/mqtt-shepherd",
+  "homepage": "https://github.com/lwmqn/mqtt-shepherd",
   "dependencies": {
     "enum": "^2.2.0",
     "lodash": "^4.5.1",
