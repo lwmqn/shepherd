@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/lwmqn/mqtt-shepherd",
   "dependencies": {
+    "busyman": "^0.1.1",
     "enum": "^2.2.0",
     "lodash": "^4.5.1",
     "lwm2m-id": "^1.2.8",
