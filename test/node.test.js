@@ -1039,7 +1039,4 @@ describe('Functional Check', function () {
             });
         });
     });
-
-
-
 });
