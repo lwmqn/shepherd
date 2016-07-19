@@ -36,8 +36,8 @@ myso.addObjects([ smObj1, smObj2 ]);
 
 var node;
 
-var dbFolder = path.resolve('./database_test');
-    dbPath = path.resolve('./database_test/mqtt.db');
+var dbFolder = path.resolve('./database_test1');
+    dbPath = path.resolve('./database_test1/mqtt.db');
 
 var fakeShp = {
     _mqdb: null
