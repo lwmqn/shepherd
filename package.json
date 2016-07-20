@@ -1,6 +1,6 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "mqtt device manager",
   "main": "index.js",
   "scripts": {
@@ -18,22 +18,19 @@
   },
   "homepage": "https://github.com/lwmqn/mqtt-shepherd",
   "dependencies": {
-    "busyman": "^0.1.1",
+    "busyman": "^0.1.2",
     "enum": "^2.2.0",
-    "lodash": "^4.5.1",
     "lwm2m-id": "^1.2.8",
     "lwmqn-util": "^0.1.0",
     "mosca": "^1.0.2",
     "mqtt": "^1.5.0",
     "nedb": "^1.4.0",
     "network": "^0.1.3",
-    "q": "^1.4.1",
-    "winston": "^2.1.1"
+    "q": "^1.4.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "debug": "^2.2.0",
-    "mocha": "^2.5.3",
-    "should": "^10.0.0"
+    "mocha": "^2.5.3"
   }
 }
