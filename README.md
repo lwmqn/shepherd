@@ -3,7 +3,7 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
   
 [![NPM](https://nodei.co/npm/mqtt-shepherd.png?downloads=true)](https://nodei.co/npm/mqtt-shepherd/)  
 
-[![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-shepherd/develop.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-shepherd)
+[![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-shepherd/master.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-shepherd)
 [![npm](https://img.shields.io/npm/v/mqtt-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
 [![npm](https://img.shields.io/npm/l/mqtt-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
 
