@@ -1,6 +1,6 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "mqtt device manager",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "sinon": "^1.17.4"
   }
 }
