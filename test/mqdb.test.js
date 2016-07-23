@@ -58,26 +58,8 @@ describe('Database Testing', function () {
     var mqdb;
 
     before(function () {
-
-        fs.exists(dbPath, function (isThere) {
-            if (isThere)
-                fs.unlink(dbPath);
-        });
-
-        try {
-            fs.statSync(dbFolder);
-        } catch (e) {
-            fs.mkdirSync(dbFolder);
-        }
-
         mqdb = new Mqdb(dbPath);
     });
-
-    after(function () {
-        fs.unlink(dbPath);
-        fs.rmdir(dbFolder);
-    });
-
 
     describe('#.insert', function () {
         it('should insert nodeMock1', function (done) {
