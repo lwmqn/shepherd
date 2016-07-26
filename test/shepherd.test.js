@@ -1,10 +1,17 @@
 var _ = require('busyman'),
+    Q = require('q'),
     chai = require('chai'),
     sinon = require('sinon'),
+    chaiAsPromised = require('chai-as-promised'),
+    sinonChai = require('sinon-chai'),
     expect = chai.expect;
 
+chai.use(sinonChai);
+chai.use(chaiAsPromised);
+
 var Shepherd = require('../index.js'),
-    config = require('../lib/config.js');
+    config = require('../lib/config.js'),
+    msgHdlr = require('../lib/components/msghandler.js');
 
 /***************************************************/
 /*** Prepare Shepherd Settings                   ***/
@@ -13,13 +20,13 @@ var shpClientId = 'shp_test';
 
 describe('Constructor Check', function () {
     it('should has all correct members after new', function () {
-        var shepherd = new Shepherd(shpClientId);
-        expect(shepherd.clientId).to.be.equal(shpClientId);
+        var shepherd = new Shepherd('test1', { defaultDbPath:  __dirname + '/database/mqtt1.db' });
+        expect(shepherd.clientId).to.be.equal('test1');
         expect(shepherd.brokerSettings).to.be.equal(config.brokerSettings);
         expect(shepherd.defaultAccount).to.be.null;
         expect(shepherd.clientConnOptions).to.be.equal(config.clientConnOptions);
         expect(shepherd.reqTimeout).to.be.equal(config.reqTimeout);
-        expect(shepherd._dbPath).to.be.equal(config.defaultDbPath);
+        expect(shepherd._dbPath).to.be.equal( __dirname + '/database/mqtt1.db');
         expect(shepherd._mqdb).to.be.an('object');
         expect(shepherd._nodebox).to.be.an('object');
         expect(shepherd._joinable).to.be.false;
@@ -78,7 +85,7 @@ describe('Constructor Check', function () {
 });
 
 describe('Signature Check', function () {
-    var shepherd = new Shepherd(shpClientId);
+    var shepherd = new Shepherd('test2', { defaultDbPath:  __dirname + '/database/mqtt1.db' });
 
     describe('#.permitJoin', function () {
         it('should throw if time is given but not a number', function () {
@@ -214,6 +221,131 @@ describe('Signature Check', function () {
 });
 
 describe('Functional Check', function () {
-    // var shepherd = new Shepherd(shpClientId);
+    var shepherd = new Shepherd(shpClientId);
+    // this.timeout(15000);
 
+    describe('#.permitJoin', function () {
+        it('should throw if shepherd is not enabled when permitJoin invoked - shepherd is disabled.', function () {
+            expect(function () { return shepherd.permitJoin(3); }).to.throw(Error);
+        });
+
+        it('should trigger permitJoin counter and event when permitJoin invoked - shepherd is enabled.', function (done) {
+            shepherd._enabled = true;
+            shepherd.once('permitJoining', function (joinTime) {
+                shepherd._enabled = false;
+                if (shepherd._joinable && joinTime === 3)
+                    done();
+            });
+            shepherd.permitJoin(3);
+        });
+    });
+
+    describe('#.start', function () {
+        this.timeout(6000);
+
+        it('should start ok, _ready and reday should be fired, _enabled,', function (done) {
+            var _readyCbCalled = false,
+                readyCbCalled = false,
+                startCbCalled = false;
+
+            shepherd.once('_ready', function () {
+                _readyCbCalled = true;
+                if (_readyCbCalled && readyCbCalled && startCbCalled && shepherd._enabled)
+                    done();
+            });
+
+            shepherd.once('ready', function () {
+                readyCbCalled = true;
+                if (_readyCbCalled && readyCbCalled && startCbCalled && shepherd._enabled)
+                    done();
+            });
+
+            shepherd.start(function (err, result) {
+                startCbCalled = true;
+                if (_readyCbCalled && readyCbCalled && startCbCalled && shepherd._enabled)
+                    done();
+            });
+        });
+    });
+
+    describe.skip('#.stop', function () {
+        it('should stop ok, permitJoin 0 should be fired, _enabled should be false', function (done) {
+            var joinFired = false,
+                stopCalled = false;
+
+            shepherd.once('permitJoining', function (joinTime) {
+                joinFired = true;
+                if (joinTime === 0 && !shepherd._enabled && !shepherd.mClient && stopCalled && joinFired)
+                    done();
+            });
+
+            shepherd.stop(function (err, result) {
+                stopCalled = true;
+                if (!err && !shepherd._enabled && !shepherd.mClient && stopCalled && joinFired) {
+                    done();
+                }
+            });
+        });
+    });
+
+    describe.skip('#.reset', function () {
+        it('should reset - hard', function () {});
+        it('should reset - soft', function () {});
+    });
+
+    describe('#.find', function () {
+        it('should find nothing', function () {
+            expect(shepherd.find('nothing')).to.be.undefined;
+        });
+    });
+
+    describe('#.findByMacAddr', function () {
+        it('should find nothing - empty array', function () {
+            expect(shepherd.findByMacAddr('no_mac')).to.be.deep.equal([]);
+        });
+    });
+
+    describe('#register new qnode: fired by mc.emit(topic, message, packet)', function () {
+
+        it('should fire registered and get a new qnode', function (done) {
+            var _responseSenderSpy = sinon.spy(shepherd, '_responseSender');
+            var _clientObjectDetailReqStub = sinon.stub(msgHdlr, '_clientObjectDetailReq', function (shp, cId, objList) {
+                return Q.resolve([
+                    { oid: 0, data: { 1: { x1: 'hi' }, 2: { x2: 'hello' }, 3: { x3: 'hey' } }},
+                    { oid: 1, data: { 4: { x4: 'hi' }, 5: { x5: 'hello' }, 6: { x6: 'hey' } }},
+                ]);
+            });
+
+            shepherd.on('registered', function (qnode) {
+                _clientObjectDetailReqStub.restore();
+                _responseSenderSpy.restore();
+                expect(_responseSenderSpy).to.have.been.calledWith('register', 'test01');
+                if (shepherd.find('test01') === qnode)
+                    done();
+            });
+
+            emitMcRawMessage(shepherd, 'register/test01', {
+                transId: 100,
+                ip: '127.0.0.1',
+                mac: 'foo:mac',
+                lifetime: 123456,
+                version: '0.0.1',
+                objList: {
+                    0: [ 1, 2, 3 ],
+                    1: [ 4, 5, 6 ]
+                }
+            });
+        });
+    });
 });
+
+function emitMcRawMessage(shepherd, intf, msg) {
+    var mc = shepherd.mClient;
+
+    if (!_.isString(msg))
+        msg = JSON.stringify(msg);
+
+    msg = new Buffer(msg);
+
+    mc.emit('message', intf, msg);
+};
