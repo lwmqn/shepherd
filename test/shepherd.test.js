@@ -1,13 +1,13 @@
-var _ = require('busyman'),
+var fs = require('fs'),
+    path = require('path'),
+    _ = require('busyman'),
     Q = require('q'),
     chai = require('chai'),
     sinon = require('sinon'),
-    chaiAsPromised = require('chai-as-promised'),
     sinonChai = require('sinon-chai'),
     expect = chai.expect;
 
 chai.use(sinonChai);
-chai.use(chaiAsPromised);
 
 var Shepherd = require('../index.js'),
     config = require('../lib/config.js'),
@@ -17,6 +17,11 @@ var Shepherd = require('../index.js'),
 /*** Prepare Shepherd Settings                   ***/
 /***************************************************/
 var shpClientId = 'shp_test';
+try {
+    fs.unlinkSync(path.resolve('./lib/database/mqtt.db'));
+} catch (e) {
+    console.log(e);
+}
 
 describe('Constructor Check', function () {
     it('should has all correct members after new', function () {
@@ -102,19 +107,11 @@ describe('Signature Check', function () {
         });
     });
 
-    describe('#.findByMacAddr', function () {
+    describe('#.findByMac', function () {
         it('should throw if macAddr is not a string', function () {
-            expect(function () { shepherd.findByMacAddr({}); }).to.throw(TypeError);
-            expect(function () { shepherd.findByMacAddr(true); }).to.throw(TypeError);
-            expect(function () { shepherd.findByMacAddr('ceed'); }).not.to.throw(TypeError);
-        });
-    });
-
-    describe('#.deregisterNode', function () {
-        it('should throw if clientId is not a string', function () {
-            expect(function () { shepherd.deregisterNode({}); }).to.throw(TypeError);
-            expect(function () { shepherd.deregisterNode(true); }).to.throw(TypeError);
-            expect(function () { shepherd.deregisterNode('ceed'); }).not.to.throw(TypeError);
+            expect(function () { shepherd.findByMac({}); }).to.throw(TypeError);
+            expect(function () { shepherd.findByMac(true); }).to.throw(TypeError);
+            expect(function () { shepherd.findByMac('ceed'); }).not.to.throw(TypeError);
         });
     });
 
@@ -198,13 +195,13 @@ describe('Signature Check', function () {
         });
     });
 
-    describe('#.listDevices', function () {
+    describe('#.list', function () {
         it('should throw if cIds is not an array of strings', function () {
-            expect(function () { shepherd.listDevices({}); }).to.throw(TypeError);
-            expect(function () { shepherd.listDevices(true); }).to.throw(TypeError);
-            expect(function () { shepherd.listDevices('ceed'); }).to.throw(TypeError);
-            expect(function () { shepherd.listDevices([ 'ceed', {} ]); }).to.throw(TypeError);
-            expect(function () { shepherd.listDevices([ 'ceed', 'xxx' ]); }).not.to.throw(TypeError);
+            expect(function () { shepherd.list({}); }).to.throw(TypeError);
+            expect(function () { shepherd.list(true); }).to.throw(TypeError);
+            expect(function () { shepherd.list('ceed'); }).to.throw(TypeError);
+            expect(function () { shepherd.list([ 'ceed', {} ]); }).to.throw(TypeError);
+            expect(function () { shepherd.list([ 'ceed', 'xxx' ]); }).not.to.throw(TypeError);
         });
     });
 
@@ -288,25 +285,19 @@ describe('Functional Check', function () {
         });
     });
 
-    describe.skip('#.reset', function () {
-        it('should reset - hard', function () {});
-        it('should reset - soft', function () {});
-    });
-
     describe('#.find', function () {
         it('should find nothing', function () {
             expect(shepherd.find('nothing')).to.be.undefined;
         });
     });
 
-    describe('#.findByMacAddr', function () {
+    describe('#.findByMac', function () {
         it('should find nothing - empty array', function () {
-            expect(shepherd.findByMacAddr('no_mac')).to.be.deep.equal([]);
+            expect(shepherd.findByMac('no_mac')).to.be.deep.equal([]);
         });
     });
 
     describe('#register new qnode: fired by mc.emit(topic, message, packet)', function () {
-
         it('should fire registered and get a new qnode', function (done) {
             var _responseSenderSpy = sinon.spy(shepherd, '_responseSender');
             var _clientObjectDetailReqStub = sinon.stub(msgHdlr, '_clientObjectDetailReq', function (shp, cId, objList) {
@@ -320,13 +311,13 @@ describe('Functional Check', function () {
                 _clientObjectDetailReqStub.restore();
                 _responseSenderSpy.restore();
                 expect(_responseSenderSpy).to.have.been.calledWith('register', 'test01');
-                if (shepherd.find('test01') === qnode)
+                if (shepherd.find('test01') === qnode && shepherd.findByMac('foo:mac')[0] === qnode )
                     done();
             });
 
             emitMcRawMessage(shepherd, 'register/test01', {
                 transId: 100,
-                ip: '127.0.0.1',
+                ip: '127.0.0.2',
                 mac: 'foo:mac',
                 lifetime: 123456,
                 version: '0.0.1',
@@ -336,7 +327,501 @@ describe('Functional Check', function () {
                 }
             });
         });
+
+        it('should get correct info about the shepherd', function () {
+            var shpInfo = shepherd.info();
+
+            expect(shpInfo.devNum).to.be.equal(1);
+            expect(shpInfo.enabled).to.be.true;
+            expect(shpInfo.name).to.be.equal("shp_test");
+        });
+
+        it('should list only one device', function () {
+            var devList = shepherd.list();
+            expect(devList.length).to.be.equal(1);
+            expect(devList[0].clientId).to.be.equal('test01');
+            expect(devList[0].lifetime).to.be.equal(123456);
+            expect(devList[0].ip).to.be.equal('127.0.0.2');
+            expect(devList[0].mac).to.be.equal('foo:mac');
+            expect(devList[0].version).to.be.equal('0.0.1');
+            expect(devList[0].objList).to.be.deep.equal({ '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] });
+            expect(devList[0].status).to.be.equal('online');
+        });
     });
+
+    describe('#.announce', function () {
+        it('should announce properly', function (done) {
+            var annCb = sinon.spy();
+            shepherd.announce('hello').then(annCb).done(function () {
+                expect(annCb).to.be.calledOnce;
+                done();
+            });
+        });
+    });
+
+    describe('#qnode.readReq', function () {
+        it('should send readReq properly - resource - update', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var readReqCb = sinon.spy();     // (clientId, reqObj, callback)
+
+            qnode.readReq('0/1/x1').then(readReqCb).done(function () {
+                expect(readReqCb).to.be.calledOnce;
+                expect(readReqCb).to.be.calledWith({ status: 205, data: 'world' });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'read',
+                oid: 0,
+                iid: 1,
+                rid: 'x1',
+                status: 205,
+                data: 'world'
+            });
+        });
+
+        it('should send readReq properly - resource - again but no update', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var readReqCb = sinon.spy();     // (clientId, reqObj, callback)
+
+            qnode.readReq('0/1/x1').then(readReqCb).done(function () {
+                expect(readReqCb).to.be.calledOnce;
+                expect(readReqCb).to.be.calledWith({ status: 205, data: 'world' });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'read',
+                oid: 0,
+                iid: 1,
+                rid: 'x1',
+                status: 205,
+                data: 'world'
+            });
+        });
+
+        it('should send readReq properly - instance - update', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var readReqCb = sinon.spy();     // (clientId, reqObj, callback)
+
+            qnode.readReq('0/1').then(readReqCb).done(function () {
+                expect(readReqCb).to.be.calledOnce;
+                expect(readReqCb).to.be.calledWith({ status: 205, data: { x1: 'hi world', x11: 'yap' } });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'read',
+                oid: 0,
+                iid: 1,
+                status: 205,
+                data: { x1: 'hi world', x11: 'yap' }
+            });
+        });
+
+        it('should send readReq properly - object - update', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var readReqCb = sinon.spy();            // (clientId, reqObj, callback)
+            //  { oid: 0, data: { 1: { x1: 'hi' }, 2: { x2: 'hello' }, 3: { x3: 'hey' } }},
+            qnode.readReq('0').then(readReqCb).done(function () {
+                expect(readReqCb).to.be.calledOnce;
+                expect(readReqCb).to.be.calledWith({ status: 205, data: {
+                    1: { x1: 'bro' },
+                    2: { x2: 'sis' },
+                    3: { x3: 'dad', x4: 'mom' }
+                } });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'read',
+                oid: 0,
+                status: 205,
+                data: {
+                    1: { x1: 'bro' },
+                    2: { x2: 'sis' },
+                    3: { x3: 'dad', x4: 'mom' }
+                }
+            });
+        });
+    });
+
+    describe('#qnode.writeReq', function () {
+        this.timeout(10000);
+        it('should send writeReq properly - resource - update', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var writeReqCb = sinon.spy();     // (clientId, reqObj, callback)
+
+            qnode.writeReq('0/1/x1', 'new_x1_value').then(writeReqCb).done(function () {
+                expect(writeReqCb).to.be.calledOnce;
+                expect(writeReqCb).to.be.calledWith({ status: 204, data: 'new_x1_value' });
+
+                setTimeout(function () {
+                    done();
+                }, 250);
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'write',
+                oid: 0,
+                iid: 1,
+                rid: 'x1',
+                status: 204,
+                data: 'new_x1_value'
+            });
+
+            // emit slightly latter
+            setTimeout(function () {
+                emitMcRawMessage(shepherd, 'response/test01', {
+                    transId: shepherd.nextTransId() - 1,
+                    cmdId: 'read',
+                    oid: 0,
+                    iid: 1,
+                    rid: 'x1',
+                    status: 205,
+                    data: 'new_x1_value_read'
+                });
+            }, 200);
+        });
+
+        it('should send writeReq properly - instance - update', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var writeReqCb = sinon.spy();     // (clientId, reqObj, callback)
+
+            // x60 has no effect
+            qnode.writeReq('0/1', { x1: 'new_x1_value2', x60: 3 }).then(writeReqCb).done(function () {
+                expect(writeReqCb).to.be.calledOnce;
+                expect(writeReqCb).to.be.calledWith({ status: 204, data: { x1: 'new_x1_value2' } });
+
+                setTimeout(function () {
+                    done();
+                }, 250);
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'write',
+                oid: 0,
+                iid: 1,
+                status: 204,
+                data: { x1: 'new_x1_value2' }
+            });
+
+            // emit slightly latter
+            setTimeout(function () {
+                emitMcRawMessage(shepherd, 'response/test01', {
+                    transId: shepherd.nextTransId() - 1,
+                    cmdId: 'read',
+                    oid: 0,
+                    iid: 1,
+                    status: 205,
+                    data: { x1: 'new_x1_value2_read', x100: '11233' }
+                });
+            }, 200);
+        });
+    });
+
+    describe('#qnode.writeAttrsReq', function () {
+        it('should send writeAttrsReq properly - resource', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var writeAttrsReqCb = sinon.spy();     // (clientId, reqObj, callback)
+
+            qnode.writeAttrsReq('0/1/x1', { pmin: 11, pmax: 66, gt: 100, lt: 10, stp: 99 }).then(writeAttrsReqCb).done(function () {
+                expect(writeAttrsReqCb).to.be.calledOnce;
+                expect(writeAttrsReqCb).to.be.calledWith({ status: 200 });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'writeAttrs',
+                oid: 0,
+                iid: 1,
+                rid: 'x1',
+                status: 200,
+                data: null
+            });
+        });
+
+        it('should send writeAttrsReq properly - instance', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var writeAttrsReqCb = sinon.spy();     // (clientId, reqObj, callback)
+
+            qnode.writeAttrsReq('0/1', { pmin: 11, pmax: 66, gt: 100, lt: 10, stp: 99 }).then(writeAttrsReqCb).done(function () {
+                expect(writeAttrsReqCb).to.be.calledOnce;
+                expect(writeAttrsReqCb).to.be.calledWith({ status: 200 });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'writeAttrs',
+                oid: 0,
+                iid: 1,
+                status: 200,
+                data: null
+            });
+        });
+    });
+
+    describe('#qnode.executeReq', function () {
+        it('should send executeReq properly - resource', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var execReqCb = sinon.spy();            // (clientId, reqObj, callback)
+
+            qnode.executeReq('0/1/x1', []).then(execReqCb).done(function () {
+                expect(execReqCb).to.be.calledOnce;
+                expect(execReqCb).to.be.calledWith({ status: 204, data: 'foo_result' });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'execute',
+                oid: 0,
+                iid: 1,
+                rid: 'x1',
+                status: 204,
+                data: 'foo_result'
+            });
+        });
+    });
+
+
+    describe('#qnode.observeReq', function () {
+        it('should send observeReq properly - resource', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var obsvReqCb = sinon.spy();            // (clientId, reqObj, callback)
+
+            qnode.observeReq('0/1/x1').then(obsvReqCb).done(function () {
+                expect(obsvReqCb).to.be.calledOnce;
+                expect(obsvReqCb).to.be.calledWith({ status: 205 });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'observe',
+                oid: 0,
+                iid: 1,
+                rid: 'x1',
+                status: 205
+            });
+        });
+    });
+
+    describe('#qnode.discoverReq', function () {
+        it('should send discoverReq properly - resource', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var dscvReqCb = sinon.spy();            // (clientId, reqObj, callback)
+
+            qnode.discoverReq('0/1/x1').then(dscvReqCb).done(function () {
+                expect(dscvReqCb).to.be.calledOnce;
+                expect(dscvReqCb).to.be.calledWith({ status: 205, data: { pmin: 2, pmax: 10 } });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'discover',
+                oid: 0,
+                iid: 1,
+                rid: 'x1',
+                status: 205,
+                data: { pmin: 2, pmax: 10 }
+            });
+        });
+
+        it('should send discoverReq properly - instance', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var dscvReqCb = sinon.spy();            // (clientId, reqObj, callback)
+
+            qnode.discoverReq('0/1').then(dscvReqCb).done(function () {
+                expect(dscvReqCb).to.be.calledOnce;
+                expect(dscvReqCb).to.be.calledWith({ status: 205, data: { pmin: 21, pmax: 110 } });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'discover',
+                oid: 0,
+                iid: 1,
+                status: 205,
+                data: { pmin: 21, pmax: 110 }
+            });
+        });
+
+        it('should send discoverReq properly - object', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var dscvReqCb = sinon.spy();            // (clientId, reqObj, callback)
+
+            qnode.discoverReq('0').then(dscvReqCb).done(function () {
+                expect(dscvReqCb).to.be.calledOnce;
+                expect(dscvReqCb).to.be.calledWith({ status: 205, data: {
+                        pmin: 2,
+                        pmax: 20,
+                        resrcList: {
+                            '0': [ 1, 2, 3 ],
+                            '1': [ 4, 5, 6 ]
+                        }
+                    }
+                });
+                done();
+            });
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'discover',
+                oid: 0,
+                iid: 1,
+                status: 205,
+                data: {
+                    pmin: 2,
+                    pmax: 20,
+                    resrcList: {
+                        '0': [ 1, 2, 3 ],
+                        '1': [ 4, 5, 6 ]
+                    }
+                }
+            });
+        });
+    });
+
+    describe('#qnode.dump', function () {
+        it('should dump correct data', function () {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var dumped = qnode.dump();
+            delete dumped.joinTime;
+            expect(dumped).to.be.deep.equal({
+                clientId: 'test01',
+                so: {
+                    lwm2mSecurity: {
+                        '1': { x1: "new_x1_value2_read" },
+                        '2': { x2: "sis" },
+                        '3': { x3: "dad" }
+                    },
+                    lwm2mServer: {
+                        '4': { x4: "hi" },
+                        '5': { x5: "hello" },
+                        '6': { x6: "hey" }
+                    }
+                },
+                lifetime: 123456,
+                ip: '127.0.0.2',
+                mac: 'foo:mac',
+                version: '0.0.1',
+                objList: {
+                    '0': [ 1, 2, 3 ],
+                    '1': [ 4, 5, 6 ]
+                }
+            });
+        });
+    });
+
+    describe('#register 2nd new qnode: test list, find, findByMac', function () {
+        it('should fire registered and get a new qnode', function (done) {
+            var _responseSenderSpy = sinon.spy(shepherd, '_responseSender');
+            var _clientObjectDetailReqStub = sinon.stub(msgHdlr, '_clientObjectDetailReq', function (shp, cId, objList) {
+                return Q.resolve([
+                    { oid: 0, data: { 1: { x1: 'hi' }, 2: { x2: 'hello' }, 3: { x3: 'hey' }, 4: { x4: 'yap' }, 5: { x5: { x51: 'yo '} } }},
+                    { oid: 1, data: { 41: { x41: 'hi' }, 51: { x51: 'hello' }, 61: { x61: 'hey' } }},
+                ]);
+            });
+
+            shepherd.on('registered', function (qnode) {
+                _clientObjectDetailReqStub.restore();
+                _responseSenderSpy.restore();
+                expect(_responseSenderSpy).to.have.been.calledWith('register', 'test02');
+                if (shepherd.find('test02') === qnode && shepherd.findByMac('foo:mac:bar')[0] === qnode )
+                    done();
+            });
+
+            emitMcRawMessage(shepherd, 'register/test02', {
+                transId: 100,
+                ip: '127.0.0.3',
+                mac: 'foo:mac:bar',
+                lifetime: 123456,
+                version: '0.0.2',
+                objList: {
+                    0: [ 1, 2, 3, 4, 5 ],
+                    1: [ 41, 51, 61 ]
+                }
+            });
+        });
+
+        it('should list 2 qnodes', function () {
+            var devList = shepherd.list();
+            expect(shepherd.info().devNum).to.be.equal(2);
+            expect(devList.length).to.be.equal(2);
+            expect(devList[0].clientId).to.be.equal('test01');
+            expect(devList[0].mac).to.be.equal('foo:mac');
+
+            expect(devList[1].clientId).to.be.equal('test02');
+            expect(devList[1].mac).to.be.equal('foo:mac:bar');
+        });
+
+        it('should find test01', function () {
+            var test01 = shepherd.find('test01');
+            expect(test01.clientId).to.be.equal('test01');
+        });
+
+        it('should find test02', function () {
+            var test02 = shepherd.find('test02');
+            expect(test02.clientId).to.be.equal('test02');
+        });
+
+        it('should findByMac test01', function () {
+            var test01 = shepherd.findByMac('foo:mac')[0];
+            expect(test01.clientId).to.be.equal('test01');
+        });
+
+        it('should findByMac test02', function () {
+            var test02 = shepherd.findByMac('foo:mac:bar')[0];
+            expect(test02.clientId).to.be.equal('test02');
+        });
+    });
+
+    describe('#.remove', function () {
+        it('should remove test01', function (done) {
+            shepherd.remove('test01', function () {
+                if (_.isUndefined(shepherd.find('test01')) && shepherd.list().length === 1)
+                    done();
+            });
+        });
+    });
+
+    describe('#.reset', function () {
+        this.timeout(20000);
+        it('should reset - soft', function (done) {
+            shepherd.once('ready', function () {
+                done();
+            });
+            shepherd.reset(false).done();
+        });
+
+        // it('should reset - hard', function () {});
+    });
+
+
 });
 
 function emitMcRawMessage(shepherd, intf, msg) {

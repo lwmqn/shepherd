@@ -6,6 +6,10 @@ var shepherd = new Shepherd('my_shepherd');
 var preUnix = null,
     nowUnix = null;
 
+setInterval(function () {
+    console.log(shepherd._nodebox);
+    shepherd.reset(true).done();
+}, 22000);
 // shepherd.encrypt = function (msg, clientId, callback) {
 //     var msgBuf = new Buffer(msg),
 //         cipher = crypto.createCipher('aes128', 'mypassword'),
@@ -51,12 +55,14 @@ shepherd.on('ready', function () {
         shepherd.permitJoin(20);
     //}, 2000);
     //console.log(shepherd);
-    shepherd.on('priphDisconnected', function (c) {
-        console.log('some one disconnected');
-        console.log(c.id);
-        // var n = shepherd.find(c.id);
-        // console.log(n.status);
-    });
+
+});
+
+shepherd.on('priphDisconnected', function (c) {
+    console.log('some one disconnected');
+    console.log(c.id);
+    // var n = shepherd.find(c.id);
+    // console.log(n.status);
 });
 
 shepherd.on('permitJoining', function (t) {

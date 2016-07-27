@@ -111,9 +111,9 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [stop()](#API_stop)  
     * [permitJoin()](#API_permitJoin)  
     * [info()](#API_info)  
-    * [listDevices()](#API_listDevices)  
+    * [list()](#API_list)  
     * [find()](#API_find)  
-    * [findByMacAddr()](#API_findByMacAddr)  
+    * [findByMac()](#API_findByMac)  
     * [remove()](#API_remove)  
     * [announce()](#API_announce)  
     * [maintain()](#API_maintain)  
@@ -293,8 +293,8 @@ console.log(qserver.info());
 ```
 
 *************************************************
-<a name="API_listDevices"></a>
-### .listDevices([clientIds])
+<a name="API_list"></a>
+### .list([clientIds])
 List records of the registered Client Devices.  
 
 **Arguments:**  
@@ -320,7 +320,7 @@ List records of the registered Client Devices.
 **Examples:**  
     
 ```js
-console.log(qserver.listDevices([ 'foo_id', 'bar_id', 'no_such_id' ]));
+console.log(qserver.list([ 'foo_id', 'bar_id', 'no_such_id' ]));
 
 // [
 //     {
@@ -378,8 +378,8 @@ if (qnode) {
 ```
 
 *************************************************
-<a name="API_findByMacAddr"></a>
-### .findByMacAddr(macAddr)
+<a name="API_findByMac"></a>
+### .findByMac(macAddr)
 Find registered client devices(qnodes) by the specified mac address.  
 
 **Arguments:**  
@@ -394,7 +394,7 @@ Find registered client devices(qnodes) by the specified mac address.
 **Examples:**  
     
 ```js
-var qnodes = qserver.findByMacAddr('9e:65:f9:0b:24:b8');
+var qnodes = qserver.findByMac('9e:65:f9:0b:24:b8');
 
 if (qnodes.length) {
     // do something upon the qnode, like qnode.readReq()
