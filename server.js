@@ -6,10 +6,10 @@ var shepherd = new Shepherd('my_shepherd');
 var preUnix = null,
     nowUnix = null;
 
-setInterval(function () {
-    console.log(shepherd._nodebox);
-    shepherd.reset(true).done();
-}, 22000);
+// setInterval(function () {
+//     console.log(shepherd._nodebox);
+//     shepherd.reset(true).done();
+// }, 22000);
 // shepherd.encrypt = function (msg, clientId, callback) {
 //     var msgBuf = new Buffer(msg),
 //         cipher = crypto.createCipher('aes128', 'mypassword'),
@@ -89,7 +89,10 @@ shepherd.on('ind:changed', function (msg) {
 shepherd.on('ind:notified', function (qnode, msg) {
     // preUnix = nowUnix;
     // nowUnix = moment().unix();
-
+    qnode.pingReq(function (err, rsp) {
+        console.log('######## PING');
+        console.log(rsp);
+    });
     // t++;
     // if (t > 5) {
     //     shepherd._responseSender('notify', msg.clientId, { transId: msg.transId, status: 204, cancel: true });

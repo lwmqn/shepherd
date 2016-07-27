@@ -712,6 +712,25 @@ describe('Functional Check', function () {
         });
     });
 
+    describe('#qnode.pingReq', function () {
+        it('should ping successfully', function (done) {
+            var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+            var pingReqCb = sinon.spy();            // (clientId, reqObj, callback)
+
+            qnode.pingReq().then(function (rsp) {
+                if (rsp.status === 200)
+                    done();
+            }).done();
+
+            // fake rx
+            emitMcRawMessage(shepherd, 'response/test01', {
+                transId: shepherd.nextTransId() - 1,
+                cmdId: 'ping',
+                status: 200
+            });
+        });
+    });
+
     describe('#qnode.dump', function () {
         it('should dump correct data', function () {
             var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
