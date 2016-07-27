@@ -248,19 +248,25 @@ describe('Functional Check', function () {
             shepherd.once('_ready', function () {
                 _readyCbCalled = true;
                 if (_readyCbCalled && readyCbCalled && startCbCalled && shepherd._enabled)
-                    done();
+                    setTimeout(function () {
+                        done();
+                    }, 200);
             });
 
             shepherd.once('ready', function () {
                 readyCbCalled = true;
                 if (_readyCbCalled && readyCbCalled && startCbCalled && shepherd._enabled)
-                    done();
+                    setTimeout(function () {
+                        done();
+                    }, 200);
             });
 
             shepherd.start(function (err, result) {
                 startCbCalled = true;
                 if (_readyCbCalled && readyCbCalled && startCbCalled && shepherd._enabled)
-                    done();
+                    setTimeout(function () {
+                        done();
+                    }, 200);
             });
         });
     });

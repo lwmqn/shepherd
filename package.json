@@ -19,7 +19,7 @@
   "homepage": "https://github.com/lwmqn/mqtt-shepherd",
   "dependencies": {
     "areq": "^0.0.9",
-    "busyman": "^0.1.3",
+    "busyman": "^0.1.4",
     "lwmqn-util": "^0.1.0",
     "mosca": "^2.0.2",
     "mqtt": "^1.5.0",
