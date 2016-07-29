@@ -27,7 +27,7 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 Lightweight MQTT machine network (**LWMQN**) is an architecture that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
 * This module, **mqtt-shepherd**, is an implementation of LWMQN Server that can run on platfroms equipped with node.js.  
-* LWMQN Client and Server benefits from IPSO data model, which leads to a very comprehensive way for the Server to use a *path* with URI-style to allocate and query Resources on Client Devices.  
+* LWMQN Client and Server benefits from [IPSO data model](http://www.ipso-alliance.org/ipso-community/resources/smart-objects-interoperability/), which leads to a very comprehensive way for the Server to use a *path* with URI-style to allocate and query Resources on Client Devices.  
 * In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.  
   
 ```js
@@ -44,8 +44,8 @@ qnode.readReq('3304/0/5700', function (err, rsp) {
   
 
 **Note**:  
-* IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where oid, iid, and rid are identifiers of them respectively to allocate resources on a Client Device.  
-* An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an iid on each Object Instance to distinguish one entity from the other.  
+* IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where `oid`, `iid`, and `rid` are identifiers of them respectively used to allocate resources on a Client Device.  
+* An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an unique `iid` on each Object Instance to distinguish one entity from the other.  
 
 <br />
 
@@ -84,7 +84,12 @@ var qserver = new MqttShepherd();   // create a LWMQN server
 
 qserver.on('ready', function () {
     console.log('Server is ready.');
-    qserver.permitJoin(180);        // allow devices to join the network within 180 secs
+
+    // allow devices to join the network within 180 secs
+    qserver.permitJoin(180, function (err, isAllowed) {
+        if (!err)
+            console.log(isAllowed); // true
+    }); 
 });
 
 qserver.start(function (err) {      // start the sever
@@ -101,25 +106,25 @@ qserver.start(function (err) {      // start the sever
   
 This moudle provides you with **MqttShepherd** and **MqttNode** classes.  
 
-* The MqttShepherd class brings you a LWMQN Server with network managing facilities, i.e., start/stop the Server, permit device joining, find an joined node. This document uses `qserver` to denote the instance of this Server class.  
+* The **MqttShepherd** class brings you a LWMQN Server with network managing facilities, i.e., start/stop the Server, permit device joining, find an joined node. This document uses `qserver` to denote the instance of this class.  
 
-* The MqttNode is the class for creating a software endpoint to represent the remote Client Device at server-side. This document uses `qnode` to denote the instance of this class. You can invoke methods on a `qnode` to operate the remote Device.  
+* The **MqttNode** is the class for creating a software endpoint to represent the remote Client Device at server-side. This document uses `qnode` to denote the instance of this class. You can invoke methods on a `qnode` to operate the remote Device.  
 
 * MqttShepherd APIs  
     * [new MqttShepherd()](#API_MqttShepherd)  
-    * [start()](#API_start)  
-    * [stop()](#API_stop)  
-    * [permitJoin()](#API_permitJoin)  
-    * [info()](#API_info)  
-    * [list()](#API_list)  
-    * [find()](#API_find)  
-    * [findByMac()](#API_findByMac)  
-    * [remove()](#API_remove)  
-    * [announce()](#API_announce)  
-    * [maintain()](#API_maintain)  
+    * [qserver.start()](#API_start)  
+    * [qserver.stop()](#API_stop)  
+    * [qserver.permitJoin()](#API_permitJoin)  
+    * [qserver.info()](#API_info)  
+    * [qserver.list()](#API_list)  
+    * [qserver.find()](#API_find)  
+    * [qserver.findByMac()](#API_findByMac)  
+    * [qserver.remove()](#API_remove)  
+    * [qserver.announce()](#API_announce)  
+    * [qserver.maintain()](#API_maintain)  
     * Events: [ready](#EVT_ready), [error](#EVT_error), [permitJoining](#EVT_permit), [ind](#EVT_ind), and [message](#EVT_message)  
 
-* MqttNode APIs (`qnode` denotes the instance of this class)  
+* MqttNode APIs  
     * [qnode.readReq()](#API_readReq)  
     * [qnode.writeReq()](#API_writeReq)  
     * [qnode.writeAttrsReq()](#API_writeAttrsReq)  
@@ -143,7 +148,7 @@ Create a new instance of the `MqttShepherd` class. The created instance is a LWM
   
 **Arguments:**  
 
-1. `name` (_String_): Server name. A default name `'mqtt_shepherd'` will be used if not given.  
+1. `name` (_String_): Server name. A default name `'mqtt-shepherd'` will be used if not given.  
 2. `settings` (_Object_): Settings for the Mosca MQTT broker. If not given, the default settings will be applied, i.e. port 1883 for the broker, LevelUp for presistence. You can set up your own backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. Please refer to the [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage) for details.  
     
 **Returns:**  
@@ -167,7 +172,7 @@ var qserver = new MqttShepherd('my_iot_server', {
 });
 ```
 
-* Create a server with other backend (example from Mosca wiki)
+* Create a server with other backend ([example from Mosca wiki](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage#--mongodb))
 
 ```js
 var qserver = new MqttShepherd('my_iot_server', {
@@ -232,21 +237,25 @@ qserver.stop(function (err) {
 *************************************************
 
 <a name="API_permitJoin"></a>
-### .permitJoin(time)
+### .permitJoin(time[, callback])
 Allow or disallow devices to join the network.  
 
 **Arguments:**  
 
 1. `time` (_Number_): Time in seconds for qsever allowing devices to join the network. Set `time` to `0` can immediately close the admission.  
-  
+2. `callback` (_Function_): `function (err, isAllowed) { ... }`, where `isAllowed` tells if the shepherd is now allowed for device joining.  
+
 **Returns:**  
   
-* (_Object_): qserver
+* _none_
 
 **Examples:**  
     
 ```js
-qserver.permitJoin(180); // permit devices to join for 180 seconds 
+qserver.permitJoin(180, function (err, isAllowed) {
+    if (!err)
+        console.log(isAllowed); // true
+}); // permit devices to join for 180 seconds 
 ```
 
 *************************************************
@@ -261,12 +270,12 @@ Returns the qserver infomation.
   
 **Returns:**  
   
-* (_Object_): An object that contains information about the Server. Fields in this object are given in the following table.  
+* (_Object_): An object that contains information about the Server. Properties in this object are given in the following table.  
 
 | Property       | Type    | Description                                                 |
 |----------------|---------|-------------------------------------------------------------|
 | name           | String  | Server name                                                 |
-| enabled        | Boolean | Server is up(true) or down(false)                           |
+| enabled        | Boolean | Server is up(`true`) or down(`false`)                       |
 | net            | Object  | Network information, `{ intf, ip, mac, routerIp }`          |
 | devNum         | Number  | Number of devices have joined the network                   |
 | startTime      | Number  | Unix Time (secs)                                            |
@@ -275,7 +284,7 @@ Returns the qserver infomation.
 **Examples:**  
     
 ```js
-console.log(qserver.info());
+qserver.info();
 
 // {
 //     name: 'my_iot_server',
@@ -288,7 +297,7 @@ console.log(qserver.info());
 //     },
 //     devNum: 36,
 //     startTime: 1454419506,
-//     permitTimeLeft: 36
+//     joinTimeLeft: 36
 // }  
 ```
 
@@ -299,7 +308,7 @@ List records of the registered Client Devices.
 
 **Arguments:**  
 
-1. `clientIds` (_Array_): An array of client ids to query for their records. All device records will be returned if `clientIds` is not given.  
+1. `clientIds` (_String_ | _String[]_): A single client id or an array of client ids to query for their records. All device records will be returned if `clientIds` is not given.  
   
 **Returns:**  
   
@@ -754,9 +763,9 @@ Configure the report settings of a Resource, an Object Instance, or an Object. T
 
 3. `callback` (_Function_):  `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-    | Property | Type    | Description                                                             |
-    |----------|---------|-------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, and 408. See [Status Code](#).                      |
+    | Property | Type    | Description                                                                                          |
+    |----------|---------|------------------------------------------------------------------------------------------------------|
+    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, and 408. See [Status Code](#). |
 
   
 **Returns:**  
