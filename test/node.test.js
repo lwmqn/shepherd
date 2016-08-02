@@ -36,8 +36,6 @@ var smObj1 = {
 
 var node;
 
-var dbFolder = path.resolve('./lib/database_test');
-    dbPath = path.resolve('./lib/database_test/mqtt.db');
 
 var fakeShp = {
     _mqdb: null
@@ -48,10 +46,30 @@ node.so.addObjects(_.merge(smObj1, smObj2));
 var myso = node.so;
 
 describe('mqtt-node verify', function () {
+    var dbFolderY = path.resolve('./lib/database');
+        dbPathY = path.resolve('./lib/database/mqttNode.db');
 
-    before(function () {
-        fakeShp._mqdb = new Mqdb(dbPath);
-        node = new MqttNode(fakeShp, cId, devAttrs);
+    before(function (done) {
+        fs.stat(dbPathY, function (err, stats) {
+            if (err) {
+                fs.mkdir(dbFolderY, function () {
+
+                    fakeShp._mqdb = new Mqdb(dbPathY);
+
+                    setTimeout(function () {
+                        done();
+                    }, 200);
+                });
+            } else {
+                fs.unlink(path.resolve('./lib/database/mqttNode.db'), function () {
+                    fakeShp._mqdb = new Mqdb(dbPathY);
+                    setTimeout(function () {
+                        done();
+                    }, 200);
+                    
+                });
+            }
+        });
     });
 
     describe('Constructor Check', function () {
@@ -906,7 +924,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after ip update', function () {
+            it('should pass equality test after ip update', function (done) {
                 var newAttrs = { ip: '111.111.222.221' },
                     diff;
                 nodex._registered = true;

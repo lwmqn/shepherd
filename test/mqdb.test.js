@@ -51,14 +51,34 @@ var nodeMock4 = {
     humidSensor: { 0: { sensorValue: 11, units: 'pcnt' } }
 };
 
+var mqdb = null;
+
 describe('Database Testing', function () {
     // clear the database file
-    var dbFolder = path.resolve('./database_test');
-        dbPath = path.resolve('./database_test/mqtt.db');
-    var mqdb;
+    var dbFolderX = path.resolve('./lib/database');
+        dbPathX = path.resolve('./lib/database/mqttDB.db');
 
-    before(function () {
-        mqdb = new Mqdb(dbPath);
+    before(function (done) {
+        fs.stat(dbPathX, function (err, stats) {
+            if (err) {
+                fs.mkdir(dbFolderX, function () {
+
+                    mqdb = new Mqdb(dbPathX);
+
+                    setTimeout(function () {
+                        done();
+                    }, 200);
+                });
+            } else {
+                fs.unlink(path.resolve('./lib/database/mqttDB.db'), function () {
+                    mqdb = new Mqdb(dbPathX);
+                    setTimeout(function () {
+                        done();
+                    }, 200);
+                    
+                });
+            }
+        });
     });
 
     describe('#.insert', function () {
@@ -470,5 +490,3 @@ describe('Database Testing', function () {
     });
 
 });
-
-    
