@@ -131,6 +131,7 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [qnode.discoverReq()](#API_discoverReq)  
     * [qnode.executeReq()](#API_executeReq)  
     * [qnode.observeReq()](#API_observeReq)  
+    * [qnode.pingReq()](#API_pingReq)  
     * [qnode.dump()](#API_dump)  
     
 *************************************************
@@ -955,7 +956,33 @@ qnode.observeReq('temperature/0/noSuchResource', function (err, rsp) {
 ```
 
 ***********************************************
+<a name="API_pingReq"></a>
+### qnode.pingReq(callback)
+Ping the remote Client Device.  
 
+**Arguments:**  
+
+1. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` is a response object with a status code to tell the result of pinging. `rsp.data` is the approximate round trip time in milliseconds.  
+
+    | Property | Type    | Description                                                             |
+    |----------|---------|-------------------------------------------------------------------------|
+    |  status  | Number  | Status code of the response. Possible status code is 200 (OK).          |
+    |  data    | Number  | Approximate round trip time in milliseconds.                            |
+
+**Returns:**  
+  
+* (_none_)
+
+**Examples:**  
+    
+```js
+qnode.pingReq(function (err, rsp) {
+    if (!err)
+        console.log(rsp);   // { status: 200, data: 12 }, round trip time is 12 ms
+});
+```
+
+***********************************************
 <a name="API_dump"></a>
 ### qnode.dump()
 Dump record of the Client Device.  
