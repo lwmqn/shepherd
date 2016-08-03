@@ -114,6 +114,7 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [new MqttShepherd()](#API_MqttShepherd)  
     * [qserver.start()](#API_start)  
     * [qserver.stop()](#API_stop)  
+    * [qserver.reset()](#API_reset)  
     * [qserver.permitJoin()](#API_permitJoin)  
     * [qserver.info()](#API_info)  
     * [qserver.list()](#API_list)  
@@ -121,7 +122,6 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [qserver.findByMac()](#API_findByMac)  
     * [qserver.remove()](#API_remove)  
     * [qserver.announce()](#API_announce)  
-    * [qserver.maintain()](#API_maintain)  
     * Events: [ready](#EVT_ready), [error](#EVT_error), [permitJoining](#EVT_permit), [ind](#EVT_ind), and [message](#EVT_message)  
 
 * MqttNode APIs  
@@ -132,6 +132,7 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [qnode.executeReq()](#API_executeReq)  
     * [qnode.observeReq()](#API_observeReq)  
     * [qnode.pingReq()](#API_pingReq)  
+    * [qnode.maintain()](#API_maintain)  
     * [qnode.dump()](#API_dump)  
     
 *************************************************
@@ -232,6 +233,41 @@ Stop the qserver.
 qserver.stop(function (err) {
     if (!err)
         console.log('server stopped.');
+});
+```
+
+*************************************************
+
+<a name="API_reset"></a>
+### .reset([mode,] [callback])
+Reset the server. A hard reset (`mode == true`) will clear the database and all qnodes. After the server restarted, a `'ready'` event will be fired.  
+
+**Arguments:**  
+
+1. `mode` (_Boolean_): `true` for a hard reset, and `false` for a soft reset. Default is 'false'.  
+1. `callback` (_Function_): `function (err) { }`. Get called after the server restarted.  
+  
+**Returns:**  
+  
+* _none_
+
+**Examples:**  
+    
+```js
+qserver.on('ready', function () {
+    console.log('server is ready');
+});
+
+// default is soft reset
+qserver.reset(function (err) {
+    if (!err)
+        console.log('server restarted.');
+});
+
+// hard reset
+qserver.reset(true, function (err) {
+    if (!err)
+        console.log('server restarted.');
 });
 ```
 
@@ -454,46 +490,6 @@ The Server can use this method to announce(/broadcast) any message to all Client
     
 ```js
 qserver.announce('Rock on!');
-```
-
-*************************************************
-<a name="API_maintain"></a>
-### .maintain([clientIds,][callback])
-Maintain Clients in the network. This will refresh all Client Devices on qserver by rediscovering them. Only the specified Client Devices will be refresh if calling with an array of `clientIds`.  
-
-**Arguments:**  
-
-1. `clientIds` (_String[]_): An array of Client ids.  
-2. `callback` (_Function_): `function (err, results) { ... }`. Get called after the maintenance finished. The `results` is an array to indicate whether each Client Device is successfully refreshed. Each entry in `results` is an object of `{ clientId, result }`, where `result` is a boolean to tell the success of refreshment.  
-
-  
-**Returns:**  
-  
-* _none_
-
-**Examples:**  
-    
-```js
-qserver.maintain(function (err, clientIds) {
-    console.log(clientIds);
-
-    // [
-    //    { clientId: 'foo', result: true },
-    //    { clientId: 'bar', result: true },
-    //     ...
-    //    { clientId: 'foobar', result: false },    // device may be offline
-    //    { clientId: 'barfoo', result: true }
-    // ]
-});
-
-server.maintain([ 'foo_id', 'no_such_id' ], function (err, clientIds) {
-    console.log(clientIds);
-
-    // [
-    //    { clientId: 'foo', result: true },
-    //    { clientId: 'no_such_id', result: false }
-    // ]
-});
 ```
 
 *************************************************
@@ -982,6 +978,27 @@ qnode.pingReq(function (err, rsp) {
 });
 ```
 
+*************************************************
+<a name="API_maintain"></a>
+### .maintain([callback])
+Maintain this Client Device. This will refresh its record on qserver by rediscovering the remote qnode.  
+
+**Arguments:**  
+
+1. `callback` (_Function_): `function (err, lastTime) { ... }`. Get called with the timestamp `lastTime` after this maintenance finished. An error occurs when the request is timeout or the qnode is offline.  
+  
+**Returns:**  
+  
+* _none_
+
+**Examples:**  
+    
+```js
+qnode.maintain(function (err, lastTime) {
+    if (!err)
+        console.log(lastTime);  // 1470192227322
+});
+```
 ***********************************************
 <a name="API_dump"></a>
 ### qnode.dump()

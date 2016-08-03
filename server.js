@@ -89,10 +89,12 @@ shepherd.on('ind:changed', function (msg) {
 shepherd.on('ind:notified', function (qnode, msg) {
     // preUnix = nowUnix;
     // nowUnix = moment().unix();
-    qnode.pingReq(function (err, rsp) {
-        console.log('######## PING');
-        console.log(rsp);
-    });
+
+    // qnode.pingReq(function (err, rsp) {
+    //     console.log('######## PING');
+    //     console.log(rsp);
+    // });
+
     // t++;
     // if (t > 5) {
     //     shepherd._responseSender('notify', msg.clientId, { transId: msg.transId, status: 204, cancel: true });
@@ -146,6 +148,15 @@ shepherd.on('ind:incoming', function (node) {
     console.log('NODE INCOMING');
     console.log(node.clientId);
     console.log(node.status);
+
+    // setInterval(function () {
+    //     node.maintain(function (err, data) {
+    //         console.log('********** MAINTAIN');
+    //         console.log(err);
+    //         console.log(data);
+    //     });
+    // }, 5000);
+
 
     // read test - resource
     // runtest(function () {
@@ -347,16 +358,17 @@ shepherd.on('ind:incoming', function (node) {
         node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
             console.log('>>>>> writeAttrs test');
             console.log(rsp);
-
-            node.observeReq('/3303/0/sensorValue', function (err, rsp) {
-                console.log('>>>>> observe test');
-                console.log(err);
-                console.log(rsp);
-                        node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
-                            console.log('>>>>> discover');
-                            console.log(rsp);
-                        });
-            });
+//--
+            // node.observeReq('/3303/0/sensorValue', function (err, rsp) {
+            //     console.log('>>>>> observe test');
+            //     console.log(err);
+            //     console.log(rsp);
+            //             node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
+            //                 console.log('>>>>> discover');
+            //                 console.log(rsp);
+            //             });
+            // });
+//--
         });
 
         // setTimeout(function () {

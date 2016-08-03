@@ -890,14 +890,22 @@ describe('Top Level of Tests', function () {
             this.timeout(20000);
             it('should reset - soft', function (done) {
                 shepherd.once('ready', function () {
-                    done();
+                    setTimeout(function () {
+                        done();
+                    }, 1000);
                 });
                 shepherd.reset(false).done();
             });
 
-            // it('should reset - hard', function () {});
+            it('should reset - hard', function (done) {
+                shepherd.once('ready', function () {
+                    setTimeout(function () {
+                        done();
+                    }, 1000);
+                });
+                shepherd.reset(true).done();
+            });
         });
-
 
     });
 
