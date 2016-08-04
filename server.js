@@ -86,6 +86,14 @@ shepherd.on('ind:changed', function (msg) {
     console.log(msg);
 });
 
+shepherd.on('ind:checkout', function (qnode) {
+    console.log(qnode.status);
+});
+
+shepherd.on('ind:checkin', function (qnode) {
+    console.log(qnode.status);
+});
+
 shepherd.on('ind:notified', function (qnode, msg) {
     // preUnix = nowUnix;
     // nowUnix = moment().unix();
