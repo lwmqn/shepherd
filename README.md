@@ -20,6 +20,8 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
     * MqttNode Class
 6. [Message Encryption](#Encryption)  
 7. [Auth Policies](#Auth)  
+8. [Sleep Mode](#Sleep)  
+9. [Status Code](#StatusCode)  
 
 <a name="Overiew"></a>
 ## 1. Overview
@@ -522,11 +524,11 @@ Fired when the Server is allowing for devices to join the network. The event wil
 `function (msg) { }`  
 Fired when there is an incoming indication message. The `msg` is an object with the properties given in the table:  
 
-| Property       | Type             | Description                                                                                                                      |
-|----------------|------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| type           | String           | Indication type, can be `'devIncoming'`, `'devLeaving'`, `'devUpdate'`, `'devNotify'`, `'devChange'`, or `'devStatus'`        |
-| qnode          | Object \| String | qnode instance, except that when `type === 'devLeaving'`, qnode will be a string of the clientId (since qnode has been removed)  |
-| data           | Depends          | Data along with the indication, which depends on the type of indication                                                          |
+| Property       | Type             | Description                                                                                                                                              |
+|----------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| type           | String           | Indication type, can be `'devIncoming'`, `'devLeaving'`, `'devUpdate'`, `'devNotify'`, `'devChange'`, `'devStatus'`, `'devCheckin'`, and `'devCheckout'` |
+| qnode          | Object \| String | qnode instance, except that when `type === 'devLeaving'`, qnode will be a string of the clientId (since qnode has been removed)                          |
+| data           | Depends          | Data along with the indication, which depends on the type of indication                                                                                   \|
 
 
 * ##### devIncoming  
@@ -617,16 +619,36 @@ Fired when there is an incoming indication message. The `msg` is an object with 
 
 
 **Note**:  
-    * The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is which a Client Device like to notify even if there is no change of it. A periodical notification is a good example, a Client Device has to report something under observation even there is no change of that thing. If the Server does notice there is really something changed, it will then fire `'devChange'` to report the change(s).  
+    * The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is which a Client Device like to notify even if there is no change of it. A periodical notification is a good example, a Client Device has to report something under observation even there is no change of that thing. If the Server does notice there is really something changed, it will then fire `'devChange'` to report the change(s). It is suggested to use `'devChange'` indication to update your GUI views, and to use `'devNotify'` indication to log data.  
 
 <br />
 
 * ##### devStatus  
-    When there is a Client Device going online or going offline, qserver will fire an `'ind'` event along this type of indication.  
+    When there is a Client Device going online, going offline, or going to sleep, qserver will fire an `'ind'` event along this type of indication.  
 
     * msg.type: `'devStatus'`  
     * msg.qnode: qnode  
-    * msg.data: `'online'` or `'offline'`  
+    * msg.data: `'online'`, `'sleep'`, or `'offline'`  
+
+<br />
+
+* ##### devCheckin  
+    When there is a Client Device waking up from sleep and doing the checkin to go online.  
+
+    * msg.type: `'devCheckin'`  
+    * msg.qnode: qnode  
+    * msg.data: `undefined`  
+
+<br />
+
+* ##### devCheckout  
+    When there is a Client Device going to sleep and doing the checkout to enter sleep mode.  
+
+    * msg.type: `'devCheckout'`  
+    * msg.qnode: qnode  
+    * msg.data: `undefined`  
+
+<br />
 
 *************************************************
 
@@ -703,10 +725,10 @@ Remotely write a value to the allocated Resource on a Client Device. The respons
 2. `val` (_Depends_): The value to write to the Resource.  
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object that has a status code along with the written data from the remote Client Device.  
 
-    | Property | Type    | Description                                                             |
-    |----------|---------|-------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, 405, and 408. See [Status Code](#).                      |
-    |  data    | Depends | `data` is the written value. It will be a string `'_unwritable_'` if the Resource is not allowed for writing.|
+    | Property | Type    | Description                                                                                                   |
+    |----------|---------|---------------------------------------------------------------------------------------------------------------|
+    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, 405, and 408. See [Status Code](#).     |
+    |  data    | Depends | `data` is the written value. It will be a string `'_unwritable_'` if the Resource is not allowed for writing. |
 
 **Returns:**  
   
@@ -749,8 +771,8 @@ Configure the report settings of a Resource, an Object Instance, or an Object. T
 1. `path` (_String_): Path of the allocated Resource, Object Instance, or Object on the remote Client Device.  
 2. `attrs` (_Object_): Parameters of the report settings.  
 
-    | Property | Type    | Mandatory | Description |
-    |----------|---------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | Property | Type    | Mandatory | Description                                                                                                                                                                                             |
+    |----------|---------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | pmin     | Number  | optional  | Minimum Period. Minimum time in seconds the Client Device should wait from the time when sending the last notification to the time when sending a new notification.                                     |
     | pmax     | Number  | optional  | Maximum Period. Maximum time in seconds the Client Device should wait from the time when sending the last notification to the time sending the next notification (regardless if the value has changed). |
     | gt       | Number  | optional  | Greater Than. The Client Device should notify its value when the value is greater than this setting. Only valid for the Resource typed as a number.                                                     |
@@ -814,9 +836,9 @@ Discover report settings of a Resource or, an Object Instance ,or an Object on t
 1. `path` (_String_):  Path of the allocated Resource, Object Instance, or Object on the remote Client Device.
 2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code along with the parameters of report settings.  
 
-    | Property | Type    | Description                                                                                                                          |
-    |----------|---------|--------------------------------------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#).                                                                                   |
+    | Property | Type    | Description                                                                                                                                                                                         |
+    |----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#).                                                                                           |
     |  data    | Object  | `data` is an object of the report settings. If the discoved target is an Object, there will be an additional field `data.resrcList` to list all its Resource idetifiers under each Object Instance. |
   
 **Returns:**  
@@ -861,10 +883,10 @@ Invoke an excutable Resource on the Client Device. An excutable Resource is like
 2. `args` (_Array_): The arguments to the procedure.  
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds. There will be a `data` field if the procedure does return something back, and the data type depends on the implementation at client-side.  
 
-    | Property | Type    | Description                                                             |
-    |----------|---------|-------------------------------------------------------------------------|
+    | Property | Type    | Description                                                                                                    |
+    |----------|---------|----------------------------------------------------------------------------------------------------------------|
     |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, 405, 408, and 500. See [Status Code](#). |
-    |  data    | Depends | What will be returned depends on the client-side implementation.        |
+    |  data    | Depends | What will be returned depends on the client-side implementation.                                               |
 
   
 **Returns:**  
@@ -918,8 +940,8 @@ Start observing a Resource on the Client Device. Please listen to event `'ind'` 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
 2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds.  
 
-    | Property | Type    | Description                                                             |
-    |----------|---------|-------------------------------------------------------------------------|
+    | Property | Type    | Description                                                                                               |
+    |----------|---------|-----------------------------------------------------------------------------------------------------------|
     |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#). |
 
   
@@ -1255,4 +1277,31 @@ qserver.authPolicy.authorizeSubscribe = function (client, topic, cb) {
 ```
 
 Please refer to Mosca Wiki to learn more about [Authentication & Authorization](https://github.com/mcollina/mosca/wiki/Authentication-&-Authorization)  
+
+***********************************************
+<br />
+
+<a name="Sleep"></a>
+## 8. Sleep Mode  
+
+[TBD]
+
+LWM2M has defined the _Queue Mode Operation (Section 8.3 in LWM2M spec)_ for Client Devices to enter sleep mode (in spec, it's offline, not sleep really), and Client Devices could be waken up by SMS message.  
+
+LWMQN use a different scheme to manage the sleep devices. LWMQN has an 'checkin' interface, when Device likes to sleep, it can send a checkout message to Server. And it can also tell the Server when it may wakeup and checkin again. If Device did'nt tell when it will wakeup, the Server will always think that the Device is in sleep.
+
+If duration is given, Server will check if the Client has checked in within 2 seconds, if not, Server will recognize it as offline.  
+
+* When a Client does **checkin**, its status will be changed to `'online'`
+* When a Client does **checkout**, its status will be changed to `'sleep'`
+* When a Client does **checkout** without telling the Server when it may **checkin** again
+* When a Client does **checkout** with letting the Server know when it may **checkin** again
+
+In LWMQN, when a Client does checkout, it is telling the Server that it is going to sleep. And then, the Client can just close the MQTT connection and enter power-down mode or even power off. The server will take it as a sleep device, but not an 'offline' device.  
+
+Thus, a sleep device is online or offline? Can I send message to it? Every time something is going to a sleepy device, the Server will internally send a quick ping to check if it is alive. If device does'nt respond, the Server will find out if it would checkin within the system timeout (10 seconds), if the device may wakeup within the system timeout, your messsage will be send out with a little time delay.
+If the server doesn't know when the Client will wakeup or the Client will wakeup beyond the system timeout, then the API will pass an error back to you and let you know this device is sleeping. You can implement your scheme with `'devCheckin'` indication to pend your message.  
+
+Most of time, you don't have to worry about the 'sleep' thing, just call the APIs and see what happens.  
+
 
