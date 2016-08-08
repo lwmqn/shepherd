@@ -1286,9 +1286,13 @@ Please refer to Mosca Wiki to learn more about [Authentication & Authorization](
 
 [TBD]
 
-LWM2M has defined the _[Queue Mode Operation](http://dev_devtoolkit.openmobilealliance.org/IoT/LWM2M10/doc/TS/index.html#!Documents/queuemodeoperation.htm) (Section 8.3 in LWM2M spec)[]_ for Client Devices to enter sleep mode (in spec, it's offline, not sleep really), and Client Devices could be waken up by SMS message.  
+LWM2M has defined the _[Queue Mode Operation](http://dev_devtoolkit.openmobilealliance.org/IoT/LWM2M10/doc/TS/index.html#!Documents/queuemodeoperation.htm)_ (Section 8.3 in LWM2M spec) to queue messages for Client Devices those are _**offline**_. LWM2M specification does not use the world _**sleep**_. Client Devices could be waken up by SMS message if it is operating with **QS** mode.  
 
-LWMQN use a different scheme to manage the sleep devices. LWMQN has an 'checkin' interface, when Device likes to sleep, it can send a checkout message to Server. And it can also tell the Server when it may wakeup and checkin again. If Device did'nt tell when it will wakeup, the Server will always think that the Device is in sleep.
+LWMQN uses a different scheme to manage sleepy devices. LWMQN has a **schedule** interface to allow a registered Client Device for checking in the network and let the Server know that it is online now. **Schedule** interface also allows a registered Client Device for checking out from the network, and the Client can also give the `'duration'` to the Server to tell when it _**may**_ check in again. The Server will use this scheduled duration to poll the Client to see if it is sleeping or offline then. If you are interested in how the schedule interface works, please refer to the LWMQN documentation of [Sleep Mode](#).  
+
+With mqtt-shepherd, the Device status will be reported by the indication of `'devStatus'` to tell if a Device is now `'online'`, `'offline'`, or `'sleep'`. If you are sending a message to a `'online'` device, that's fine. If you are sending a message to a `'offline'` device, then you will get an error back to tell you that the Device is offline. How about sending a message to a `'sleep'` device? 
+
+, when Device likes to sleep, it can send a checkout message to Server. And it can also tell the Server when it may wakeup and checkin again. If Device did'nt tell when it will wakeup, the Server will always think that the Device is in sleep.
 
 If duration is given, Server will check if the Client has checked in within 2 seconds, if not, Server will recognize it as offline.  
 
