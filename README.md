@@ -1286,7 +1286,7 @@ Please refer to Mosca Wiki to learn more about [Authentication & Authorization](
 
 [TBD]
 
-LWM2M has defined the _Queue Mode Operation (Section 8.3 in LWM2M spec)_ for Client Devices to enter sleep mode (in spec, it's offline, not sleep really), and Client Devices could be waken up by SMS message.  
+LWM2M has defined the _[Queue Mode Operation](http://dev_devtoolkit.openmobilealliance.org/IoT/LWM2M10/doc/TS/index.html#!Documents/queuemodeoperation.htm) (Section 8.3 in LWM2M spec)[]_ for Client Devices to enter sleep mode (in spec, it's offline, not sleep really), and Client Devices could be waken up by SMS message.  
 
 LWMQN use a different scheme to manage the sleep devices. LWMQN has an 'checkin' interface, when Device likes to sleep, it can send a checkout message to Server. And it can also tell the Server when it may wakeup and checkin again. If Device did'nt tell when it will wakeup, the Server will always think that the Device is in sleep.
 
@@ -1305,3 +1305,21 @@ If the server doesn't know when the Client will wakeup or the Client will wakeup
 Most of time, you don't have to worry about the 'sleep' thing, just call the APIs and see what happens.  
 
 
+***********************************************
+<br />
+
+<a name="StatusCode"></a>
+## 9. Status Code  
+
+| Status Code               | Description                                                                        |
+|---------------------------|------------------------------------------------------------------------------------|
+| 200 (Ok)                  |                                                                                    |
+| 201 (Created)             |                                                                                    |
+| 202 (Deleted)             |                                                                                    |
+| 204 (Changed)             | The Server accepted this update message successfully                               |
+| 400 (BadRequest)          | There is an unrecognized attribute in the update message                           |
+| 404 (NotFound)            |                                                                                    |
+| 405 (MethodNotAllowed)    | If you are trying to change either `clientId` or `mac`, you will get this response |
+| 408 (Timeout)             | No response from the Server in 10 secs                                             |
+| 409 (Conflict)            |                                                                                    |
+| 500 (InternalServerError) | The Server has some trouble                                                        |
