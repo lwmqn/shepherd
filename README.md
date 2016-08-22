@@ -59,6 +59,8 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
 * **qserver**: Instance of MqttShepherd Class 
 * **qnode**: Instance of MqttNode Class  
 
+<br />
+
 <a name="Features"></a>
 ## 2. Features
 
@@ -321,19 +323,21 @@ Returns the qserver information.
 ```js
 qserver.info();
 
-// {
-//     name: 'my_iot_server',
-//     enabled: true,
-//     net: {
-//         intf: 'eth0',
-//         ip: '192.168.1.99',
-//         mac: '00:0c:29:6b:fe:e7',
-//         routerIp: '192.168.1.1'
-//     },
-//     devNum: 36,
-//     startTime: 1454419506,
-//     joinTimeLeft: 28
-// }  
+/*
+{
+    name: 'my_iot_server',
+    enabled: true,
+    net: {
+        intf: 'eth0',
+        ip: '192.168.1.99',
+        mac: '00:0c:29:6b:fe:e7',
+        routerIp: '192.168.1.1'
+    },
+    devNum: 36,
+    startTime: 1454419506,
+    joinTimeLeft: 28
+}
+*/
 ```
 
 *************************************************
@@ -462,7 +466,7 @@ Find registered Clients (qnodes) by the specified mac address. This method will 
 var qnodes = qserver.findByMac('9e:65:f9:0b:24:b8');
 
 if (qnodes.length) {
-    // do something upon the qnode, like qnode.readReq()
+    // do something upon the qnodes
 }
 ```
 
@@ -515,28 +519,28 @@ qserver.announce('Rock on!');
 
 <a name="EVT_ready"></a>
 ### Event: 'ready'  
-`function () { }`  
+Listener: `function () { }`  
 Fired when Server is ready.  
 
 *************************************************
 
 <a name="EVT_error"></a>
 ### Event: 'error'  
-`function (err) { }`  
+Listener: `function (err) { }`  
 Fired when there is an error occurs.  
 
 *************************************************
 
 <a name="EVT_permit"></a>
 ### Event: 'permitJoining'
-`function (joinTimeLeft) {}`  
+Listener: `function (joinTimeLeft) {}`  
 Fired when the Server is allowing for devices to join the network, where `joinTimeLeft` is number of seconds left to allow devices to join the network. This event will be triggered at each tick of countdown.  
 
 *************************************************
 
 <a name="EVT_ind"></a>
 ### Event: 'ind'
-`function (msg) { }`  
+Listener: `function (msg) { }`  
 Fired when there is an incoming indication message. The `msg` is an object with the properties given in the table:  
 
 | Property       | Type             | Description                                                                                                                     |
@@ -638,12 +642,12 @@ Fired when there is an incoming indication message. The `msg` is an object with 
 
 <a name="EVT_message"></a>
 ### Event: 'message'
-`function(topic, message, packet) {}`  
-Emitted when the Server receives any published packet from any remote Device  
+Listener: `function(topic, message, packet) {}`  
+Emitted when the Server receives any published packet from any remote Device.  
 
 1. `topic` (_String_): topic of the received packet  
 2. `message` (_Buffer_): payload of the received packet  
-3. `packet` (_Object_): the received packet, as defined in [mqtt-packet](#https://github.com/mqttjs/mqtt-packet#publish)  
+3. `packet` (_Object_): the received packet, as defined in [mqtt-packet](https://github.com/mqttjs/mqtt-packet#publish)  
 
 
 ***********************************************
@@ -654,9 +658,6 @@ Emitted when the Server receives any published packet from any remote Device
 This class provides you with methods to perform remote operations upon a registered Client Device. An instance of this class is denoted as `qnode` in this document.  
 
 ***********************************************
-
-<br />
-
 <a name="API_readReq"></a>
 ### qnode.readReq(path, callback)
 Remotely read a target from the Client Device. Response will be passed through the second argument of the callback.  
@@ -670,7 +671,7 @@ Remotely read a target from the Client Device. Response will be passed through t
 
     | Property | Type    | Description                                                                                                                                                                   |
     |----------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#).                                                                     |
+    |  status  | Number  | [Status code](#StatusCode) of the response. Possible status codes are 205, 400, 404, and 405.                                                                                 |
     |  data    | Depends | `data` can be the value of an Object, an Object Instance, or a Resource. Note that when an unreadable Resource is read, the returned value will be a string `'_unreadable_'`. |
   
 
@@ -694,10 +695,14 @@ qnode.readReq('/noSuchObject/0/foo', function (err, rsp) {
 qnode.readReq('/temperature/0/noSuchResource/', function (err, rsp) {
     console.log(rsp);       // { status: 404, data: undefined }
 });
+
+// Target is unreadable
+qnode.readReq('/temperature/0/foo', function (err, rsp) {
+    console.log(rsp);       // { status: 405, data: '_unreadable_' }
+});
 ```
 
 ***********************************************
-
 <a name="API_writeReq"></a>
 ### qnode.writeReq(path, val[, callback])
 Remotely write a value to the allocated _Resource_ on a Client Device. The response will be passed through the second argument of the callback.  
@@ -708,10 +713,10 @@ Remotely write a value to the allocated _Resource_ on a Client Device. The respo
 2. `val` (_Depends_): The value to write to the _Resource_.
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object that has a status code along with the written data from the remote Client Device.
 
-    | Property | Type    | Description                                                                                                   |
-    |----------|---------|---------------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, 405, and 408. See [Status Code](#).     |
-    |  data    | Depends | `data` is the written value. It will be a string `'_unwritable_'` if the Resource is not allowed for writing. |
+    | Property | Type    | Description                                                                                                         |
+    |----------|---------|---------------------------------------------------------------------------------------------------------------------|
+    |  status  | Number  | [Status code](#StatusCode) of the response. Possible status codes are 204, 400, 404, and 405.                       |
+    |  data    | Depends | `data` is the written value. It will be a string `'_unwritable_'` if the Resource is not allowed for writing.       |
 
 **Returns:**  
   
@@ -751,10 +756,10 @@ Invoke an excutable Resource on the Client Device. An excutable Resource is like
 2. `args` (_Array_): The arguments to the procedure.  
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds. There will be a `data` field if the procedure does return something back, and the data type depends on the implementation at client-side.  
 
-    | Property | Type    | Description                                                                                                    |
-    |----------|---------|----------------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, 405, 408, and 500. See [Status Code](#). |
-    |  data    | Depends | What will be returned depends on the client-side implementation.                                               |
+    | Property | Type    | Description                                                                                                              |
+    |----------|---------|--------------------------------------------------------------------------------------------------------------------------|
+    |  status  | Number  | [Status code](#StatusCode) of the response. Possible status codes are 204, 400, 404, 405, and 500.                       |
+    |  data    | Depends | What will be returned depends on the client-side implementation.                                                         |
 
   
 **Returns:**  
@@ -799,13 +804,12 @@ qnode.executeReq('temperature/0/sensedValue', function (err, rsp) {
 ```
 
 ***********************************************
-
 <a name="API_writeAttrsReq"></a>
 ### qnode.writeAttrsReq(path, attrs[, callback])
-Configure the report settings of a Resource, an Object Instance, or an Object. This method can also cancel an observation by assigning the `cancel` property to `true` within `attrs` object.  
+Configure the report settings of a Resource, an Object Instance, or an Object. This method can also be used to cancel an observation by assigning the `attrs.cancel` to `true`.  
     
 **Note**
-* This API won't start reporting of the notifications, call observe() method if you want to turn the report on.  
+* This API **won't start reporting** of the notifications, call observe() method if you want to turn the report on.  
 
 **Arguments:**  
 
@@ -823,9 +827,9 @@ Configure the report settings of a Resource, an Object Instance, or an Object. T
 
 3. `callback` (_Function_):  `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-    | Property | Type    | Description                                                                                          |
-    |----------|---------|------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 204, 400, 404, and 408. See [Status Code](#). |
+    | Property | Type    | Description                                                                                                    |
+    |----------|---------|----------------------------------------------------------------------------------------------------------------|
+    |  status  | Number  | [Status code](#StatusCode) of the response. Possible status codes are 204, 400, and 404.                       |
 
   
 **Returns:**  
@@ -867,7 +871,6 @@ qnode.writeAttrsReq('temperature/0/noSuchResource', {
 ```
 
 ***********************************************
-
 <a name="API_discoverReq"></a>
 ### qnode.discoverReq(path, callback)
 Discover report settings of a Resource or, an Object Instance ,or an Object on the Client Device.  
@@ -879,7 +882,7 @@ Discover report settings of a Resource or, an Object Instance ,or an Object on t
 
     | Property | Type    | Description                                                                                                                                                                                         |
     |----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#).                                                                                           |
+    |  status  | Number  | [Status code](#StatusCode) of the response. Possible status codes are 205, 400, 404, and 405.                                                                                                       |
     |  data    | Object  | `data` is an object of the report settings. If the discoved target is an Object, there will be an additional field `data.resrcList` to list all its Resource idetifiers under each Object Instance. |
   
 **Returns:**  
@@ -897,19 +900,20 @@ qnode.discoverReq('temperature/0/sensedValue', function (err, rsp) {
 // discover an Object successfully
 qnode.discoverReq('temperature/', function (err, rsp) {
     console.log(rsp);
-
-    // {
-    //   status: 205,
-    //   data: {
-    //      pmin: 10,
-    //      pmax: 600,
-    //      gt: 45,
-    //      resrcList: {
-    //          0: [ 1, 3, 88 ],    // Instance 0 has Resources 1, 3, and 88
-    //          1: [ 1, 2, 6 ]      // Instance 1 has Resources 1, 2, and 6
-    //      }
-    //   }
-    // }
+    /*
+    {
+      status: 205,
+      data: {
+         pmin: 10,
+         pmax: 600,
+         gt: 45,
+         resrcList: {
+             0: [ 1, 3, 88 ],    // Instance 0 has Resources 1, 3, and 88
+             1: [ 1, 2, 6 ]      // Instance 1 has Resources 1, 2, and 6
+         }
+      }
+    }
+    */
 });
 ```
 
@@ -923,9 +927,9 @@ Start observing a Resource on the Client Device. Please listen to event `'ind'` 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
 2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds.  
 
-    | Property | Type    | Description                                                                                               |
-    |----------|---------|-----------------------------------------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status codes are 205, 400, 404, 405, and 408. See [Status Code](#). |
+    | Property | Type    | Description                                                                                                         |
+    |----------|---------|---------------------------------------------------------------------------------------------------------------------|
+    |  status  | Number  | [Status code](#StatusCode) of the response. Possible status codes are 205, 400, 404, and 405.                       |
 
   
 **Returns:**  
@@ -963,12 +967,12 @@ Ping the remote Client Device.
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` is a response object with a status code to tell the result of pinging. `rsp.data` is the approximate round trip time in milliseconds.  
+1. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` is a response object with a status code to tell the result of pinging. `rsp.data` is the approximate round-trip time in milliseconds.  
 
-    | Property | Type    | Description                                                             |
-    |----------|---------|-------------------------------------------------------------------------|
-    |  status  | Number  | Status code of the response. Possible status code is 200 (OK).          |
-    |  data    | Number  | Approximate round trip time in milliseconds.                            |
+    | Property | Type    | Description                                                                   |
+    |----------|---------|-------------------------------------------------------------------------------|
+    |  status  | Number  | [Status code](#StatusCode) of the response. Possible status code is 200 (OK). |
+    |  data    | Number  | Approximate round trip time in milliseconds.                                  |
 
 **Returns:**  
   
@@ -979,7 +983,7 @@ Ping the remote Client Device.
 ```js
 qnode.pingReq(function (err, rsp) {
     if (!err)
-        console.log(rsp);   // { status: 200, data: 12 }, round trip time is 12 ms
+        console.log(rsp);   // { status: 200, data: 12 }, round-trip time is 12 ms
 });
 ```
 
@@ -990,7 +994,7 @@ Maintain this Client Device. This will refresh its record on qserver by rediscov
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, lastTime) { ... }`. Get called with the timestamp `lastTime` after this maintenance finished. An error occurs when the request is timeout or the qnode is offline.  
+1. `callback` (_Function_): `function (err, lastTime) { ... }`. Get called with the timestamp `lastTime` (ms) after this maintenance finished. An error occurs when the request is timeout or the qnode is offline.  
   
 **Returns:**  
   
@@ -1001,7 +1005,7 @@ Maintain this Client Device. This will refresh its record on qserver by rediscov
 ```js
 qnode.maintain(function (err, lastTime) {
     if (!err)
-        console.log(lastTime);  // 1470192227322
+        console.log(lastTime);  // 1470192227322 (ms, from 1970/1/1)
 });
 ```
 ***********************************************
@@ -1106,15 +1110,17 @@ console.log(qnode.dump());
 
 By default, the Server won't encrypt the message. You can override the encrypt() and decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your Client Devices as well.  
 
+Note: You may like to distribute pre-configured keys to your Clients and utilize the [authentication](#Auth) approach to build your own security subsystem.  
+
 ***********************************************
 ### qserver.encrypt(msg, clientId, cb)
 Method of encryption. Overridable.  
 
 **Arguments:**  
 
-1. `msg` is a string or a buffer.  
-2. `clientId` is the Client that this message going to.  
-3. `cb(err, encrypted)` is the callback you should call and pass the encrypted message to it after encryption.  
+1. `msg` (_String_ | _Buffer_): The outgoing message.  
+2. `clientId` (_String_): Indicates the Client of this message going to.  
+3. `cb` (_Function_): `function (err, encrypted) {}`, the callback you should call and pass the encrypted message to it after encryption.  
   
 
 ***********************************************
@@ -1123,9 +1129,9 @@ Method of decryption. Overridable.
 
 **Arguments:**  
 
-1. `msg` is a received buffer.  
-2. `clientId` is the Client that this message coming from.  
-3. `cb(err, decrypted)` is the callback you should call and pass the decrypted message to it after decryption.  
+1. `msg` (_Buffer_): The incoming message which is a raw buffer.  
+2. `clientId` (_String_): Indicates the Client of this message coming from.  
+3. `cb` (_Function_): `function (err, decrypted) {}`, the callback you should call and pass the decrypted message to it after decryption.  
   
 ***********************************************
 
@@ -1134,8 +1140,9 @@ Method of decryption. Overridable.
 ```js
 var qserver = new MqttShepherd('my_iot_server');
 
-// In this example, I simply encrypt the message with a constant password 'mysecrete'
-// You may like to get the password according to different Clients by `clientId`
+// In this example, I simply encrypt the message with a constant password 'mysecrete'.
+// You may like to get the password according to different Clients by `clientId` if you have
+// a security subsystem.
 
 qserver.encrypt = function (msg, clientId, cb) {
     var msgBuf = new Buffer(msg),
@@ -1170,19 +1177,19 @@ qserver.decrypt = function (msg, clientId, cb) {
 <a name="Auth"></a>
 ## 7. Authentication and Authorization Policies
 
-Override methods within `qserver.authPolicy` to authorize a Client. These methods are `authenticate()`, `authorizePublish()`, and `authorizeSubscribe()`.  
+Override methods within `qserver.authPolicy` to authorize a Client. These methods include `authenticate()`, `authorizePublish()`, and `authorizeSubscribe()`.  
 
 ***********************************************
 ### qserver.authPolicy.authenticate(client, username, password, cb)  
 Method of user authentication. Override at will.  
-The default implementation authenticate the account of `{ username: 'freebird', password: 'skynyrd' }`.  
+The default implementation authenticate all Clients.  
 
 **Arguments:**  
 
-1. `client` is a mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
-2. `username` is the username given by a Client during connection.  
-3. `password` is the password given by a Client during connection.  
-4. `cb(err, valid)` is the callback you should call and pass a boolean flag `valid` to tell if this Client is authenticated.  
+1. `client` (_Object_): A mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
+2. `username` (_String_): Username given by a Client during connection.  
+3. `password` (_Buffer_): Password given by a Client during connection.  
+4. `cb` (_Function_): `function (err, valid) {}`, the callback you should call and pass a boolean flag `valid` to tell if this Client is authenticated.  
   
 **Example:**  
 
@@ -1213,10 +1220,10 @@ The default implementation authorize every Client, that was successfully registe
 
 **Arguments:**  
 
-1. `client` is a mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
-2. `topic` is the topic to publish to.  
-3. `payload` is the data to publish out.  
-4. `cb(err, authorized)` is the callback you should call and pass a boolean flag `authorized` to tell if a Client is authorized to publish the topic.  
+1. `client` (_Object_): A mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
+2. `topic` (_String_): The topic to publish to.  
+3. `payload` (_String_ | _Buffer_): The data to publish out.  
+4. `cb` (_Function_): `function (err, authorized) {}`, the callback you should call and pass a boolean flag `authorized` to tell if a Client is authorized to publish the topic.  
   
 **Example:**  
 
@@ -1240,9 +1247,9 @@ The default implementation authorize every Client, that was successfully registe
 
 **Arguments:**  
 
-1. `client` is a mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
-2. `topic` is the topic to subscribe to.  
-3. `cb(err, authorized)` is the callback you should call and pass a boolean flag `authorized` to tell if a Client is authorized to subscribe to the topic.  
+1. `client` (_Object_): A mqtt client instance from [Mosca](http://mcollina.github.io/mosca/docs/lib/client.js.html#Client).  
+2. `topic` (_String_): The topic to subscribe to.  
+3. `cb` (_Function_): `function (err, authorized) {}`, the callback you should call and pass a boolean flag `authorized` to tell if a Client is authorized to subscribe to the topic.  
   
 **Example:**  
 
@@ -1261,21 +1268,16 @@ qserver.authPolicy.authorizeSubscribe = function (client, topic, cb) {
 
 Please refer to Mosca Wiki to learn more about [Authentication & Authorization](https://github.com/mcollina/mosca/wiki/Authentication-&-Authorization)  
 
-***********************************************
-<br />
 
+***********************************************
 <a name="StatusCode"></a>
 ## 8. Status Code  
 
 | Status Code               | Description                                                                        |
 |---------------------------|------------------------------------------------------------------------------------|
-| 200 (Ok)                  |                                                                                    |
-| 201 (Created)             |                                                                                    |
-| 202 (Deleted)             |                                                                                    |
-| 204 (Changed)             | The Server accepted this update message successfully                               |
-| 400 (BadRequest)          | There is an unrecognized attribute in the update message                           |
-| 404 (NotFound)            |                                                                                    |
-| 405 (MethodNotAllowed)    | If you are trying to change either `clientId` or `mac`, you will get this response |
-| 408 (Timeout)             | No response from the Server in 10 secs                                             |
-| 409 (Conflict)            |                                                                                    |
-| 500 (InternalServerError) | The Server has some trouble                                                        |
+| 200 (Ok)                  | Everything is fine                                                                 |
+| 204 (Changed)             | The Client accepted this writing request successfully                              |
+| 400 (BadRequest)          | There is an unrecognized attribute/parameter within the request message            |
+| 404 (NotFound)            | The Client not found                                                               |
+| 405 (MethodNotAllowed)    | If you are trying to change either `clientId` or `mac`, to read something unreadable, to write something unwritable, and execute something unexecutable, then you will get this response |
+| 500 (InternalServerError) | The Client has some trouble                                                        |
