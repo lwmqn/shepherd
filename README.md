@@ -16,8 +16,6 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 3. [Installation](#Installation)  
 4. [Basic Usage](#Basic)  
 5. [APIs and Events](#APIs)  
-    * MqttShepherd Class
-    * MqttNode Class
 6. [Message Encryption](#Encryption)  
 7. [Auth Policies](#Auth)  
 8. [Status Code](#StatusCode)  
@@ -26,12 +24,12 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 ## 1. Overview
 
 Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an architecture that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management. LWMQN is also an open source project that offers a solution of establishing a local area machine network with MQTT, and it can be a replacement of the cloud-based solution if you don't really need the cloud (which becomes an option). Not only has LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.  
+* LWMQN project provides you with a server-side **mqtt-shepherd** library and a client-side [**mqtt-node**](https://github.com/lwmqn/mqtt-node) library to run your machine network with JavaScript and node.js. With these two libraries and node.js, you can have your own authentication, authorization and encryption subsystems to secure your network easily. LWMQN project is trying to let you build an IoT machine network with less pain.  
 
 ![LWMQN Network](https://github.com/lwmqn/documents/blob/master/media/lwmqn_net.png)
 
-* LWMQN project provides you with a server-side **mqtt-shepherd** library and a client-side [**mqtt-node**](https://github.com/lwmqn/mqtt-node) library to run your machine network with JavaScript and node.js. LWMQN project is trying to let you build an IoT machine network with less pain. In addition, with these two libraries and node.js, you can have your own authentication, authorization and encryption subsystems to secure your network easily.  
 * This module, **mqtt-shepherd**, is an implementation of LWMQN Server that can run on platfroms equipped with node.js.  
-* LWMQN Client and Server benefits from [IPSO data model](http://www.ipso-alliance.org/ipso-community/resources/smart-objects-interoperability/), which leads to a very comprehensive way for the Server to use a *path* with URI-style to allocate and query Resources on Client Devices.  
+* LWMQN Client and Server benefits from [IPSO data model](http://www.ipso-alliance.org/ipso-community/resources/smart-objects-interoperability/), which leads to a very comprehensive way for the Server to use an URI-style *path* to allocate and query Resources on Client Devices.  
 * In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.  
   
     ```js
@@ -69,6 +67,7 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
 * Hierarchical data model in Smart-Object-style (IPSO)  
 * Easy to query resources on a Client Device  
 * LWM2M-like interfaces for Client/Server interaction  
+* Embedded persistence ([NeDB](https://github.com/louischatriot/nedb)) and auto-reload at boot-up for Client Devices  
 * Simple machine network managment  
   
 <a name="Installation"></a>
@@ -87,7 +86,7 @@ qserver.on('ready', function () {
     console.log('Server is ready.');
 
     // when server is ready, allow devices to join the network within 180 secs
-    qserver.permitJoin(180;
+    qserver.permitJoin(180);
 });
 
 qserver.start(function (err) {      // start the sever
@@ -133,7 +132,6 @@ This moudle provides you with **MqttShepherd** and **MqttNode** classes.
     * [qnode.maintain()](#API_maintain)  
     * [qnode.dump()](#API_dump)  
     
-*************************************************
 
 <br />
 
@@ -144,7 +142,7 @@ Exposed by `require('mqtt-shepherd')`
 
 <a name="API_MqttShepherd"></a>
 ### new MqttShepherd([name][, settings])
-Create a new instance of the `MqttShepherd` class. The created instance is a LWMQN Server.  
+Create an instance of the `MqttShepherd` class. The created instance is a LWMQN Server.  
   
 **Arguments:**  
 
@@ -177,7 +175,7 @@ var qserver = new MqttShepherd('my_iot_server', {
 ```js
 var qserver = new MqttShepherd('my_iot_server', {
     port: 1883,
-    backend: {
+    backend: {  // This is the pubsubsettings you will see in Mosca wiki  
         type: 'mongo',        
         url: 'mongodb://localhost:27017/mqtt',
         pubsubCollection: 'ascoltatori',
@@ -238,7 +236,7 @@ qserver.stop(function (err) {
 
 <a name="API_reset"></a>
 ### .reset([mode,] [callback])
-Reset the server. A hard reset (`mode == true`) will clear the database and all qnodes. After the server restarted, a `'ready'` event will be fired.  
+Reset the server. After the server restarted, a `'ready'` event will be fired. A hard reset (`mode == true`) will clear all joined qnodes and the database.  
 
 **Arguments:**  
 
@@ -286,7 +284,12 @@ Allow or disallow devices to join the network.
 **Examples:**  
     
 ```js
-// allow devices to join for 180 seconds 
+qserver.on('permitJoining', function (joinTimeLeft) {
+    console.log(joinTimeLeft);
+});
+
+// allow devices to join for 180 seconds, this will also trigger 
+// a 'permitJoining' event at each tick of countdown.
 qserver.permitJoin(180);
 ```
 
@@ -329,7 +332,7 @@ qserver.info();
 //     },
 //     devNum: 36,
 //     startTime: 1454419506,
-//     joinTimeLeft: 36
+//     joinTimeLeft: 28
 // }  
 ```
 
@@ -344,7 +347,7 @@ List records of the registered Client Devices.
   
 **Returns:**  
   
-* (_Array_): Information of Client Devices. Each record in the array is an object with the properties shown in the following table. The entry in the array will be `undefined` if that Client Device is not found.  
+* (_Array_): Information of Client Devices. Each record in the array is an object with the properties shown in the following table. An element in the array will be `undefined` if the corresponding Client Device is not found.  
 
     | Property     | Type    | Description                                                                                                                  |
     |--------------|---------|------------------------------------------------------------------------------------------------------------------------------|
@@ -357,41 +360,62 @@ List records of the registered Client Devices.
     | objList      | Object  | IPSO Objects and Object Instances. Each key in `objList` is the `oid` and each value is an array of `iid` under that `oid`.  |
     | status       | String  | `online` or `offline`                                                                                                        |
 
-
 **Examples:**  
     
 ```js
 console.log(qserver.list([ 'foo_id', 'bar_id', 'no_such_id' ]));
 
-// [
-//     {
-//         clientId: 'foo_id',          // record for 'foo_id'
-//         joinTime: 1454419506,
-//         lifetime: 12345,
-//         ip: '192.168.1.112',
-//         mac: 'd8:fe:e3:e5:9f:3b',
-//         version: '',
-//         objList: {
-//             3: [ 1, 2, 3 ],
-//             2205: [ 7, 5503 ]
-//         },
-//         status: 'online'
-//     },
-//     {
-//         clientId: 'bar_id',          // record for 'bar_id'
-//         joinTime: 1454419706,
-//         lifetime: 12345,
-//         ip: '192.168.1.113',
-//         mac: '9c:d6:43:01:7e:c7',
-//         version: '',
-//         objList: {
-//             3: [ 1, 2, 3 ],
-//             2205: [ 7, 5503 ]
-//         },
-//         status: 'sleep',
-//     },
-//     undefined                        // record not found for 'no_such_id'
-// ]
+/*
+[
+    {
+        clientId: 'foo_id',          // record for 'foo_id'
+        joinTime: 1454419506,
+        lifetime: 12345,
+        ip: '192.168.1.112',
+        mac: 'd8:fe:e3:e5:9f:3b',
+        version: '',
+        objList: {
+            3: [ 1, 2, 3 ],
+            2205: [ 7, 5503 ]
+        },
+        status: 'online'
+    },
+    {
+        clientId: 'bar_id',          // record for 'bar_id'
+        joinTime: 1454419706,
+        lifetime: 12345,
+        ip: '192.168.1.113',
+        mac: '9c:d6:43:01:7e:c7',
+        version: '',
+        objList: {
+            3: [ 1, 2, 3 ],
+            2205: [ 7, 5503 ]
+        },
+        status: 'sleep',
+    },
+    undefined                        // record not found for 'no_such_id'
+]
+*/
+
+console.log(qserver.list('foo_id'));
+
+/* An array will be returned even a single string is argumented.
+[
+    {
+        clientId: 'foo_id',          // record for 'foo_id'
+        joinTime: 1454419506,
+        lifetime: 12345,
+        ip: '192.168.1.112',
+        mac: 'd8:fe:e3:e5:9f:3b',
+        version: '',
+        objList: {
+            3: [ 1, 2, 3 ],
+            2205: [ 7, 5503 ]
+        },
+        status: 'online'
+    }
+]
+*/
 ```
 
 *************************************************
@@ -421,11 +445,11 @@ if (qnode) {
 *************************************************
 <a name="API_findByMac"></a>
 ### .findByMac(macAddr)
-Find registered Clients (qnodes) by the specified mac address.  
+Find registered Clients (qnodes) by the specified mac address. This method will always returns you an array, because there may be many Clients living in the same machine to share the same mac address.  
 
 **Arguments:**  
 
-1. `macAddr` (_String_): Mac address of the device(s) to find for.  
+1. `macAddr` (_String_): Mac address of the device(s) to find for. The address in case-insensitive.  
 
   
 **Returns:**  
@@ -451,7 +475,7 @@ Deregister and remove a qnode from the network.
 **Arguments:**  
 
 1. `clientId` (_String_): Client id of the qnode to be removed.  
-2. `callback` (_Function_): `function (err, clientId) { ... }` will be called after qnode removal. `clientId` is client id of the removed qnode.  
+2. `callback` (_Function_): `function (err, clientId) { ... }` will be called after removal. `clientId` is client id of the removed qnode.  
   
 **Returns:**  
   
@@ -506,7 +530,7 @@ Fired when there is an error occurs.
 <a name="EVT_permit"></a>
 ### Event: 'permitJoining'
 `function (joinTimeLeft) {}`  
-Fired when the Server is allowing for devices to join the network, where `joinTimeLeft` is number of seconds left to allow devices to join the network. The event will be triggered at each tick of countdown.  
+Fired when the Server is allowing for devices to join the network, where `joinTimeLeft` is number of seconds left to allow devices to join the network. This event will be triggered at each tick of countdown.  
 
 *************************************************
 
@@ -529,16 +553,12 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     * msg.qnode: qnode  
     * msg.data: `undefined`  
 
-<br />
-
 * ##### devLeaving  
     When there is a Client Device leaving the network, qserver will fire an `'ind'` event along with this type of indication.  
 
     * msg.type: `'devLeaving'`  
     * msg.qnode: `'foo_clientId'`, the clientId of which qnode is leaving  
     * msg.data: `9e:65:f9:0b:24:b8`, the mac address of which qnode is leaving.  
-
-<br />
 
 * ##### devUpdate  
     When there is a Client Device that publishes an update of its device attribute(s), qserver will fire an `'ind'` event along this type of indication.  
@@ -547,26 +567,16 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     * msg.qnode: qnode  
     * msg.data: `{ ip: '192.168.0.36' }`, an object that contains the updated attribute(s). There may be fields of `status`, `lifetime`, `ip`, and `version` in this object.  
 
-<br />
-
 * ##### devNotify  
     When there is a Client Device that publishes a notification of its Object Instance or Resource, qserver will fire an `'ind'` event along this type of indication.  
 
-    * msg.type: `'devNotify'`  
-    * msg.qnode: qnode  
-    * msg.data: Content of the notification. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
-        - `data` is an Object Instance if `oid` and `iid` are given but `rid` is null or undefined  
-        - `data` is a Resource if `oid`, `iid` and `rid` are given (data type depends on the Resource)  
-
+    * msg.type: `'devNotify'`
+    * msg.qnode: qnode
+    * msg.data: Content of the notification. This object has fileds of `oid`, `iid`, `rid`, and `data`.
+        - `data` is an Object Instance if `oid` and `iid` are given but `rid` is null or undefined
+        - `data` is a Resource if `oid`, `iid` and `rid` are given (data type depends on the Resource)
+  
         ```js
-        // example of a Resource notification
-        {
-            oid: 'humidity',
-            iid: 0,
-            rid: 'sensorValue',
-            data: 32            // Resource value
-        }
-
         // example of an Object Instance notification
         {
             oid: 'humidity',
@@ -575,11 +585,17 @@ Fired when there is an incoming indication message. The `msg` is an object with 
                 sensorValue: 32
             }
         }
+
+        // example of a Resource notification
+        {
+            oid: 'humidity',
+            iid: 0,
+            rid: 'sensorValue',
+            data: 32            // Resource value
+        }
         ```
 
-<br />
-
-* ##### 'devChange'  
+* ##### devChange  
     When the Server perceives that there is any change of _Resources_ from notifications or read/write responses, qserver will fire an `'ind'` event along this type of indication.  
 
     * msg.type: `'devChange'`  
@@ -607,8 +623,8 @@ Fired when there is an incoming indication message. The `msg` is an object with 
         }
         ```
     * Note
-        - The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is which a Client Device like to notify even if there is no change of it. A periodical notification is a good example, a Client Device has to report something under observation even there is no change of that thing. If the Server does notice there is really something changed, it will then fire `'devChange'` to report the change(s). It is suggested to use `'devChange'` indication to update your GUI views, and to use `'devNotify'` indication to log data.
-<br />
+        - The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is which a Client Device like to notify even if there is no change of it. A periodical notification is a good example, a Client Device has to report something under observation even there is no change of that thing.
+        - If the Server does notice there is really something changed, it will then fire `'devChange'` to report the change(s). It is suggested to use `'devChange'` indication to update your GUI views, and to use `'devNotify'` indication to log data.
 
 * ##### devStatus  
     When there is a Client Device going online, going offline, or going to sleep, qserver will fire an `'ind'` event along this type of indication.  
@@ -617,7 +633,6 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     * msg.qnode: qnode  
     * msg.data: `'online'`, `'sleep'`, or `'offline'`  
 
-<br />
 
 *************************************************
 
