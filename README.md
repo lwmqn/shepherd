@@ -1273,11 +1273,11 @@ Please refer to Mosca Wiki to learn more about [Authentication & Authorization](
 <a name="StatusCode"></a>
 ## 8. Status Code  
 
-| Status Code               | Description                                                                        |
-|---------------------------|------------------------------------------------------------------------------------|
-| 200 (Ok)                  | Everything is fine                                                                 |
-| 204 (Changed)             | The Client accepted this writing request successfully                              |
-| 400 (BadRequest)          | There is an unrecognized attribute/parameter within the request message            |
-| 404 (NotFound)            | The Client not found                                                               |
+| Status Code               | Description                                                                                                                                                                              |
+|---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 200 (Ok)                  | Everything is fine                                                                                                                                                                       |
+| 204 (Changed)             | The Client accepted this writing request successfully                                                                                                                                    |
+| 400 (BadRequest)          | There is an unrecognized attribute/parameter within the request message                                                                                                                  |
+| 404 (NotFound)            | The Client not found                                                                                                                                                                     |
 | 405 (MethodNotAllowed)    | If you are trying to change either `clientId` or `mac`, to read something unreadable, to write something unwritable, and execute something unexecutable, then you will get this response |
-| 500 (InternalServerError) | The Client has some trouble                                                        |
+| 500 (InternalServerError) | The Client has some trouble                                                                                                                                                              |
