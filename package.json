@@ -1,7 +1,7 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.2.3",
-  "description": "mqtt device manager",
+  "version": "0.2.4",
+  "description": "Network server and manager for the lightweight MQTT machine network (LWMQN)",
   "main": "index.js",
   "scripts": {
     "test": "make test-all",
@@ -18,15 +18,15 @@
   },
   "homepage": "https://github.com/lwmqn/mqtt-shepherd",
   "dependencies": {
-    "areq": "^0.0.9",
-    "busyman": "^0.1.4",
-    "lwmqn-util": "^0.1.0",
+    "areq": "^0.1.0",
+    "busyman": "^0.2.0",
+    "lwmqn-util": "^0.2.2",
     "mosca": "^2.0.2",
     "mqtt": "^1.5.0",
     "nedb": "^1.4.0",
     "network": "^0.2.1",
     "q": "^1.4.1",
-    "smartobject": "^0.1.2"
+    "smartobject": "^0.1.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",

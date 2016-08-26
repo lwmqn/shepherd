@@ -919,13 +919,14 @@ qnode.discoverReq('temperature/', function (err, rsp) {
 
 ***********************************************
 <a name="API_observeReq"></a>
-### qnode.observeReq(path[, callback])
+### qnode.observeReq(path[, opt][, callback])
 Start observing a Resource on the Client Device. Please listen to event `'ind'` with indication type `'devNotify'` to get the reports.  
 
 **Arguments:**  
 
 1. `path` (_String_): Path of the allocated Resource on the remote Client Device.  
-2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds.  
+2. `opt` (_Number_): Set to `1` to cancel the observation. Default is `0` to enable the observation.  
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation succeeds.  
 
     | Property | Type    | Description                                                                                                         |
     |----------|---------|---------------------------------------------------------------------------------------------------------------------|
