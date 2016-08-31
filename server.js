@@ -254,13 +254,13 @@ shepherd.on('ind:incoming', function (node) {
     //     });
     // }, 5000, 2000);
 
-    // // exec test - object not allowed
-    // runtest(function () {
-    //     node.executeReq('/3303/', 'simen', function (err, rsp) {
-    //         console.log('>>>>> exec object test');
-    //         console.log(rsp);
-    //     });
-    // }, 5000, 2000);
+    // exec test - object not allowed
+    runtest(function () {
+        node.executeReq('/3303/', 'simen', function (err, rsp) {
+            console.log('>>>>> exec object test');
+            console.log(rsp);
+        });
+    }, 5000, 2000);
 
     // // write test - resource
     // runtest(function () {
@@ -286,13 +286,13 @@ shepherd.on('ind:incoming', function (node) {
     //     });
     // }, 5000, 1000);
 
-    // // write test - write invlaid resource
-    // runtest(function () {
-    //     node.writeReq('/3303/0/x', 60, function (err, rsp) {
-    //         console.log('>>>>> write resource test');
-    //         console.log(rsp);
-    //     });
-    // }, 5000, 1000);
+    // write test - write invlaid resource
+    runtest(function () {
+        node.writeReq('/3303/0/x', 60, function (err, rsp) {
+            console.log('>>>>> write resource test');
+            console.log(rsp);
+        });
+    }, 5000, 1000);
 
     // write test - write instance (not allowed)
     // runtest(function () {
@@ -320,13 +320,13 @@ shepherd.on('ind:incoming', function (node) {
     //     });
     // }, 5000, 1000);
 
-    // // disover test - Object
-    // runtest(function () {
-    //     node.discoverReq('/3303', function (err, rsp) {
-    //         console.log('>>>>> discover test');
-    //         console.log(rsp);
-    //     });
-    // }, 5000, 2000);
+    // disover test - Object
+    runtest(function () {
+        node.discoverReq('/3303', function (err, rsp) {
+            console.log('>>>>> discover test');
+            console.log(rsp);
+        });
+    }, 5000, 2000);
 
     // // disover test - Object Instance
     // runtest(function () {
@@ -374,23 +374,23 @@ shepherd.on('ind:incoming', function (node) {
 
     // }, 5000, 2000);
     
-    // // writeAttrs test - Object Instance
-    // runtest(function () {
-    //     var attrs = {
-    //         pmin: 50,
-    //         pmax: 600,
-    //     };
-    //     node.writeAttrsReq('/3303/0', attrs , function (err, rsp) {
-    //         console.log('>>>>> writeAttrs test - Object Instance');
-    //         console.log(rsp);
-    //     });
+    // writeAttrs test - Object Instance
+    runtest(function () {
+        var attrs = {
+            pmin: 50,
+            pmax: 600,
+        };
+        node.writeAttrsReq('/3303/0', attrs , function (err, rsp) {
+            console.log('>>>>> writeAttrs test - Object Instance');
+            console.log(rsp);
+        });
 
-    //     node.discoverReq('/3303/0', function (err, rsp) {
-    //         console.log('>>>>> writeAttrs test:Object Instance:discover back');
-    //         console.log(rsp);
-    //     });
+        node.discoverReq('/3303/0', function (err, rsp) {
+            console.log('>>>>> writeAttrs test:Object Instance:discover back');
+            console.log(rsp);
+        });
 
-    // }, 5000, 2000);
+    }, 5000, 2000);
 
     // // writeAttrs test
     // runtest(function () {
