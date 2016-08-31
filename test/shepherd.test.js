@@ -92,6 +92,7 @@ describe('Top Level of Tests', function () {
                 'update/#': 1,
                 'response/#': 1,
                 'ping/#': 0,
+                'schedule/#': 0,
                 'lwt/#': 0,
                 'request/#': 0,
                 'announce/#': 0
@@ -254,17 +255,6 @@ describe('Top Level of Tests', function () {
 
                 expect(function () { shepherd.list('ceed'); }).not.to.throw(Error);
                 expect(function () { shepherd.list([ 'ceed', 'xxx' ]); }).not.to.throw(Error);
-            });
-        });
-
-        describe('#.maintain', function () {
-            it('should throw if cIds is not a string or not an array of strings', function () {
-                expect(function () { shepherd.maintain({}); }).to.throw(TypeError);
-                expect(function () { shepherd.maintain(true); }).to.throw(TypeError);
-                expect(function () { shepherd.maintain([ 'ceed', {} ]); }).to.throw(TypeError);
-
-                expect(function () { shepherd.maintain('ceed'); }).not.to.throw(TypeError);
-                expect(function () { shepherd.maintain([ 'ceed', 'xxx' ]); }).not.to.throw(TypeError);
             });
         });
     });

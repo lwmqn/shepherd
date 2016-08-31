@@ -20,6 +20,7 @@
   "dependencies": {
     "areq": "^0.1.0",
     "busyman": "^0.2.0",
+    "debug": "^2.2.0",
     "lwmqn-util": "^0.2.2",
     "mosca": "^2.0.2",
     "mqtt": "^1.5.0",

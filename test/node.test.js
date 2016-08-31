@@ -191,6 +191,18 @@ describe('mqtt-node verify', function () {
             });
         });
 
+        describe('#.maintain', function () {
+            it('should throw if cIds is not a string or not an array of strings', function () {
+                expect(function () { node.maintain({}); }).to.throw(TypeError);
+                expect(function () { node.maintain(true); }).to.throw(TypeError);
+                expect(function () { node.maintain([ 'ceed', {} ]); }).to.throw(TypeError);
+
+                expect(function () { node.maintain('ceed'); }).to.throw(TypeError);
+                expect(function () { node.maintain([ 'ceed', 'xxx' ]); }).to.throw(TypeError);
+                expect(function () { node.maintain(function () {}); }).not.to.throw(Error);
+            });
+        });
+
         describe('#.dump()', function () {
             it('should should empty object if no so bound', function () {
                 node.so = null;
