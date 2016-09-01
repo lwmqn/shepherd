@@ -38,7 +38,8 @@ var node;
 
 
 var fakeShp = {
-    _mqdb: null
+    _mqdb: null,
+    emit: function () {}
 };
 
 var node = new MqttNode(fakeShp, cId, devAttrs);
@@ -741,7 +742,7 @@ describe('mqtt-node verify', function () {
         });
 
         describe('#.replaceObjectInstance(oid, iid, data)', function () {
-            it('should pass equality test after replaced', function () {
+            it('should pass equality test after replaced', function (done) {
                 nodex._registered = true;
                 var newInst = { newY1: 100, newY2: 'hihi' },
                     inst;
@@ -750,8 +751,7 @@ describe('mqtt-node verify', function () {
                     return nodex.dbRead();
                 }).done(function (ndata) {
                     nodex._registered = false;
-
-                    if (_.isEqual(nodex.so.y[3], newInst) && _.isEqual(nodex.so.y[3], ndata.so.y[3]))
+                    if (_.isEqual(nodex.so.dumpSync('y', 3), newInst) && _.isEqual(nodex.so.dumpSync('y', 3), ndata.so.y[3]))
                         done();
                 }, function (err) {
                     console.log(err);
@@ -760,15 +760,15 @@ describe('mqtt-node verify', function () {
         });
 
         describe('#.updateObjectInstance(oid, iid, data)', function () {
-            it('should pass equality test after partial update', function () {
+            it('should pass equality test after partial update', function (done) {
                 var newInst = { y1: 'hello', y2: 4 },
                     diff;
-
+                nodex._registered = true;
                 nodex.updateObjectInstance('x', 1, newInst).then(function (idiff) {
                     diff = idiff;
                     return nodex.dbRead();
                 }).done(function (ndata) {
-                    if (_.isEqual(nodex.so.x[1], newInst) && _.isEqual(nodex.so.x[1], ndata.so.x[1]))
+                    if (_.isEqual(nodex.so.dumpSync('x', 1), newInst) && _.isEqual(nodex.so.dumpSync('x', 1), ndata.so.x[1]))
                         if (_.isEqual(diff, { y1: 'hello' }))
                             done();
                 }, function (err) {
@@ -776,7 +776,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after full update', function () {
+            it('should pass equality test after full update', function (done) {
                 var newInst = { y1: 'world', y2: 1200 },
                     diff;
                 nodex._registered = true;
@@ -785,7 +785,7 @@ describe('mqtt-node verify', function () {
                     return nodex.dbRead();
                 }).done(function (ndata) {
                     nodex._registered = false;
-                    if (_.isEqual(nodex.so.x[1], newInst) && _.isEqual(nodex.so.x[1], ndata.so.x[1]))
+                    if (_.isEqual(nodex.so.dumpSync('x', 1), newInst) && _.isEqual(nodex.so.dumpSync('x', 1), ndata.so.x[1]))
                         if (_.isEqual(diff, { y1: 'world', y2: 1200  }))
                             done();
                 }, function (err) {
@@ -795,7 +795,7 @@ describe('mqtt-node verify', function () {
         });
 
         describe('#.updateResource(oid, iid, rid, data, callback)', function () {
-            it('should pass equality test after value/value update', function () {
+            it('should pass equality test after value/value update', function (done) {
                 var newVal = 'new value',
                     diff;
                 nodex._registered = true;
@@ -804,7 +804,7 @@ describe('mqtt-node verify', function () {
                     return nodex.dbRead();
                 }).done(function (ndata) {
                     nodex._registered = false;
-                    if (_.isEqual(nodex.so.z[0].z12, newVal) && _.isEqual(nodex.so.z[0].z12, ndata.so.z[0].z12))
+                    if (_.isEqual(nodex.so.dumpSync('z', 0).z12, newVal) && _.isEqual(nodex.so.dumpSync('z', 0).z12, ndata.so.z[0].z12))
                         if (_.isEqual(diff, newVal))
                             done();
                 }, function (err) {
@@ -812,12 +812,11 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after value/object update', function () {
+            it('should pass equality test after value/object update', function (done) {
                 var newVal = { n1: 100, n2: 30 },
                     diff;
                 nodex._registered = true;
                 nodex.updateResource('z', 0, 'z12', newVal).then(function (idiff) {
-
                     diff = idiff;
                     return nodex.dbRead();
                 }).done(function (ndata) {
@@ -830,7 +829,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after object/object update', function () {
+            it('should pass equality test after object/object update', function (done) {
                 var newVal = { n1: 300, n2: 30 },
                     diff;
                 nodex._registered = true;
@@ -847,11 +846,12 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after object/value update', function () {
+            it('should pass equality test after object/value update', function (done) {
                 var newVal = 'I am new value',
                     diff;
                 nodex._registered = true;
                 nodex.updateResource('z', 0, 'z12', newVal).then(function (idiff) {
+                    //console.log(idiff);
                     diff = idiff;
                     return nodex.dbRead();
                 }).done(function (ndata) {
@@ -865,7 +865,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after value/object update', function () {
+            it('should pass equality test after value/object update', function (done) {
                 var newVal = { n1: 1, n2: 2, n3: { n31: 'hi', n32: 3 } },
                     diff;
                 nodex._registered = true;
@@ -883,7 +883,7 @@ describe('mqtt-node verify', function () {
                 });
             });
         
-            it('should pass equality test after object/object update', function () {
+            it('should pass equality test after object/object update', function (done) {
                 var newVal = { n3: { n31: 'hello' } },
                     diff;
                 nodex._registered = true;
@@ -900,7 +900,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after object/object update', function () {
+            it('should pass equality test after object/object update', function (done) {
                 var newVal = { n1: 1024, n3: { n31: 'world' } },
                     diff;
                 nodex._registered = true;
@@ -920,7 +920,7 @@ describe('mqtt-node verify', function () {
 
         describe('#.updateAttrs(attrs, callback)', function () {
             // { lifetime, ip, mac, version }
-            it('should pass equality test after lifetime and ip update', function () {
+            it('should pass equality test after lifetime and ip update', function (done) {
                 var newAttrs = { lifetime: 1000, ip: '111.111.222.222' },
                     diff;
                 nodex._registered = true;
@@ -954,23 +954,22 @@ describe('mqtt-node verify', function () {
         });
 
         describe('#._checkAndUpdate(attrs, callback)', function () {
-            it('should return error if no such property to update', function () {
+            it('should ignore if no such property to update', function (done) {
                 var diff;
                 nodex._registered = true;
-                nodex._checkAndUpdate('/y', { '3': { newY1: 999 } } ).then(function (idiff) {
+                nodex._checkAndUpdate('/y', { '3': { newY8: 999 } } ).then(function (idiff) {
                     diff = idiff;
                     return nodex.dbRead();
                 }).done(function (ndata) {
-     
-                }, function (err) {
                     nodex._registered = false;
-                    if (err)    // no such property
+                    if (_.isEqual(nodex.so.dumpSync('y', 3), { newY1: 100, newY2: 'hihi' }))
                         done();
+                }, function (err) {
                     console.log(err);
                 });
             });
 
-            it('should pass equality test after instance update 1', function () {
+            it('should pass equality test after instance update 1', function (done) {
                 var diff;
                 nodex._registered = true;
                 nodex._checkAndUpdate('/x/0', { x1: 1111 } ).then(function (idiff) {
@@ -978,7 +977,7 @@ describe('mqtt-node verify', function () {
                     return nodex.dbRead();
                 }).done(function (ndata) {
                     nodex._registered = false;
-                    if (_.isEqual(nodex.so.x[0], { x1: 1111, x2: 2 }) && _.isEqual(nodex.so.x[0], ndata.so.x[0]))
+                    if (_.isEqual(nodex.so.dumpSync('x', 0), { x1: 1111, x2: 2 }) && _.isEqual(nodex.so.dumpSync('x', 0), ndata.so.x[0]))
                         if (_.isEqual(diff, { x1: 1111 }))
                             done();
                 }, function (err) {
@@ -986,7 +985,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after instance update 2', function () {
+            it('should pass equality test after instance update 2', function (done) {
                 var diff;
                 nodex._registered = true;
                 nodex._checkAndUpdate('/x/0', { x1: 'hi', x2: 'friend' } ).then(function (idiff) {
@@ -994,7 +993,7 @@ describe('mqtt-node verify', function () {
                     return nodex.dbRead();
                 }).done(function (ndata) {
                     nodex._registered = false;
-                    if (_.isEqual(nodex.so.x[0], { x1: 'hi', x2: 'friend' }) && _.isEqual(nodex.so.x[0], ndata.so.x[0]))
+                    if (_.isEqual(nodex.so.dumpSync('x', 0), { x1: 'hi', x2: 'friend' }) && _.isEqual(nodex.so.dumpSync('x', 0), ndata.so.x[0]))
                         if (_.isEqual(diff, { x1: 'hi', x2: 'friend' }))
                             done();
                 }, function (err) {
@@ -1002,7 +1001,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after resource update 1', function () {
+            it('should pass equality test after resource update 1', function (done) {
                 var diff;
                 nodex._registered = true;
                 nodex._checkAndUpdate('/z/1/z11', 'awesome' ).then(function (idiff) {
@@ -1010,7 +1009,7 @@ describe('mqtt-node verify', function () {
                     return nodex.dbRead();
                 }).done(function (ndata) {
                     nodex._registered = false;
-                    if (_.isEqual(nodex.so.z[1].z11, 'awesome') && _.isEqual(nodex.so.z[1], ndata.so.z[1]))
+                    if (_.isEqual(nodex.so.z[1].z11, 'awesome') && _.isEqual(nodex.so.dumpSync('z', 1), ndata.so.z[1]))
                         if (_.isEqual(diff, 'awesome'))
                             done();
                 }, function (err) {
@@ -1018,7 +1017,7 @@ describe('mqtt-node verify', function () {
                 });
             });
 
-            it('should pass equality test after resource update 2', function () {
+            it('should pass equality test after resource update 2', function (done) {
                 var diff;
                 nodex._registered = true;
                 nodex._checkAndUpdate('/z/1/z11', { a: 'amazing' } ).then(function (idiff) {
@@ -1027,7 +1026,7 @@ describe('mqtt-node verify', function () {
                 }).done(function (ndata) {
                     nodex._registered = false;
 
-                    if (_.isEqual(nodex.so.z[1].z11, { a: 'amazing' }) && _.isEqual(nodex.so.z[1], ndata.so.z[1]))
+                    if (_.isEqual(nodex.so.z[1].z11, { a: 'amazing' }) && _.isEqual(nodex.so.dumpSync('z', 1), ndata.so.z[1]))
                         if (_.isEqual(diff, { a: 'amazing' }))
                             done();
                 }, function (err) {
