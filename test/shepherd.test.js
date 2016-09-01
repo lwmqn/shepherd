@@ -260,7 +260,8 @@ describe('Top Level of Tests', function () {
     });
 
     describe('Functional Check', function () {
-        var shepherd = new Shepherd(shpClientId);
+        console.log(__dirname + '/database/mqtt2.db');
+        var shepherd = new Shepherd(shpClientId, { defaultDbPath: __dirname + '/database/mqtt2.db' });
         // this.timeout(15000);
 
         describe('#.permitJoin', function () {
