@@ -30,10 +30,14 @@ describe('Top Level of Tests', function () {
             unlink2 = false;
 
         fs.stat('./lib/database/mqtt.db', function (err, stats) {
+            if (err) {
+                unlink1 = true;
+                return;
+            }
             if (stats.isFile()) {
                 fs.unlink(path.resolve('./lib/database/mqtt.db'), function () {
                     unlink1 = true;
-                    if (unlink1 && unlink2)
+                    if (unlink1 && unlink2 )
                         done();
                 });
             }
@@ -260,8 +264,7 @@ describe('Top Level of Tests', function () {
     });
 
     describe('Functional Check', function () {
-        console.log(__dirname + '/database/mqtt2.db');
-        var shepherd = new Shepherd(shpClientId, { defaultDbPath: __dirname + '/database/mqtt2.db' });
+        var shepherd = new Shepherd(shpClientId, { defaultDbPath: path.resolve('./test/database/mqtt2.db') });
         // this.timeout(15000);
 
         describe('#.permitJoin', function () {

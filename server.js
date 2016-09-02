@@ -424,21 +424,19 @@ shepherd.on('ind:incoming', function (node) {
         //     console.log(rsp);
         // });
 
-//         node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
-//             console.log('>>>>> writeAttrs test');
-//             console.log(rsp);
-// //--
-//             // node.observeReq('/3303/0/sensorValue', function (err, rsp) {
-//             //     console.log('>>>>> observe test');
-//             //     console.log(err);
-//             //     console.log(rsp);
-//             //             node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
-//             //                 console.log('>>>>> discover');
-//             //                 console.log(rsp);
-//             //             });
-//             // });
-// //--
-//         });
+        node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
+            console.log('>>>>> writeAttrs test');
+            console.log(rsp);
+            node.observeReq('/3303/0/sensorValue', function (err, rsp) {
+                console.log('>>>>> observe test');
+                console.log(err);
+                console.log(rsp);
+                        node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
+                            console.log('>>>>> discover');
+                            console.log(rsp);
+                        });
+            });
+        });
 
         // setTimeout(function () {
         //     node.observeReq('/3303/0/', { option: 1 }, function (err, rsp) {
