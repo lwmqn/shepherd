@@ -59,39 +59,39 @@ shepherd.on('ready', function () {
 });
 
 shepherd.on('priphDisconnected', function (c) {
-    console.log('some one disconnected');
-    console.log(c.id);
+    // console.log('some one disconnected');
+    // console.log(c.id);
     // var n = shepherd.find(c.id);
     // console.log(n.status);
 });
 
 shepherd.on('permitJoining', function (t) {
-    console.log('PERMIT JOIN: ' + t);
-    console.log('PERMIT JOIN: ' + shepherd._joinable);
-    console.log('SERVER ENABLED: ' + shepherd._enabled);
+    // console.log('PERMIT JOIN: ' + t);
+    // console.log('PERMIT JOIN: ' + shepherd._joinable);
+    // console.log('SERVER ENABLED: ' + shepherd._enabled);
 
 });
 
 shepherd.on('updated', function (qnode, diff) {
-    console.log(diff);
+    //console.log(diff);
 });
 
 shepherd.on('error', function (err) {
-    console.log(err);
+    //console.log(err);
 });
 
 var t = 0;
 shepherd.on('ind:changed', function (msg) {
-    console.log('>>>>>>>>>> CHANGED');
-    console.log(msg);
+    // console.log('>>>>>>>>>> CHANGED');
+    // console.log(msg);
 });
 
 shepherd.on('ind:checkout', function (qnode) {
-    console.log(qnode.status);
+    // console.log(qnode.status);
 });
 
 shepherd.on('ind:checkin', function (qnode) {
-    console.log(qnode.status);
+    // console.log(qnode.status);
 });
 
 shepherd.on('ind:notified', function (qnode, msg) {
@@ -111,9 +111,9 @@ shepherd.on('ind:notified', function (qnode, msg) {
 
     // var tdf = nowUnix - preUnix;
     // tdf  = tdf > 10000 ? 0 : tdf;
-    console.log('>>>>>>>>>> NOTIFIED');
-    // console.log(tdf);
-    console.log(msg);
+    // console.log('>>>>>>>>>> NOTIFIED');
+    // // console.log(tdf);
+    // console.log(msg);
 
     //var n = shepherd.find(msg.clientId);
     // console.log(n.dump());
@@ -141,9 +141,9 @@ shepherd.on('ind:notified', function (qnode, msg) {
 
 // });
 shepherd.on('ind:status', function (qnode, status) {
-    console.log('ind:status');
-    console.log(qnode.status);
-    console.log(status);
+    // console.log('ind:status');
+    // console.log(qnode.status);
+    // console.log(status);
 });
 
 // shepherd.on('message', function (topic, message) {
@@ -153,9 +153,9 @@ shepherd.on('ind:status', function (qnode, status) {
 // });
 
 shepherd.on('ind:incoming', function (node) {
-    console.log('NODE INCOMING');
-    console.log(node.clientId);
-    console.log(node.status);
+    // console.log('NODE INCOMING');
+    // console.log(node.clientId);
+    // console.log(node.status);
 
     // setInterval(function () {
     //     node.maintain(function (err, data) {
@@ -257,8 +257,8 @@ shepherd.on('ind:incoming', function (node) {
     // exec test - object not allowed
     runtest(function () {
         node.executeReq('/3303/', 'simen', function (err, rsp) {
-            console.log('>>>>> exec object test');
-            console.log(rsp);
+            // console.log('>>>>> exec object test');
+            // console.log(rsp);
         });
     }, 5000, 2000);
 
@@ -289,8 +289,8 @@ shepherd.on('ind:incoming', function (node) {
     // write test - write invlaid resource
     runtest(function () {
         node.writeReq('/3303/0/x', 60, function (err, rsp) {
-            console.log('>>>>> write resource test');
-            console.log(rsp);
+            // console.log('>>>>> write resource test');
+            // console.log(rsp);
         });
     }, 5000, 1000);
 
@@ -323,8 +323,8 @@ shepherd.on('ind:incoming', function (node) {
     // disover test - Object
     runtest(function () {
         node.discoverReq('/3303', function (err, rsp) {
-            console.log('>>>>> discover test');
-            console.log(rsp);
+            // console.log('>>>>> discover test');
+            // console.log(rsp);
         });
     }, 5000, 2000);
 
@@ -381,13 +381,13 @@ shepherd.on('ind:incoming', function (node) {
             pmax: 600,
         };
         node.writeAttrsReq('/3303/0', attrs , function (err, rsp) {
-            console.log('>>>>> writeAttrs test - Object Instance');
-            console.log(rsp);
+            // console.log('>>>>> writeAttrs test - Object Instance');
+            // console.log(rsp);
         });
 
         node.discoverReq('/3303/0', function (err, rsp) {
-            console.log('>>>>> writeAttrs test:Object Instance:discover back');
-            console.log(rsp);
+            // console.log('>>>>> writeAttrs test:Object Instance:discover back');
+            // console.log(rsp);
         });
 
     }, 5000, 2000);
@@ -425,15 +425,15 @@ shepherd.on('ind:incoming', function (node) {
         // });
 
         node.writeAttrsReq('/3303/0/sensorValue', attrs , function (err, rsp) {
-            console.log('>>>>> writeAttrs test');
-            console.log(rsp);
+            // console.log('>>>>> writeAttrs test');
+            // console.log(rsp);
             node.observeReq('/3303/0/sensorValue', function (err, rsp) {
-                console.log('>>>>> observe test');
-                console.log(err);
-                console.log(rsp);
+                // console.log('>>>>> observe test');
+                // console.log(err);
+                // console.log(rsp);
                         node.discoverReq('/3303/0/sensorValue', function (err, rsp) {
-                            console.log('>>>>> discover');
-                            console.log(rsp);
+                            // console.log('>>>>> discover');
+                            // console.log(rsp);
                         });
             });
         });
@@ -491,12 +491,12 @@ shepherd.on('ind:incoming', function (node) {
     // }, 6000);
 
     // ping test
-    runtest(function () {
-        node.pingReq(function (err, rsp) {
-            console.log('>>>>> ping test');
-            console.log(err);
-            console.log(rsp);
-        });
-    }, 500, 2000);
+    // runtest(function () {
+    //     node.pingReq(function (err, rsp) {
+    //         console.log('>>>>> ping test');
+    //         console.log(err);
+    //         console.log(rsp);
+    //     });
+    // }, 500, 2000);
 
 });
