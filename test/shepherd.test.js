@@ -317,26 +317,6 @@ describe('Top Level of Tests', function () {
             });
         });
 
-        describe.skip('#.stop', function () {
-            it('should stop ok, permitJoin 0 should be fired, _enabled should be false', function (done) {
-                var joinFired = false,
-                    stopCalled = false;
-
-                shepherd.once('permitJoining', function (joinTime) {
-                    joinFired = true;
-                    if (joinTime === 0 && !shepherd._enabled && !shepherd.mClient && stopCalled && joinFired)
-                        done();
-                });
-
-                shepherd.stop(function (err, result) {
-                    stopCalled = true;
-                    if (!err && !shepherd._enabled && !shepherd.mClient && stopCalled && joinFired) {
-                        done();
-                    }
-                });
-            });
-        });
-
         describe('#.find', function () {
             it('should find nothing', function () {
                 expect(shepherd.find('nothing')).to.be.undefined;
@@ -424,7 +404,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'read',
                     oid: 0,
                     iid: 1,
@@ -446,7 +426,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'read',
                     oid: 0,
                     iid: 1,
@@ -468,7 +448,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'read',
                     oid: 0,
                     iid: 1,
@@ -493,7 +473,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'read',
                     oid: 0,
                     status: 205,
@@ -523,7 +503,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'write',
                     oid: 0,
                     iid: 1,
@@ -535,7 +515,7 @@ describe('Top Level of Tests', function () {
                 // emit slightly latter
                 setTimeout(function () {
                     emitMcRawMessage(shepherd, 'response/test01', {
-                        transId: shepherd.nextTransId() - 1,
+                        transId: shepherd._currentTransId() -1,
                         cmdId: 'read',
                         oid: 0,
                         iid: 1,
@@ -562,7 +542,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),    // for write
                     cmdId: 'write',
                     oid: 0,
                     iid: 1,
@@ -573,14 +553,14 @@ describe('Top Level of Tests', function () {
                 // emit slightly latter
                 setTimeout(function () {
                     emitMcRawMessage(shepherd, 'response/test01', {
-                        transId: shepherd.nextTransId() - 1,
+                        transId: shepherd._currentTransId() - 1,    //  inner write +1, thus should -1 to backoff
                         cmdId: 'read',
                         oid: 0,
                         iid: 1,
                         status: 205,
                         data: { x1: 'new_x1_value2_read', x100: '11233' }
                     });
-                }, 200);
+                }, 100);
             });
         });
 
@@ -597,7 +577,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'writeAttrs',
                     oid: 0,
                     iid: 1,
@@ -619,7 +599,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'writeAttrs',
                     oid: 0,
                     iid: 1,
@@ -642,7 +622,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'execute',
                     oid: 0,
                     iid: 1,
@@ -667,7 +647,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'observe',
                     oid: 0,
                     iid: 1,
@@ -690,7 +670,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'discover',
                     oid: 0,
                     iid: 1,
@@ -712,7 +692,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'discover',
                     oid: 0,
                     iid: 1,
@@ -741,7 +721,7 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
                     cmdId: 'discover',
                     oid: 0,
                     iid: 1,
@@ -762,7 +742,6 @@ describe('Top Level of Tests', function () {
             it('should ping successfully', function (done) {
                 var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
                 var pingReqCb = sinon.spy();            // (clientId, reqObj, callback)
-
                 qnode.pingReq().then(function (rsp) {
                     if (rsp.status === 200)
                         done();
@@ -770,7 +749,25 @@ describe('Top Level of Tests', function () {
 
                 // fake rx
                 emitMcRawMessage(shepherd, 'response/test01', {
-                    transId: shepherd.nextTransId() - 1,
+                    transId: shepherd._currentTransId(),
+                    cmdId: 'ping',
+                    status: 200
+                });
+            });
+        });
+
+        describe('#qnode.quickPingReq', function () {
+            it('should quick ping successfully', function (done) {
+                var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+                var pingReqCb = sinon.spy();            // (clientId, reqObj, callback)
+                qnode.pingReq().then(function (rsp) {
+                    if (rsp.status === 200)
+                        done();
+                }).done();
+
+                // fake rx
+                emitMcRawMessage(shepherd, 'response/test01', {
+                    transId: shepherd._currentTransId(),
                     cmdId: 'ping',
                     status: 200
                 });
@@ -901,8 +898,27 @@ describe('Top Level of Tests', function () {
             });
         });
 
-    });
+        describe('#.stop', function () {
+            it('should stop ok, permitJoin 0 should be fired, _enabled should be false', function (done) {
+                var joinFired = false,
+                    stopCalled = false;
 
+                shepherd.once('permitJoining', function (joinTime) {
+                    joinFired = true;
+                    if (joinTime === 0 && !shepherd._enabled && !shepherd.mClient && stopCalled && joinFired)
+                        done();
+                });
+
+                shepherd.stop(function (err, result) {
+                    stopCalled = true;
+                    if (!err && !shepherd._enabled && !shepherd.mClient && stopCalled && joinFired) {
+                        done();
+                    }
+                });
+            });
+        });
+
+    });
 });
 
 function emitMcRawMessage(shepherd, intf, msg) {

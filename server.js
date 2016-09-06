@@ -10,31 +10,32 @@ var preUnix = null,
 //     console.log(shepherd._nodebox);
 //     shepherd.reset(true).done();
 // }, 22000);
-// shepherd.encrypt = function (msg, clientId, callback) {
-//     var msgBuf = new Buffer(msg),
-//         cipher = crypto.createCipher('aes128', 'mypassword'),
-//         encrypted = cipher.update(msgBuf, 'binary', 'base64');
 
-//     try {
-//         encrypted += cipher.final('base64');
-//         callback(null, encrypted);
-//     } catch (e) {
-//         callback(e);
-//     }
-// };
+shepherd.encrypt = function (msg, clientId, callback) {
+    var msgBuf = new Buffer(msg),
+        cipher = crypto.createCipher('aes128', 'mypassword'),
+        encrypted = cipher.update(msgBuf, 'binary', 'base64');
 
-// shepherd.decrypt = function (msg, clientId, callback) {
-//     msg = msg.toString();
-//     var decipher = crypto.createDecipher('aes128', 'mypassword'),
-//         decrypted = decipher.update(msg, 'base64', 'utf8');
+    try {
+        encrypted += cipher.final('base64');
+        callback(null, encrypted);
+    } catch (e) {
+        callback(e);
+    }
+};
 
-//     try {
-//         decrypted += decipher.final('utf8');
-//         callback(null, decrypted);
-//     } catch (e) {
-//         callback(e);
-//     }
-// };
+shepherd.decrypt = function (msg, clientId, callback) {
+    msg = msg.toString();
+    var decipher = crypto.createDecipher('aes128', 'mypassword'),
+        decrypted = decipher.update(msg, 'base64', 'utf8');
+
+    try {
+        decrypted += decipher.final('utf8');
+        callback(null, decrypted);
+    } catch (e) {
+        callback(e);
+    }
+};
 
 function runtest(cb, delay, rp) {
     setTimeout(function () {
@@ -257,8 +258,9 @@ shepherd.on('ind:incoming', function (node) {
     // exec test - object not allowed
     runtest(function () {
         node.executeReq('/3303/', 'simen', function (err, rsp) {
-            // console.log('>>>>> exec object test');
-            // console.log(rsp);
+            console.log('>>>>> exec object test');
+            console.log(err);
+            console.log(rsp);
         });
     }, 5000, 2000);
 
