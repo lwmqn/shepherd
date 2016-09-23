@@ -72,7 +72,7 @@ describe('Top Level of Tests', function () {
     describe('Constructor Check', function () {
         var shepherd;
         before(function () {
-            shepherd = new Shepherd('test1', { defaultDbPath:  __dirname + '/database/mqtt1.db' });
+            shepherd = new Shepherd('test1', { dbPath:  __dirname + '/database/mqtt1.db' });
         });
 
         it('should has all correct members after new', function () {
@@ -141,11 +141,11 @@ describe('Top Level of Tests', function () {
     });
 
     describe('Signature Check', function () {
-        // var shepherd = new Shepherd('test2', { defaultDbPath:  __dirname + '/database/mqtt1.db' });
+        // var shepherd = new Shepherd('test2', { dbPath:  __dirname + '/database/mqtt1.db' });
 
         var shepherd;
         before(function () {
-            shepherd = new Shepherd('test1', { defaultDbPath:  __dirname + '/database/mqtt1.db' });
+            shepherd = new Shepherd('test1', { dbPath:  __dirname + '/database/mqtt1.db' });
         });
 
         describe('#.permitJoin', function () {
@@ -264,12 +264,12 @@ describe('Top Level of Tests', function () {
     });
 
     describe('Functional Check', function () {
-        var shepherd = new Shepherd(shpClientId, { defaultDbPath: path.resolve('./test/database/mqtt2.db') });
+        var shepherd = new Shepherd(shpClientId, { dbPath: path.resolve('./test/database/mqtt2.db') });
         // this.timeout(15000);
 
         describe('#.permitJoin', function () {
-            it('should throw if shepherd is not enabled when permitJoin invoked - shepherd is disabled.', function () {
-                expect(function () { return shepherd.permitJoin(3); }).to.throw(Error);
+            it('should not throw if shepherd is not enabled when permitJoin invoked - shepherd is disabled.', function () {
+                expect(shepherd.permitJoin(3)).to.be.false;
             });
 
             it('should trigger permitJoin counter and event when permitJoin invoked - shepherd is enabled.', function (done) {
@@ -362,7 +362,6 @@ describe('Top Level of Tests', function () {
 
             it('should get correct info about the shepherd', function () {
                 var shpInfo = shepherd.info();
-
                 expect(shpInfo.devNum).to.be.equal(1);
                 expect(shpInfo.enabled).to.be.true;
                 expect(shpInfo.name).to.be.equal("shp_test");

@@ -1,6 +1,6 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Network server and manager for the lightweight MQTT machine network (LWMQN)",
   "main": "index.js",
   "scripts": {

@@ -32,8 +32,8 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
 
 ## Server: mqtt-shepherd
 * This module, **mqtt-shepherd**, is an implementation of LWMQN server that can run on platfroms equipped with node.js.
-* It is a server-side application framework with functionality of network and devices management, e.g. permission of device joining, device authentication, reading resources, writing resources, observing resources, and executing a procedure on the remote Devices. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.
-* LWMQN Client and server benefits from [IPSO data model](http://www.ipso-alliance.org/ipso-community/resources/smart-objects-interoperability/), which leads to a very comprehensive way for the Server to use an URI-style *path* to allocate and query Resources on Client Devices. In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.
+* It is a server-side application framework with functionality of network and devices management, e.g. permission of device joining, device authentication, reading resources, writing resources, observing resources, and executing a procedure on the remote devices. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.
+* LWMQN Client and Server benefits from [IPSO data model](http://www.ipso-alliance.org/ipso-community/resources/smart-objects-interoperability/), which leads to a very comprehensive way for the Server to use an URI-style *path* to allocate and query Resources on Client Devices. In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.
     ```js
     qnode.readReq('temperature/0/sensorValue', function (err, rsp) {
         console.log(rsp); // { status: 205, data: 18 }
@@ -103,6 +103,7 @@ qserver.start(function (err) {      // start the sever
 This moudle provides you with **MqttShepherd** and **MqttNode** classes.  
 * **MqttShepherd** class brings you a LWMQN server with network managing facilities, i.e., start/stop the server, permit device joining, find a joined node. This document uses `qserver` to denote the instance of this class.
 * **MqttNode** is the class for creating a software endpoint at server-side to represent the remote Client Device. This document uses `qnode` to denote the instance of this class. You can invoke methods on a `qnode` to operate the remote Client.
+* Each asynchronous API supports both callback style and promise backed by [q](https://github.com/kriskowal/q) 1.4.x.
 
 * **MqttShepherd APIs**
     * [new MqttShepherd()](#API_MqttShepherd)
@@ -145,8 +146,15 @@ Create a server instance of the `MqttShepherd` class. This document will use `qs
 **Arguments:**  
 
 1. `name` (_String_): Server name. A default name `'mqtt-shepherd'` will be used if not given.  
-2. `settings` (_Object_): Settings for the Mosca MQTT broker. If not given, the default settings will be applied, i.e. port 1883 for the broker, LevelUp for presistence. You can set up your own backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. Please refer to the [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage) for details.  
-    
+2. `settings` (_Object_): Optional settings for the server.  
+
+    | Property       | Type    | Description                                                                                                                                                                         |
+    |----------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+    | broker         | Object  | Broker settings in shape of `{ port, backend }`, where backend is a `pubsubsettings` object given in [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage).You can set up your own backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. |
+    | account        | Object  | Set default account with a `{ username, password }` object, where usename and password are strings. Default is `null` to accept all incoming clients                                |
+    | reqTimeout     | Number  | Number of milliseconds, a global timeout for all requests                                                                                                                           |
+    | dbPath         | String  | Set database file path, default is `__dirname + '/database/mqtt.db'`                                                                                                                |
+
 **Returns:**  
   
 * (_Object_): qserver
@@ -164,7 +172,9 @@ var qserver = new MqttShepherd('my_iot_server');
 
 ```js
 var qserver = new MqttShepherd('my_iot_server', {
-    port: 9000
+    broker: {
+        port: 9000
+    }
 });
 ```
 
@@ -172,12 +182,25 @@ var qserver = new MqttShepherd('my_iot_server', {
 
 ```js
 var qserver = new MqttShepherd('my_iot_server', {
-    port: 1883,
-    backend: {  // This is the pubsubsettings you will see in Mosca wiki  
-        type: 'mongo',        
-        url: 'mongodb://localhost:27017/mqtt',
-        pubsubCollection: 'ascoltatori',
-        mongo: {}
+    broker: {
+        port: 1883,
+        backend: {  // This is the pubsubsettings you will see in Mosca wiki  
+            type: 'mongo',        
+            url: 'mongodb://localhost:27017/mqtt',
+            pubsubCollection: 'ascoltatori',
+            mongo: {}
+        }
+    }
+});
+```
+
+* Create a server with a default account. Only clients connecting with this account is authenticated if you don't have an authentication subsystem.
+
+```js
+var qserver = new MqttShepherd('my_iot_server', {
+    account: {
+        username: 'skynyrd',
+        password: 'lynyrd'
     }
 });
 ```
@@ -195,7 +218,7 @@ Start qserver.
   
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -219,7 +242,7 @@ Stop qserver.
   
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -243,7 +266,7 @@ Reset qserver. After qserver restarted, a `'ready'` event will be fired. A hard 
   
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -277,7 +300,7 @@ Allow or disallow devices to join the network.
 
 **Returns:**  
   
-* _none_
+* (_Boolean_): `true` for a success, otherwise `false` if qserver is not enabled.  
 
 **Examples:**  
     
@@ -288,7 +311,7 @@ qserver.on('permitJoining', function (joinTimeLeft) {
 
 // allow devices to join for 180 seconds, this will also trigger 
 // a 'permitJoining' event at each tick of countdown.
-qserver.permitJoin(180);
+qserver.permitJoin(180);    // true
 ```
 
 *************************************************
@@ -479,7 +502,7 @@ Deregister and remove a qnode from the network by its clientId.
   
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -503,7 +526,7 @@ The qserver can use this method to announce(/broadcast) any message to all qnode
   
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -633,7 +656,7 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     ```
 
 * ##### devChange  
-    When the Server perceives that there is any change of _Resources_ from notifications or read/write responses, qserver will fire an `'ind'` event along this type of indication.  
+    Fired when the Server perceives that there is any change of _Resources_ from notifications or read/write responses.  
 
     * msg.type: `'devChange'`  
     * msg.qnode: `qnode`  
@@ -670,11 +693,11 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     ```
 
     * Note
-        - The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is which a qnode like to notify even if there is no change of it. A periodical notification is a good example, a qnode has to report something under observation even there is no change of that thing.
+        - The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is what a qnode like to notify of even if there is no change of it. A periodical notification is a good example, a qnode has to report something under observation even there is no change of that thing.
         - If qserver does notice there is really something changed, it will then fire `'devChange'` to report the change(s). It is suggested to use `'devChange'` indication to update your GUI views, and to use `'devNotify'` indication to log data.
 
 * ##### devStatus  
-    When there is a qnode going online, going offline, or going to sleep, qserver will fire an `'ind'` event along this type of indication.  
+    Fired when there is a qnode going online, going offline, or going to sleep.  
 
     * msg.type: `'devStatus'`  
     * msg.qnode: `qnode`  
@@ -728,7 +751,7 @@ Remotely read a target from the qnode. Response will be passed through the secon
 
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -771,7 +794,7 @@ Remotely write a value to the allocated _Resource_ on a qnode. The response will
 
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -815,7 +838,7 @@ Invoke an excutable _Resource_ on the remote qnode. An excutable _Resource_ is l
   
 **Returns:**  
   
-* (_none_)
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -860,7 +883,7 @@ qnode.executeReq('temperature/0/sensedValue', function (err, rsp) {
 Configure the report settings of a _Resource_, an _Object Instance_, or an _Object_. This method can also be used to cancel an observation by assigning the `attrs.cancel` to `true`.  
     
 **Note**
-* This API **won't start reporting** of the notifications, call observe() method if you want to turn the report on.  
+* This API **_won't start reporting_** of notifications, call observe() method if you want to turn the reporting on.  
 
 **Arguments:**  
 
@@ -885,7 +908,7 @@ Configure the report settings of a _Resource_, an _Object Instance_, or an _Obje
   
 **Returns:**  
   
-* (_none_)
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -938,7 +961,7 @@ Discover report settings of a _Resource_ or, an _Object Instance_ ,or an _Object
   
 **Returns:**  
   
-* (_none_)
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -957,7 +980,6 @@ qnode.discoverReq('temperature/', function (err, rsp) {
       data: {
          pmin: 10,
          pmax: 600,
-         gt: 45,
          resrcList: {
              0: [ 1, 3, 88 ],    // Instance 0 has Resources 1, 3, and 88
              1: [ 1, 2, 6 ]      // Instance 1 has Resources 1, 2, and 6
@@ -971,7 +993,7 @@ qnode.discoverReq('temperature/', function (err, rsp) {
 ***********************************************
 <a name="API_observeReq"></a>
 ### qnode.observeReq(path[, opt][, callback])
-Start observing a _Resource_ on the remote qnode. Please listen to event `'ind'` with indication type `'devNotify'` to get the reports.  
+Start observing a _Resource_ on the remote qnode. Please listen to event `'ind'` with type of `'devNotify'` to get the reports.  
 
 **Arguments:**  
 
@@ -986,7 +1008,7 @@ Start observing a _Resource_ on the remote qnode. Please listen to event `'ind'`
   
 **Returns:**  
   
-* (_none_)
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -1028,7 +1050,7 @@ Ping the remote qnode.
 
 **Returns:**  
   
-* (_none_)
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -1055,7 +1077,7 @@ Maintain this qnode. This will refresh its record on qserver by rediscovering th
   
 **Returns:**  
   
-* _none_
+* (_Promise_): promise
 
 **Examples:**  
     
@@ -1068,7 +1090,7 @@ qnode.maintain(function (err, lastTime) {
 ***********************************************
 <a name="API_dump"></a>
 ### qnode.dump()
-Dump record of the qnode.  
+Dump qnode record.  
 
 **Arguments:**  
 
@@ -1165,9 +1187,9 @@ console.log(qnode.dump());
 <a name="Encryption"></a>
 ## 6. Message Encryption  
 
-By default, qserver won't encrypt the message. You can override the encrypt() and decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your Client Devices as well.  
+By default, qserver won't encrypt the message. You can override the qserver.encrypt() and qserver.decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your [**remote Client Devices**](https://github.com/lwmqn/mqtt-node) as well.  
 
-Note: You may like to distribute pre-configured keys to your Clients and utilize the [authentication](#Auth) approach to build your own security subsystem.  
+**Note**: You may like to distribute pre-configured keys to your Clients and utilize the [authentication](#Auth) approach to build your own security subsystem.  
 
 ***********************************************
 ### qserver.encrypt(msg, clientId, cb)
