@@ -756,7 +756,7 @@ Remotely read a target from the qnode. Response will be passed through the secon
 **Examples:**  
     
 ```js
-qnode.readReq('temperature/1/sensedValue', function (err, rsp) {
+qnode.readReq('temperature/1/sensorValue', function (err, rsp) {
     console.log(rsp);       // { status: 205, data: 87 }
 });
 
@@ -872,7 +872,7 @@ qnode.executeReq('temperature/0/noSuchResource', function (err, rsp) {
 });
 
 // invoke an unexecutable Resource
-qnode.executeReq('temperature/0/sensedValue', function (err, rsp) {
+qnode.executeReq('temperature/0/sensorValue', function (err, rsp) {
     console.log(rsp);       // { status: 405 }
 });
 ```
@@ -914,7 +914,7 @@ Configure the report settings of a _Resource_, an _Object Instance_, or an _Obje
     
 ```js
 // set successfully
-qnode.writeAttrsReq('temperature/0/sensedValue', {
+qnode.writeAttrsReq('temperature/0/sensorValue', {
     pmin: 10,
     pmax: 600,
     gt: 45
@@ -923,7 +923,7 @@ qnode.writeAttrsReq('temperature/0/sensedValue', {
 });
 
 // cancel the observation on a Resource
-qnode.writeAttrsReq('temperature/0/sensedValue', {
+qnode.writeAttrsReq('temperature/0/sensorValue', {
     cancel: true
 }, function (err, rsp) {
     console.log(rsp);       // { status: 200 }
@@ -967,7 +967,7 @@ Discover report settings of a _Resource_ or, an _Object Instance_ ,or an _Object
     
 ```js
 // discover a Resource successfully
-qnode.discoverReq('temperature/0/sensedValue', function (err, rsp) {
+qnode.discoverReq('temperature/0/sensorValue', function (err, rsp) {
     console.log(rsp);   // { status: 205, data: { pmin: 10, pmax: 600, gt: 45 }
 });
 
@@ -1014,7 +1014,7 @@ Start observing a _Resource_ on the remote qnode. Please listen to event `'ind'`
     
 ```js
 // observation starts successfully
-qnode.observeReq('temperature/0/sensedValue', function (err, rsp) {
+qnode.observeReq('temperature/0/sensorValue', function (err, rsp) {
     console.log(rsp);       // { status: 205 }
 });
 
