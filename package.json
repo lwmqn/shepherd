@@ -1,6 +1,6 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Network server and manager for the lightweight MQTT machine network (LWMQN)",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "nedb": "^1.4.0",
     "network": "^0.2.1",
     "q": "^1.4.1",
-    "smartobject": "1.0.0"
+    "smartobject": "^1.1.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
