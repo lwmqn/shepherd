@@ -24,7 +24,7 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 ## 1. Overview
 
 Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an architecture that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
-* LWMQN is also an open source project that offers a solution of establishing a local area machine network with MQTT, and it can be a replacement of the cloud-based solution **if you don't really need the cloud** (which becomes an option).
+* LWMQN is also an open source project that offers a solution of establishing a local area machine network with MQTT, and it can be a replacement of the cloud-based solution **if you don't really need the cloud** (which becomes an option). Here is a [quick demo](#Demo).
 * Not only has LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.
 * LWMQN project provides you with a server-side **mqtt-shepherd** library and a client-side [**mqtt-node**](https://github.com/lwmqn/mqtt-node) library to run your machine network with JavaScript and node.js. With these two libraries and node.js, you can have your own authentication, authorization and encryption subsystems to secure your network easily. LWMQN project is trying to let you build an IoT machine network with less pain.
 
@@ -44,11 +44,21 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
     });
     ```
 
-  
-
 **Note**:  
 * IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where `oid`, `iid`, and `rid` are identifiers of them respectively used to allocate resources on a Client Device.  
 * An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an unique `iid` on each Object Instance to distinguish one entity from the other.  
+  
+* This [demo app](https://github.com/lwmqn/lwmqn-demo) is built with **mqtt-shepherd** and **mqtt-node** to mimic a smart-home application. To run the demo:
+  
+    ```sh
+    $ git clone https://github.com/lwmqn/lwmqn-demo
+    $ cd lwmqn-demo
+    $ npm install
+    $ npm start
+    ```
+  
+<a name="Demo"></a>
+![Demo](https://github.com/lwmqn/documents/blob/master/media/demo.gif)
 
 #### Acronyms and Abbreviations
 * **MqttShepherd**: Class exposed by `require('mqtt-shepherd')`  
