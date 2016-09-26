@@ -47,6 +47,7 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
 **Note**:  
 * IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where `oid`, `iid`, and `rid` are identifiers of them respectively used to allocate resources on a Client Device.  
 * An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an unique `iid` on each Object Instance to distinguish one entity from the other.  
+<a name="Demo"></a>
   
 * This [demo app](https://github.com/lwmqn/lwmqn-demo) is built with **mqtt-shepherd** and **mqtt-node** to mimic a smart-home application. To run the demo:
   
@@ -57,7 +58,6 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
     $ npm start
     ```
   
-<a name="Demo"></a>
 ![Demo](https://github.com/lwmqn/documents/blob/master/media/demo.gif)
 
 #### Acronyms and Abbreviations
