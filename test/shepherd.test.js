@@ -782,7 +782,7 @@ describe('Top Level of Tests', function () {
                     clientId: 'test01',
                     so: {
                         lwm2mSecurity: {
-                            '1': { x1: "new_x1_value2_read" },
+                            '1': { x1: "new_x1_value2" },   // now don't send readReq again, if writeReq has data back
                             '2': { x2: "sis" },
                             '3': { x3: "dad" }
                         },
