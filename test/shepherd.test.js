@@ -339,7 +339,7 @@ describe('Top Level of Tests', function () {
                     ]);
                 });
 
-                shepherd.on('registered', function (qnode) {
+                shepherd.on('_registered', function (qnode) {
                     _clientObjectDetailReqStub.restore();
                     _responseSenderSpy.restore();
                     expect(_responseSenderSpy).to.have.been.calledWith('register', 'test01');
@@ -814,7 +814,7 @@ describe('Top Level of Tests', function () {
                     ]);
                 });
 
-                shepherd.on('registered', function (qnode) {
+                shepherd.on('_registered', function (qnode) {
                     _clientObjectDetailReqStub.restore();
                     _responseSenderSpy.restore();
                     expect(_responseSenderSpy).to.have.been.calledWith('register', 'test02');

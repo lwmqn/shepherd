@@ -23,17 +23,27 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 <a name="Overiew"></a>
 ## 1. Overview
 
-Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an architecture that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
-* LWMQN is also an open source project that offers a solution of establishing a local area machine network with MQTT, and it can be a replacement of the cloud-based solution **if you don't really need the cloud** (which becomes an option). Here is a [quick demo](#Demo).
-* Not only has LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.
-* LWMQN project provides you with a server-side **mqtt-shepherd** library and a client-side [**mqtt-node**](https://github.com/lwmqn/mqtt-node) library to run your machine network with JavaScript and node.js. With these two libraries and node.js, you can have your own authentication, authorization and encryption subsystems to secure your network easily. LWMQN project is trying to let you build an IoT machine network with less pain.
+Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
+Here is a [**demo webapp**](https://github.com/lwmqn/lwmqn-demo) that shows a simple smart home application built with LWMQN.  
 ![LWMQN Network](https://github.com/lwmqn/documents/blob/master/media/lwmqn_net.png)
 
-## Server: mqtt-shepherd
+* **Build Your IoT Network without Cloud Service**
+    - LWMQN offers a solution of establishing a _**Local Area Machine Network**_ with MQTT.
+    - Cloud becomes an option. LWMQN Server is your local machime gateway and application runner. But if you like to let your machines go up cloud, why not? It's node.js!
+
+* **LWM2M-like Interfaces and Smart Object Model**
+    - Not only has the LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.
+    - Everything has been well-organized to ease the pain for you to create RPC interfaces for your webapps, such as RESTful and websocket-based APIs.
+
+* **mqtt-shepherd and mqtt-node libraries**
+   - LWMQN project provides you with a server-side **mqtt-shepherd** library and a machine-side [**mqtt-node**](https://github.com/lwmqn/mqtt-node) library to run your machine network with JavaScript and node.js. By these two libraries and node.js, you can have your own authentication, authorization and encryption subsystems to secure your network easily.
+
+
+## LWMQN Server: mqtt-shepherd
 * This module, **mqtt-shepherd**, is an implementation of LWMQN server that can run on platfroms equipped with node.js.
-* It is a server-side application framework with functionality of network and devices management, e.g. permission of device joining, device authentication, reading resources, writing resources, observing resources, and executing a procedure on the remote devices. Furthermore, thanks to the power of node.js, making your own RESTful APIs to interact with your machines is also possible.
-* LWMQN Client and Server benefits from [IPSO data model](http://www.ipso-alliance.org/ipso-community/resources/smart-objects-interoperability/), which leads to a very comprehensive way for the Server to use an URI-style *path* to allocate and query Resources on Client Devices. In the following example, both of these two requests is to read the sensed value from a temperature sensor on a Client Device.
+* It is a server-side application framework with functionality of network and devices management, e.g. permission of device joining, device authentication, reading resources, writing resources, observing resources, and executing procedures on remote devices.  
+* It's easy to allocate and query resources on remote devices with an URI-style *path* in the shape of `'oid/iid/rid'`. In the following example, both of these two requests is to remotely read the sensed value from a temperature sensor on a machine.
     ```js
     qnode.readReq('temperature/0/sensorValue', function (err, rsp) {
         console.log(rsp); // { status: 205, data: 18 }
@@ -45,26 +55,17 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
     ```
 
 **Note**:  
-* IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where `oid`, `iid`, and `rid` are identifiers of them respectively used to allocate resources on a Client Device.  
+* IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the [hierarchical structure](https://github.com/PeterEB/smartobject#1-overview) of resources, where `oid`, `iid`, and `rid` are identifiers of them respectively used to allocate resources on a Client Device.  
 * An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an unique `iid` on each Object Instance to distinguish one entity from the other.  
-<a name="Demo"></a>
-  
-* This [demo app](https://github.com/lwmqn/lwmqn-demo) is built with **mqtt-shepherd** and **mqtt-node** to mimic a smart-home application. To run the demo:
-  
-    ```sh
-    $ git clone https://github.com/lwmqn/lwmqn-demo
-    $ cd lwmqn-demo
-    $ npm install
-    $ npm start
-    ```
-  
-![Demo](https://github.com/lwmqn/documents/blob/master/media/demo.gif)
 
 #### Acronyms and Abbreviations
+* **Server**: LWMQN server
+* **Client** or **Client Device**: LWMQN client (machine)
 * **MqttShepherd**: Class exposed by `require('mqtt-shepherd')`  
-* **MqttNode**: Class to create a software endpoint of a remote Client Device on the server
+* **MqttNode**: Class to create a software endpoint(proxy) of a remote Client Device on the server
 * **qserver**: Instance of MqttShepherd Class 
 * **qnode**: Instance of MqttNode Class  
+
 
 <br />
 
@@ -73,11 +74,10 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an arc
 
 * Communication based on MQTT protocol
 * Based on [Mosca](https://github.com/mcollina/mosca/wiki), an MQTT broker on node.js
-* Hierarchical data model in Smart-Object-style (IPSO)
-* Easy to query resources on a Client Device
 * LWM2M-like interfaces for Client/Server interaction
-* Embedded persistence ([NeDB](https://github.com/louischatriot/nedb)) and auto-reload at boot-up for Client Devices
-* Simple machine network managment
+* Hierarchical data model in Smart-Object-style (IPSO)
+* Easy to query resources on a Client Device with the URI-style path
+* Embedded persistence ([NeDB](https://github.com/louischatriot/nedb)) and auto-reloading at boot-up for Client Devices
   
 <a name="Installation"></a>
 ## 3. Installation
@@ -111,8 +111,8 @@ qserver.start(function (err) {      // start the sever
 ## 5. APIs and Events  
   
 This moudle provides you with **MqttShepherd** and **MqttNode** classes.  
-* **MqttShepherd** class brings you a LWMQN server with network managing facilities, i.e., start/stop the server, permit device joining, find a joined node. This document uses `qserver` to denote the instance of this class.
-* **MqttNode** is the class for creating a software endpoint at server-side to represent the remote Client Device. This document uses `qnode` to denote the instance of this class. You can invoke methods on a `qnode` to operate the remote Client.
+* **MqttShepherd** class brings you a LWMQN Server with network managing facilities, i.e., start/stop the server, permit device joining, find a joined node. This document uses `qserver` to denote the instance of this class.
+* **MqttNode** is the class for creating a software endpoint(proxy) at server-side to represent the remote Client Device. This document uses `qnode` to denote the instance of this class. You can invoke methods on a `qnode` to operate the remote Client.
 * Each asynchronous API supports both callback style and promise backed by [q](https://github.com/kriskowal/q) 1.4.x.
 
 * **MqttShepherd APIs**
@@ -150,20 +150,20 @@ Exposed by `require('mqtt-shepherd')`
 ***********************************************
 
 <a name="API_MqttShepherd"></a>
-### new MqttShepherd([name][, settings])
+### new MqttShepherd([name,] [settings])
 Create a server instance of the `MqttShepherd` class. This document will use `qserver` to denote the server.  
   
 **Arguments:**  
 
 1. `name` (_String_): Server name. A default name `'mqtt-shepherd'` will be used if not given.  
-2. `settings` (_Object_): Optional settings for the server.  
+2. `settings` (_Object_): Optional settings for qserver.  
 
     | Property       | Type    | Description                                                                                                                                                                         |
     |----------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-    | broker         | Object  | Broker settings in shape of `{ port, backend }`, where backend is a `pubsubsettings` object given in [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage).You can set up your own backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. |
-    | account        | Object  | Set default account with a `{ username, password }` object, where usename and password are strings. Default is `null` to accept all incoming clients                                |
-    | reqTimeout     | Number  | Number of milliseconds, a global timeout for all requests                                                                                                                           |
-    | dbPath         | String  | Set database file path, default is `__dirname + '/database/mqtt.db'`                                                                                                                |
+    | broker         | Object  | Broker settings in shape of `{ port, backend }`, where backend is a `pubsubsettings` object given in [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage). You can set up your own MQTT backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. |
+    | account        | Object  | Set default account with a `{ username, password }` object, where usename and password are strings. Default is `null` to accept all incoming Clients.                               |
+    | reqTimeout     | Number  | Number of milliseconds, a global timeout for all requests.                                                                                                                          |
+    | dbPath         | String  | Set database file path, default is `__dirname + '/database/mqtt.db'`.                                                                                                                |
 
 **Returns:**  
   
@@ -194,7 +194,7 @@ var qserver = new MqttShepherd('my_iot_server', {
 var qserver = new MqttShepherd('my_iot_server', {
     broker: {
         port: 1883,
-        backend: {  // This is the pubsubsettings you will see in Mosca wiki  
+        backend: {  // backend is the pubsubsettings seen in Mosca wiki page 
             type: 'mongo',        
             url: 'mongodb://localhost:27017/mqtt',
             pubsubCollection: 'ascoltatori',
@@ -204,7 +204,7 @@ var qserver = new MqttShepherd('my_iot_server', {
 });
 ```
 
-* Create a server with a default account. Only clients connecting with this account is authenticated if you don't have an authentication subsystem.
+* Create a server with a default account. Only Clients connecting with this account is authenticated if you don't have an authentication subsystem.
 
 ```js
 var qserver = new MqttShepherd('my_iot_server', {
@@ -233,10 +233,16 @@ Start qserver.
 **Examples:**  
     
 ```js
+// callback style
 qserver.start(function (err) {
     if (!err)
         console.log('server initialized.');
 });
+
+// promise style
+qserver.start().then(function() {
+    console.log('server initialized.');
+}).done();
 ```
 
 *************************************************
@@ -302,7 +308,7 @@ qserver.reset(true, function (err) {
 
 <a name="API_permitJoin"></a>
 ### .permitJoin(time)
-Allow or disallow devices to join the network.  
+Allow or disallow devices to join the network. A 'permitJoining` event will be fired every tick of countdown (per second) when qserver is allowing device to join its network.  
 
 **Arguments:**  
 
@@ -482,7 +488,7 @@ Find registered **qnodes** by the specified mac address. This method always retu
 
 **Arguments:**  
 
-1. `macAddr` (_String_): Mac address of the qnode(s) to find for. The address in **case-insensitive**.  
+1. `macAddr` (_String_): Mac address of the qnode(s) to find for. The address is **_case-insensitive_**.  
 
   
 **Returns:**  
@@ -563,7 +569,7 @@ Fired when there is an error occurs.
 <a name="EVT_permit"></a>
 ### Event: 'permitJoining'
 **Listener**: `function (joinTimeLeft) {}`  
-Fired when qserver is allowing for devices to join the network, where `joinTimeLeft` is number of seconds left to allow devices to join the network. This event will be triggered at each tick of countdown.  
+Fired when qserver is allowing for devices to join the network, where `joinTimeLeft` is number of seconds left to allow devices to join the network. This event will be triggered at each tick of countdown (per second).  
 
 *************************************************
 
@@ -702,8 +708,8 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     }
     ```
 
-    * Note
-        - The diffrence between `'devChange'` and `'devNotify'` is that data along with `'devNotify'` is what a qnode like to notify of even if there is no change of it. A periodical notification is a good example, a qnode has to report something under observation even there is no change of that thing.
+    * **Notice!!!** The diffrence between `'devChange'` and `'devNotify'`:
+        - Data along with `'devNotify'` is what a qnode like to notify of even if there is nothing changed. A periodical notification is a good example, a qnode has to report something under observation even there is no change of that thing.
         - If qserver does notice there is really something changed, it will then fire `'devChange'` to report the change(s). It is suggested to use `'devChange'` indication to update your GUI views, and to use `'devNotify'` indication to log data.
 
 * ##### devStatus  
@@ -739,7 +745,7 @@ Fired when the qserver receives any published packet from any remote qnode.
 <br />
 
 ## MqttNode Class
-This class provides you with methods to perform remote operations upon a registered Client Device. An instance of this class is denoted as `qnode` in this document.  
+This class is to create proxy instance for each remote Client Device joined the newtwork. An instance of this class is denoted as `qnode` in this document.  
 
 ***********************************************
 <a name="API_readReq"></a>
@@ -750,8 +756,8 @@ Remotely read a target from the qnode. Response will be passed through the secon
 
 1. `path` (_String_): Path of the allocated _Object_, _Object Instance_, or _Resource_ on the remote qnode.
 2. `callback` (_Function_): `function (err, rsp) { }`
-    - `err` (_Object_): Error object
-    - `rsp` (_Object_): The response is an object that has a status code along with the returned data from the remote qnode.  
+    - `err` (_Object_): Error object.
+    - `rsp` (_Object_): The response is an object that has a status code along with the returned data.
 
     | Property | Type    | Description                                                                                                                                                                                                 |
     |----------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -784,6 +790,13 @@ qnode.readReq('/temperature/0/noSuchResource/', function (err, rsp) {
 qnode.readReq('/temperature/0/foo', function (err, rsp) {
     console.log(rsp);       // { status: 405, data: '_unreadable_' }
 });
+
+// promise-style
+qnode.readReq('temperature/1/sensorValue').then(function (rsp) {
+    console.log(rsp);       // { status: 205, data: 87 }
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 
 ***********************************************
@@ -795,7 +808,7 @@ Remotely write a value to the allocated _Resource_ on a qnode. The response will
 
 1. `path` (_String_): Path of the allocated _Resource_ on the remote qnode.
 2. `val` (_Depends_): The value to write to the _Resource_.
-3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object that has a status code along with the written data from the remote qnode.
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object that has a status code along with the written data.
 
     | Property | Type    | Description                                                                                                                                  |
     |----------|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -827,6 +840,13 @@ qnode.writeReq('temperature/0/noSuchResource', 1, function (err, rsp) {
 qnode.writeReq('digitalInput/1/dInState', 1, function (err, rsp) {
     console.log(rsp);   // { status: 405, data: '_unwritable_' }
 });
+
+// promise-style
+qnode.writeReq('digitalOutput/0/appType', 'lightning').then(function (rsp) {
+    console.log(rsp);       // { status: 204, data: 'lightning' }
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 
 ***********************************************
@@ -885,6 +905,13 @@ qnode.executeReq('temperature/0/noSuchResource', function (err, rsp) {
 qnode.executeReq('temperature/0/sensorValue', function (err, rsp) {
     console.log(rsp);       // { status: 405 }
 });
+
+// promise-style
+qnode.executeReq('button/0/blink', [ 'falling', 20 ]).then(function (rsp) {
+    console.log(rsp);       // { status: 204, data: 71 }
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 
 ***********************************************
@@ -952,6 +979,17 @@ qnode.writeAttrsReq('temperature/0/noSuchResource', {
 }, function (err, rsp) {
     console.log(rsp);       // { status: 400 }
 });
+
+// promise-style
+qnode.writeAttrsReq('temperature/0/sensorValue', {
+    pmin: 10,
+    pmax: 600,
+    gt: 45
+}).then(function (rsp) {
+    console.log(rsp);       // { status: 200 }
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 
 ***********************************************
@@ -998,6 +1036,13 @@ qnode.discoverReq('temperature/', function (err, rsp) {
     }
     */
 });
+
+// promise-style
+qnode.discoverReq('temperature/0/sensorValue').then(function (rsp) {
+    console.log(rsp);       // { status: 205, data: { pmin: 10, pmax: 600, gt: 45 }
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 
 ***********************************************
@@ -1042,6 +1087,13 @@ qnode.observeReq('temperature/0', function (err, rsp) {
 qnode.observeReq('temperature/0/noSuchResource', function (err, rsp) {
     console.log(rsp);       // { status: 404 }
 });
+
+// promise-style
+qnode.observeReq('temperature/0/sensorValue').then(function (rsp) {
+    console.log(rsp);       // { status: 205 }
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 
 ***********************************************
@@ -1074,6 +1126,13 @@ qnode.pingReq(function (err, rsp) {
     if (!err)
         console.log(rsp);   // { status: 408 }, request timeout
 });
+
+// promise-style
+qnode.pingReq().then(function (rsp) {
+    console.log(rsp);       // { status: 200, data: 12 }, round-trip time is 12 ms
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 
 *************************************************
@@ -1096,11 +1155,18 @@ qnode.maintain(function (err, lastTime) {
     if (!err)
         console.log(lastTime);  // 1470192227322 (ms, from 1970/1/1)
 });
+
+// promise-style
+qnode.maintain().then(function (lastTime) {
+    console.log(lastTime);      // 1470192227322 (ms, from 1970/1/1)
+}).fail(function (err) {
+    console.log(err);
+}).done();
 ```
 ***********************************************
 <a name="API_dump"></a>
 ### qnode.dump()
-Dump qnode record.  
+Synchronously dump qnode record.  
 
 **Arguments:**  
 
@@ -1124,7 +1190,7 @@ Dump qnode record.
 **Examples:**  
     
 ```js
-console.log(qnode.dump());
+qnode.dump();
 
 /* 
 {
@@ -1364,7 +1430,7 @@ Please refer to Mosca Wiki to learn more about [Authentication & Authorization](
 
 | Status Code               | Description                                                                                                                                                                              |
 |---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 200 (Ok)                  | Everything is fine                                                                                                                                                                       |
+| 200 (OK)                  | Everything is fine                                                                                                                                                                       |
 | 204 (Changed)             | The remote qnode accepted this writing request successfully                                                                                                                              |
 | 400 (BadRequest)          | There is an unrecognized attribute/parameter within the request message                                                                                                                  |
 | 404 (NotFound)            | The qnode is not found                                                                                                                                                                   |
