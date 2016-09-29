@@ -24,6 +24,7 @@ var shpClientId = 'shp_test';
 //     console.log(e);
 // }
 
+
 describe('Top Level of Tests', function () {
     before(function (done) {
         var unlink1 = false,
@@ -264,8 +265,16 @@ describe('Top Level of Tests', function () {
     });
 
     describe('Functional Check', function () {
+        var _setClientStub;
         var shepherd = new Shepherd(shpClientId, { dbPath: path.resolve('./test/database/mqtt2.db') });
         // this.timeout(15000);
+        before(function () {
+            _setClientStub = sinon.stub(shepherd, '_setClient', function () { return true; });
+        });
+
+        after(function () {
+            _setClientStub.restore();
+        });
 
         describe('#.permitJoin', function () {
             it('should not throw if shepherd is not enabled when permitJoin invoked - shepherd is disabled.', function () {
