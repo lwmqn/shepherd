@@ -24,6 +24,13 @@ var shpClientId = 'shp_test';
 //     console.log(e);
 // }
 
+after(function (done) {
+    fs.unlink(path.resolve('./lib/database/mqtt.db'), function () {
+        setTimeout(function () {
+            done();
+        }, 200);
+    });
+});
 
 describe('Top Level of Tests', function () {
     before(function (done) {

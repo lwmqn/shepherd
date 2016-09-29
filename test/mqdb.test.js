@@ -53,6 +53,14 @@ var nodeMock4 = {
 
 var mqdb = null;
 
+after(function (done) {
+    fs.unlink(path.resolve('./lib/database/mqttDB.db'), function () {
+        setTimeout(function () {
+            done();
+        }, 200);
+    });
+});
+
 describe('Database Testing', function () {
     // clear the database file
     var dbFolderX = path.resolve('./lib/database');

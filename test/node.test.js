@@ -46,6 +46,14 @@ var node = new MqttNode(fakeShp, cId, devAttrs);
 node.so.addObjects(_.merge(smObj1, smObj2));
 var myso = node.so;
 
+after(function (done) {
+    fs.unlink(path.resolve('./lib/database/mqttNode.db'), function () {
+        setTimeout(function () {
+            done();
+        }, 200);
+    });
+});
+    
 describe('mqtt-node verify', function () {
     var dbFolderY = path.resolve('./lib/database');
         dbPathY = path.resolve('./lib/database/mqttNode.db');
