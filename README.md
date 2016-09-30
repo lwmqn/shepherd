@@ -5,13 +5,16 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 
 [![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-shepherd/master.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-shepherd)
 [![npm](https://img.shields.io/npm/v/mqtt-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
+[![PyPI](https://img.shields.io/pypi/status/Django.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
 [![npm](https://img.shields.io/npm/l/mqtt-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
+
+Make sure you are with version >= 0.6.0, the old bumps before 0.6.0 are all deprecated.
 
 <br />
 
 ## Table of Contents
 
-1. [Overiew](#Overiew)  
+1. [Overview](#Overview)  
 2. [Features](#Features)  
 3. [Installation](#Installation)  
 4. [Basic Usage](#Basic)  
@@ -21,7 +24,7 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 8. [Status Code](#StatusCode)  
 9. [Debug Messages](#Debug)
 
-<a name="Overiew"></a>
+<a name="Overview"></a>
 ## 1. Overview
 
 Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
@@ -31,7 +34,7 @@ Here is a [**demo webapp**](https://github.com/lwmqn/lwmqn-demo) that shows a si
 
 * **Build Your IoT Network without Cloud Service**
     - LWMQN offers a solution of establishing a _**Local Area Machine Network**_ with MQTT.
-    - Cloud becomes an option. LWMQN Server is your local machime gateway and application runner. But if you like to let your machines go up cloud, why not? It's node.js!
+    - Cloud becomes an option. LWMQN Server is your local machine gateway and application runner. But if you like to let your machines go up cloud, why not? It's node.js!
 
 * **LWM2M-like Interfaces and Smart Object Model**
     - Not only has the LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.
@@ -42,7 +45,7 @@ Here is a [**demo webapp**](https://github.com/lwmqn/lwmqn-demo) that shows a si
 
 
 ## LWMQN Server: mqtt-shepherd
-* This module, **mqtt-shepherd**, is an implementation of LWMQN server that can run on platfroms equipped with node.js.
+* This module, **mqtt-shepherd**, is an implementation of LWMQN server that can run on platforms equipped with node.js.
 * It is a server-side application framework with functionality of network and devices management, e.g. permission of device joining, device authentication, reading resources, writing resources, observing resources, and executing procedures on remote devices.  
 * It's easy to allocate and query resources on remote devices with an URI-style *path* in the shape of `'oid/iid/rid'`. In the following example, both of these two requests is to remotely read the sensed value from a temperature sensor on a machine.
     ```js
@@ -105,7 +108,7 @@ qserver.start(function (err) {      // start the sever
 });
 
 // That's all to start a LWMQN server.
-// Now qserver is going to auotmatically tackle most of the network managing things.
+// Now qserver is going to automatically tackle most of the network managing things.
 ```
   
 <a name="APIs"></a>
@@ -162,7 +165,7 @@ Create a server instance of the `MqttShepherd` class. This document will use `qs
     | Property       | Type    | Description                                                                                                                                                                         |
     |----------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | broker         | Object  | Broker settings in shape of `{ port, backend }`, where backend is a `pubsubsettings` object given in [Mosca wiki page](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage). You can set up your own MQTT backend, like mongoDB, Redis, Mosquitto, or RabbitMQ, through this option. |
-    | account        | Object  | Set default account with a `{ username, password }` object, where usename and password are strings. Default is `null` to accept all incoming Clients.                               |
+    | account        | Object  | Set default account with a `{ username, password }` object, where username and password are strings. Default is `null` to accept all incoming Clients.                               |
     | reqTimeout     | Number  | Number of milliseconds, a global timeout for all requests.                                                                                                                          |
     | dbPath         | String  | Set database file path, default is `__dirname + '/database/mqtt.db'`.                                                                                                                |
 
@@ -313,7 +316,7 @@ Allow or disallow devices to join the network. A 'permitJoining` event will be f
 
 **Arguments:**  
 
-1. `time` (_Number_): Time in seconds for qsever allowing devices to join the network. Set `time` to `0` can immediately close the admission.  
+1. `time` (_Number_): Time in seconds for qserver allowing devices to join the network. Set `time` to `0` can immediately close the admission.  
 
 **Returns:**  
   
@@ -641,7 +644,7 @@ Fired when there is an incoming indication message. The `msg` is an object with 
 
     * msg.type: `'devNotify'`
     * msg.qnode: `qnode`
-    * msg.data: Content of the notification. This object has fileds of `oid`, `iid`, `rid`, and `data`.
+    * msg.data: Content of the notification. This object has fields of `oid`, `iid`, `rid`, and `data`.
         - `data` is an _Object Instance_ if `oid` and `iid` are given but `rid` is null or undefined
         - `data` is a _Resource_ if `oid`, `iid` and `rid` are given (data type depends on the _Resource_)
     * message examples
@@ -677,7 +680,7 @@ Fired when there is an incoming indication message. The `msg` is an object with 
 
     * msg.type: `'devChange'`  
     * msg.qnode: `qnode`  
-    * msg.data: Content of the changes. This object has fileds of `oid`, `iid`, `rid`, and `data`.  
+    * msg.data: Content of the changes. This object has fields of `oid`, `iid`, `rid`, and `data`.  
         - `data` is an object that contains only the properties changed in an Object Instance. In this case, `oid` and `iid` are given but `rid` is null or undefined  
         - `data` is the new value of a Resource. If a Resource itself is an object, then `data` will be an object that contains only the properties changed in that Resource. In this case, `oid`, `iid` and `rid` are given (data type depends on the Resource)
     * message examples
@@ -709,7 +712,7 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     }
     ```
 
-    * **Notice!!!** The diffrence between `'devChange'` and `'devNotify'`:
+    * **Notice!!!** The difference between `'devChange'` and `'devNotify'`:
         - Data along with `'devNotify'` is what a qnode like to notify of even if there is nothing changed. A periodical notification is a good example, a qnode has to report something under observation even there is no change of that thing.
         - If qserver does notice there is really something changed, it will then fire `'devChange'` to report the change(s). It is suggested to use `'devChange'` indication to update your GUI views, and to use `'devNotify'` indication to log data.
 
@@ -746,7 +749,7 @@ Fired when the qserver receives any published packet from any remote qnode.
 <br />
 
 ## MqttNode Class
-This class is to create proxy instance for each remote Client Device joined the newtwork. An instance of this class is denoted as `qnode` in this document.  
+This class is to create proxy instance for each remote Client Device joined the network. An instance of this class is denoted as `qnode` in this document.  
 
 ***********************************************
 <a name="API_readReq"></a>
@@ -853,7 +856,7 @@ qnode.writeReq('digitalOutput/0/appType', 'lightning').then(function (rsp) {
 ***********************************************
 <a name="API_executeReq"></a>
 ### qnode.executeReq(path[, args][, callback])
-Invoke an excutable _Resource_ on the remote qnode. An excutable _Resource_ is like a remote procedure call.  
+Invoke an executable _Resource_ on the remote qnode. An executable _Resource_ is like a remote procedure call.  
 
 **Arguments:**  
 
@@ -874,7 +877,7 @@ Invoke an excutable _Resource_ on the remote qnode. An excutable _Resource_ is l
 **Examples:**  
     
 ```js
-// assuming there is an executable Resource (procedure) with singnatue
+// assuming there is an executable Resource (procedure) with signature
 // function(n) { ... } to blink an LED n times.
 qnode.executeReq('led/0/blink', [ 10 ] ,function (err, rsp) {
     console.log(rsp);       // { status: 204 }
@@ -967,7 +970,7 @@ qnode.writeAttrsReq('temperature/0/sensorValue', {
     console.log(rsp);       // { status: 200 }
 });
 
-// taget not found
+// target not found
 qnode.writeAttrsReq('temperature/0/noSuchResource', {
     gt: 20
 }, function (err, rsp) {
@@ -1006,7 +1009,7 @@ Discover report settings of a _Resource_ or, an _Object Instance_ ,or an _Object
     | Property | Type    | Description                                                                                                                                                                                               |
     |----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     |  status  | Number  | [Status code](#StatusCode) of the response. Possible status codes are 205, 400, 404, 408, and 408.                                                                                                        |
-    |  data    | Object  | `data` is an object of the report settings. If the discoved target is an _Object_, there will be an additional field `data.resrcList` to list all its _Resource_ idetifiers under each _Object Instance_. |
+    |  data    | Object  | `data` is an object of the report settings. If the discovered target is an _Object_, there will be an additional field `data.resrcList` to list all its _Resource_ identifiers under each _Object Instance_. |
   
 **Returns:**  
   
@@ -1338,7 +1341,7 @@ Override methods within `qserver.authPolicy` to authorize a Client. These method
 ***********************************************
 ### qserver.authPolicy.authenticate(client, username, password, cb)  
 Method of user authentication. Override at will.  
-The default implementation authenticate all Clients.  
+The default implementation authenticates all Clients.  
 
 **Arguments:**  
 
@@ -1372,7 +1375,7 @@ qserver.authPolicy.authenticate = function (client, username, password, cb) {
 ***********************************************
 ### qserver.authPolicy.authorizePublish(client, topic, payload, cb)  
 Method of authorizing a Client to publish to a topic. Override at will.  
-The default implementation authorize every Client, that was successfully registered, to publish to any topic.  
+The default implementation authorizes every Client, that was successfully registered, to publish to any topic.  
 
 **Arguments:**  
 
@@ -1399,7 +1402,7 @@ qserver.authPolicy.authorizePublish = function (client, topic, payload, cb) {
 ***********************************************
 ### qserver.authPolicy.authorizeSubscribe(client, topic, cb)  
 Method of authorizing a Client to subscribe to a topic. Override at will.  
-The default implementation authorize every Client, that was successfully registered, to subscribe to any topic.  
+The default implementation authorizes every Client, that was successfully registered, to subscribe to any topic.  
 
 **Arguments:**  
 
@@ -1445,7 +1448,7 @@ Please refer to Mosca Wiki to learn more about [Authentication & Authorization](
 
 Like many node.js modules do, **mqtt-shepherd** utilizes [debug](https://www.npmjs.com/package/debug) module to print out messages that may help in debugging. The namespaces include `mqtt-shepherd`, `mqtt-shepherd:init`, `mqtt-shepherd:request`, and `mqtt-shepherd:msgHdlr`. The `mqtt-shepherd:request` logs requests that qserver sends to qnodes, and `mqtt-shepherd:msgHdlr` logs the requests that comes from qnodes.  
 
-If you like to print the debug messages, run your app.js with the DEBUG environment varaible:
+If you like to print the debug messages, run your app.js with the DEBUG environment variable:
 
 ```sh
 $ DEBUG=mqtt-shpeherd* app.js          # use wildcard to print all mqtt-shepherd messages
