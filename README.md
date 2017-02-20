@@ -29,11 +29,14 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 
 ![LWMQN Network](https://raw.githubusercontent.com/lwmqn/documents/master/media/lwmqn_net.png)
 
+<br />
 
-## nstallation
+## Installation
 
 > $ npm install mqtt-shepherd --save
   
+<br />
+
 ## Basic Usage
 
 ```js
@@ -56,6 +59,8 @@ qserver.start(function (err) {      // start the sever
 // Now qserver is going to automatically tackle most of the network managing things.
 ```
   
+<br />
+
 ## License
 
 Licensed under [MIT](https://github.com/lwmqn/mqtt-shepherd/blob/master/LICENSE).
