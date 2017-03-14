@@ -753,6 +753,24 @@ describe('Top Level of Tests', function () {
             });
         });
 
+        describe('#qnode.identifyReq', function () {
+            it('should identify successfully', function (done) {
+                var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
+                var identifyReqCb = sinon.spy();            // (clientId, reqObj, callback)
+                qnode.identifyReq().then(function (rsp) {
+                    if (rsp.status === 200)
+                        done();
+                }).done();
+
+                // fake rx
+                emitMcRawMessage(shepherd, 'response/test01', {
+                    transId: shepherd._currentTransId(),
+                    cmdId: 'identify',
+                    status: 200
+                });
+            });
+        });
+
         describe('#qnode.pingReq', function () {
             it('should ping successfully', function (done) {
                 var qnode = shepherd.find('test01');    // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
@@ -888,6 +906,47 @@ describe('Top Level of Tests', function () {
                 shepherd.remove('test01', function () {
                     if (_.isUndefined(shepherd.find('test01')) && shepherd.list().length === 1)
                         done();
+                });
+            });
+        });
+
+        describe('#register 3nd new qnode: test acceptDevIncoming', function () {
+            this.timeout(60000);
+
+            it('should fire registered and get a new qnode', function (done) {
+                var _responseSenderSpy = sinon.spy(shepherd, '_responseSender');
+                var _acceptDevIncomingStub = sinon.stub(shepherd, 'acceptDevIncoming', function (qnode, cb) {
+                    setTimeout(function () {
+                        var accepted = true;
+                        cb(null, accepted);
+                    }, 6000);
+                });
+                var _clientObjectDetailReqStub = sinon.stub(msgHdlr, '_clientObjectDetailReq', function (shp, cId, objList) {
+                    return Q.resolve([
+                        { oid: 0, data: { 1: { x1: 'hi' }, 2: { x2: 'hello' }, 3: { x3: 'hey' }, 4: { x4: 'yap' }, 5: { x5: { x51: 'yo '} } }},
+                        { oid: 1, data: { 41: { x41: 'hi' }, 51: { x51: 'hello' }, 61: { x61: 'hey' } }},
+                    ]);
+                });
+
+                shepherd.on('_registered', function (qnode) {
+                    _clientObjectDetailReqStub.restore();
+                    _acceptDevIncomingStub.restore();
+                    _responseSenderSpy.restore();
+                    expect(_responseSenderSpy).to.have.been.calledWith('register', 'test03');
+                    if (shepherd.find('test03') === qnode && shepherd.findByMac('foo:mac:bar:xyz')[0] === qnode )
+                        done();
+                });
+
+                emitMcRawMessage(shepherd, 'register/test03', {
+                    transId: 100,
+                    ip: '127.0.0.4',
+                    mac: 'foo:mac:bar:xyz',
+                    lifetime: 123456,
+                    version: '0.0.2',
+                    objList: {
+                        0: [ 1, 2, 3, 4, 5 ],
+                        1: [ 41, 51, 61 ]
+                    }
                 });
             });
         });
