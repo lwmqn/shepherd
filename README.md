@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/lwmqn/documents/master/media/mqtt.png" align="right" height="96" width="96" />
+  
 # mqtt-shepherd
 Network server and manager for the lightweight MQTT machine network (LWMQN)  
   
