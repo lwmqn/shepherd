@@ -9,6 +9,7 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 [![npm](https://img.shields.io/npm/v/mqtt-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
 [![PyPI](https://img.shields.io/pypi/status/Django.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
 [![npm](https://img.shields.io/npm/l/mqtt-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-shepherd)
+[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg)](https://gitter.im/lwmqn/Lobby)
 
 Make sure you are with version >= 0.7.0, the old bumps before 0.7.0 are all deprecated.
 
