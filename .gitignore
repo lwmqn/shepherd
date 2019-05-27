@@ -28,3 +28,8 @@ build/Release
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
+
+# lock files
+yarn.lock
+package-lock.json
+npm-shrinkwrap.json
