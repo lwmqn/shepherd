@@ -4,7 +4,9 @@
   "description": "Network server and manager for the lightweight MQTT machine network (LWMQN)",
   "main": "index.js",
   "scripts": {
-    "test": "make test-all"
+    "lint": "standard --env mocha | snazzy",
+    "lint-fix": "standard --env mocha --fix | snazzy",
+    "test": "mocha -u bdd --reporter spec --exit"
   },
   "repository": {
     "type": "git",
@@ -29,9 +31,11 @@
     "smartobject": "^1.4.2"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^2.5.3",
-    "sinon": "^1.17.4",
-    "sinon-chai": "^2.8.0"
+    "chai": "^4.2.0",
+    "mocha": "^4.1.0",
+    "sinon": "^7.3.2",
+    "sinon-chai": "^3.3.0",
+    "snazzy": "^8.0.0",
+    "standard": "^12.0.1"
   }
 }
