@@ -1,6 +1,6 @@
 {
   "name": "mqtt-shepherd",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Network server and manager for the lightweight MQTT machine network (LWMQN)",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "areq": "^0.2.0",
     "busyman": "^0.3.0",
     "debug": "^2.2.0",
-    "lwmqn-util": "^0.5.0",
+    "lwmqn-util": "^0.5.1",
     "mosca": "^2.0.2",
     "mqtt": "^1.5.0",
     "nedb": "^1.8.0",
