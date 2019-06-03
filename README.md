@@ -12,11 +12,13 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 
 Make sure you are with version >= 0.7.0, the old bumps before 0.7.0 are all deprecated.
 
+-------
 
 ## Documentation
 
 Please visit the [Wiki](https://github.com/lwmqn/mqtt-shepherd/wiki).
 
+-------
 
 ## Overview
 
@@ -28,6 +30,7 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 
 ![LWMQN Network](https://raw.githubusercontent.com/lwmqn/documents/master/media/lwmqn_net.png)
 
+-------
 
 ## Installation
 
@@ -56,6 +59,7 @@ qserver.start(function (err) {      // start the sever
 // Now qserver is going to automatically tackle most of the network managing things.
 ```
 
+-------
 
 ## License
 
