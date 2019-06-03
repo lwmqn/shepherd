@@ -1,9 +1,9 @@
 <img src="https://raw.githubusercontent.com/lwmqn/documents/master/media/mqtt.png" align="right" height="96" width="96" />
-  
+
 # mqtt-shepherd
-Network server and manager for the lightweight MQTT machine network (LWMQN)  
-  
-[![NPM](https://nodei.co/npm/mqtt-shepherd.png?downloads=true)](https://nodei.co/npm/mqtt-shepherd/)  
+Network server and manager for the lightweight MQTT machine network (LWMQN)
+
+[![NPM](https://nodei.co/npm/mqtt-shepherd.png?downloads=true)](https://nodei.co/npm/mqtt-shepherd/)
 
 [![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-shepherd/master.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-shepherd)
 [![Coverage Status](https://coveralls.io/repos/github/lwmqn/mqtt-shepherd/badge.svg?branch=master)](https://coveralls.io/github/lwmqn/mqtt-shepherd?branch=master)
@@ -12,18 +12,15 @@ Network server and manager for the lightweight MQTT machine network (LWMQN)
 
 Make sure you are with version >= 0.7.0, the old bumps before 0.7.0 are all deprecated.
 
-<br />
-  
-## Documentation  
+
+## Documentation
 
 Please visit the [Wiki](https://github.com/lwmqn/mqtt-shepherd/wiki).
 
 
-<br />
-
 ## Overview
 
-Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
+Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
 
 * Server-side library: **mqtt-shepherd** (this module)
 * Client-side library: [**mqtt-node**](https://github.com/lwmqn/mqtt-node)
@@ -31,13 +28,11 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 
 ![LWMQN Network](https://raw.githubusercontent.com/lwmqn/documents/master/media/lwmqn_net.png)
 
-<br />
 
 ## Installation
 
 > $ npm install mqtt-shepherd --save
-  
-<br />
+
 
 ## Basic Usage
 
@@ -60,8 +55,7 @@ qserver.start(function (err) {      // start the sever
 // That's all to start a LWMQN server.
 // Now qserver is going to automatically tackle most of the network managing things.
 ```
-  
-<br />
+
 
 ## License
 
