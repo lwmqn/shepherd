@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "standard --env mocha | snazzy",
     "lint-fix": "standard --env mocha --fix | snazzy",
-    "test": "mocha -u bdd --reporter spec --exit"
+    "test": "nyc mocha -u bdd --reporter spec --exit",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -32,7 +33,9 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "coveralls": "^3.0.3",
     "mocha": "^4.1.0",
+    "nyc": "^14.1.1",
     "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0",
     "snazzy": "^8.0.0",
