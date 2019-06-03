@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**mqtt-node** is a network server and manager for the lightweight MQTT machine network (LWMQN)
+**mqtt-shepherd** is a network server and manager for the lightweight MQTT machine network (LWMQN)
   
 [![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/mqtt-shepherd.svg?style=flat-square)](https://greenkeeper.io/)
 [![NPM version](https://img.shields.io/npm/v/mqtt-shepherd.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-shepherd)
