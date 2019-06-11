@@ -2,7 +2,7 @@
 const _ = require('busyman')
 const fs = require('fs')
 const path = require('path')
-const Mqdb = require('../lib/components/mqdb')
+const Mqdb = require('../../lib/components/mqdb')
 
 const nodeMock1 = {
   clientId: 'mock01',
@@ -58,7 +58,7 @@ after((done) => {
   })
 })
 
-describe('Database Testing', () => {
+describe('mqdb -> Database Testing', () => {
   // clear the database file
   const dbFolderX = path.resolve('./lib/database')
   const dbPathX = path.resolve('./lib/database/mqttDB.db')

@@ -1,57 +1,57 @@
 /* eslint-env mocha */
-const chai = require('chai')
-const { expect } = chai
-const SO = require('../lib/components/smartobject')
+const assert = require('assert')
+const SO = require('../../lib/components/smartobject')
 
 describe('Signature Check', () => {
   const so = new SO()
 
   describe('#Constructor', () => {
     it("Aruguments no use, thus won't throw", () => {
-      expect(() => new SO()).not.to.throw(Error)
-      expect(() => new SO(2)).not.to.throw(Error)
-      expect(() => new SO([])).not.to.throw(Error)
-      expect(() => new SO({})).not.to.throw(Error)
+      assert.doesNotThrow(() => new SO(), Error)
+      assert.doesNotThrow(() => new SO(2), Error)
+      assert.doesNotThrow(() => new SO([]), Error)
+      assert.doesNotThrow(() => new SO({}), Error)
     })
   })
 
   describe('#.shoudaddObjects', () => {
     it('should throw if smObjs is not an object', () => {
-      expect(() => { so.addObjects(1) }).to.throw(TypeError)
-      expect(() => { so.addObjects('xxx') }).to.throw(TypeError)
-      expect(() => { so.addObjects([]) }).to.throw(TypeError)
-      expect(() => { so.addObjects({}) }).not.to.throw(Error)
+      assert.throws(() => { so.addObjects(1) }, TypeError)
+      assert.throws(() => { so.addObjects('xxx') }, TypeError)
+      assert.throws(() => { so.addObjects([]) }, TypeError)
+
+      assert.doesNotThrow(() => { so.addObjects({}) }, Error)
     })
   })
 
   describe('#.addIObjects', () => {
     it('should throw if iObjs is not an object', () => {
-      expect(() => { so.addIObjects(1, []) }).to.throw(TypeError)
-      expect(() => { so.addIObjects(1, 1) }).to.throw(TypeError)
-      expect(() => { so.addIObjects(1, 'xxx') }).to.throw(TypeError)
-      expect(() => { so.addIObjects(1) }).to.throw(TypeError)
-      expect(() => { so.addIObjects(1, null) }).to.throw(TypeError)
+      assert.throws(() => { so.addIObjects(1, []) }, TypeError)
+      assert.throws(() => { so.addIObjects(1, 1) }, TypeError)
+      assert.throws(() => { so.addIObjects(1, 'xxx') }, TypeError)
+      assert.throws(() => { so.addIObjects(1) }, TypeError)
+      assert.throws(() => { so.addIObjects(1, null) }, TypeError)
 
-      expect(() => { so.addIObjects('1', {}) }).not.to.throw(Error)
+      assert.doesNotThrow(() => { so.addIObjects('1', {}) }, Error)
     })
   })
 
   describe('#.init', () => {
     it('should throw if resources is not an object', () => {
-      expect(() => { so.init(1, 20, []) }).to.throw(TypeError)
-      expect(() => { so.init(1, 20, 1) }).to.throw(TypeError)
-      expect(() => { so.init(1, 20, 'xxx') }).to.throw(TypeError)
-      expect(() => { so.init(1, 20, null) }).to.throw(TypeError)
-      expect(() => { so.init(1, 20) }).to.throw(TypeError)
-      expect(() => { so.init(1) }).to.throw(TypeError)
-      expect(() => { so.init(1, null) }).to.throw(TypeError)
+      assert.throws(() => { so.init(1, 20, []) }, TypeError)
+      assert.throws(() => { so.init(1, 20, 1) }, TypeError)
+      assert.throws(() => { so.init(1, 20, 'xxx') }, TypeError)
+      assert.throws(() => { so.init(1, 20, null) }, TypeError)
+      assert.throws(() => { so.init(1, 20) }, TypeError)
+      assert.throws(() => { so.init(1) }, TypeError)
+      assert.throws(() => { so.init(1, null) }, TypeError)
 
-      expect(() => { so.init('1', '20', {}) }).not.to.throw(Error)
+      assert.doesNotThrow(() => { so.init('1', '20', {}) }, Error)
     })
   })
 })
 
-describe('Functional Check', () => {
+describe('smartobject -> Functional Check', () => {
   const so = new SO()
   const smObj1 = {
     x: {
@@ -98,13 +98,13 @@ describe('Functional Check', () => {
     so.addObjects(smObj1)
     so.addObjects(smObj2)
 
-    expect(so.dumpSync('x')).to.deep.equal(smObj1.x)
-    expect(so.dumpSync('y')).to.deep.equal(smObj2.y)
+    assert.deepStrictEqual(so.dumpSync('x'), smObj1.x)
+    assert.deepStrictEqual(so.dumpSync('y'), smObj2.y)
   })
 
   it('should be pass equality check - addIObjects(oid, iObjs)', () => {
     so.addIObjects('new', iobj)
-    expect(so.dumpSync('new')).be.deep.equal(iobj)
+    assert.deepStrictEqual(so.dumpSync('new'), iobj)
   })
 
   it('should be pass equality check - init(oid, iid, rObjs)', () => {
@@ -112,12 +112,12 @@ describe('Functional Check', () => {
     so.init('hiver', 4, resrc1)
     so.init(3200, 0, { 5502: 1 })
 
-    expect(so.dumpSync('hiver', 3)).be.deep.equal(resrc)
-    expect(so.dumpSync('hiver', 4)).be.deep.equal({ rx1: 10, rx3: 600 })
+    assert.deepStrictEqual(so.dumpSync('hiver', 3), resrc)
+    assert.deepStrictEqual(so.dumpSync('hiver', 4), { rx1: 10, rx3: 600 })
   })
 
   it('should be pass equality check - dumpSync()', () => {
-    expect(so.dumpSync()).be.deep.equal({
+    assert.deepStrictEqual(so.dumpSync(), {
       x: { 0: { x1: 1, x2: 2 }, 1: { y1: 3, y2: 4 } },
       y: { 3: { y31: 'hi' } },
       z: {

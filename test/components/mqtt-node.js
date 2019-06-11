@@ -1,15 +1,12 @@
 /* eslint-env mocha */
+const assert = require('assert')
+const path = require('path')
+const fs = require('fs')
 const _ = require('busyman')
-const chai = require('chai')
 const debug = require('debug')
 
-const { expect } = chai
-
-const fs = require('fs')
-const path = require('path')
-
-const MqttNode = require('../lib/components/mqtt-node')
-const Mqdb = require('../lib/components/mqdb')
+const MqttNode = require('../../lib/components/mqtt-node')
+const Mqdb = require('../../lib/components/mqdb')
 
 const cId = 'Im-client-node'
 const devAttrs = {
@@ -53,7 +50,7 @@ after((done) => {
   })
 })
 
-describe('mqtt-node verify', () => {
+describe('mqtt-node -> verify', () => {
   const dbFolderY = path.resolve('./lib/database')
   const dbPathY = path.resolve('./lib/database/mqttNode.db')
 
@@ -78,65 +75,65 @@ describe('mqtt-node verify', () => {
     })
   })
 
-  describe('Constructor Check', () => {
+  describe('mqtt-node -> Constructor Check', () => {
     it('should has all correct members after new', () => {
       const node = new MqttNode(fakeShp, cId, devAttrs)
-      expect(node.shepherd).be.deep.equal(fakeShp)
-      expect(node.clientId).be.equal(cId)
-      expect(node.ip).be.equal('140.117.11.1')
-      expect(node.mac).be.equal('11:22:AA:BB:CC:DD')
-      expect(node.version).be.equal('v0.0.1')
-      expect(node.lifetime).be.equal(60000)
-      expect(node.objList).be.deep.equal({})
-      expect(node.so).not.to.be.equal(null)
-      expect(node._registered).to.be.equal(false)
-      expect(node.status).be.equal('offline')
-      expect(node.lifeChecker).to.be.equal(null)
+      assert.deepStrictEqual(node.shepherd, fakeShp)
+      assert.strictEqual(node.clientId, cId)
+      assert.strictEqual(node.ip, '140.117.11.1')
+      assert.strictEqual(node.mac, '11:22:AA:BB:CC:DD')
+      assert.strictEqual(node.version, 'v0.0.1')
+      assert.strictEqual(node.lifetime, 60000)
+      assert.deepStrictEqual(node.objList, {})
+      assert.notStrictEqual(node.so, null)
+      assert.strictEqual(node._registered, false)
+      assert.strictEqual(node.status, 'offline')
+      assert.strictEqual(node.lifeChecker, null)
     })
   })
 
   describe('Signature Check', () => {
     describe('#.MqttNode(shepherd, clientId, devAttrs)', () => {
       it('should throw if input arguments have wrong type', () => {
-        expect(() => new MqttNode({}, 'xxx')).not.to.throw(Error)
-        expect(() => new MqttNode({}, 'xxx', {})).not.to.throw(Error)
+        assert.doesNotThrow(() => new MqttNode({}, 'xxx'), Error)
+        assert.doesNotThrow(() => new MqttNode({}, 'xxx', {}), Error)
 
-        expect(() => new MqttNode({}, 'xxx', [])).to.throw(TypeError)
-        expect(() => new MqttNode({}, 'xxx', 1)).to.throw(TypeError)
-        expect(() => new MqttNode({}, 'xxx', 'ttt')).to.throw(TypeError)
+        assert.throws(() => new MqttNode({}, 'xxx', []), TypeError)
+        assert.throws(() => new MqttNode({}, 'xxx', 1), TypeError)
+        assert.throws(() => new MqttNode({}, 'xxx', 'ttt'), TypeError)
 
-        expect(() => new MqttNode({}, [], {})).to.throw(TypeError)
-        expect(() => new MqttNode({}, {}, {})).to.throw(TypeError)
-        expect(() => new MqttNode({}, false, {})).to.throw(TypeError)
-        expect(() => new MqttNode({}, undefined, {})).to.throw(TypeError)
-        expect(() => new MqttNode({}, null, {})).to.throw(TypeError)
+        assert.throws(() => new MqttNode({}, [], {}), TypeError)
+        assert.throws(() => new MqttNode({}, {}, {}), TypeError)
+        assert.throws(() => new MqttNode({}, false, {}), TypeError)
+        assert.throws(() => new MqttNode({}, undefined, {}), TypeError)
+        assert.throws(() => new MqttNode({}, null, {}), TypeError)
 
-        expect(() => new MqttNode({})).to.throw()
+        assert.throws(() => new MqttNode({}), Error)
 
-        expect(() => new MqttNode([], 'xxx', {})).to.throw(TypeError)
-        expect(() => new MqttNode(1, 'xxx', {})).to.throw(TypeError)
-        expect(() => new MqttNode(false, 'xxx', {})).to.throw(TypeError)
-        expect(() => new MqttNode(undefined, 'xxx', {})).to.throw(TypeError)
-        expect(() => new MqttNode(null, 'xxx', {})).to.throw(TypeError)
-        expect(() => new MqttNode('fff', 'xxx', {})).to.throw(TypeError)
+        assert.throws(() => new MqttNode([], 'xxx', {}), TypeError)
+        assert.throws(() => new MqttNode(1, 'xxx', {}), TypeError)
+        assert.throws(() => new MqttNode(false, 'xxx', {}), TypeError)
+        assert.throws(() => new MqttNode(undefined, 'xxx', {}), TypeError)
+        assert.throws(() => new MqttNode(null, 'xxx', {}), TypeError)
+        assert.throws(() => new MqttNode('fff', 'xxx', {}), TypeError)
       })
     })
 
     describe('#.acquire(oid)', () => {
       it('should throw if input arguments have wrong type', () => {
-        expect(() => { node.so.acquire({}) }).to.throw(TypeError)
-        expect(() => { node.so.acquire([]) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(true) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(null) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(1) }).not.to.throw(TypeError)
+        assert.throws(() => { node.so.acquire({}) }, TypeError)
+        assert.throws(() => { node.so.acquire([]) }, TypeError)
+        assert.throws(() => { node.so.acquire(true) }, TypeError)
+        assert.throws(() => { node.so.acquire(null) }, TypeError)
+        assert.doesNotThrow(() => { node.so.acquire(1) }, TypeError)
 
-        expect(node.so.acquire()).to.be.equal(undefined)
+        assert.strictEqual(node.so.acquire(), undefined)
       })
 
       it('should throw if so not bound', () => {
         const sotmp = node.so
         node.so = null
-        expect(() => { node.so.acquire('x') }).to.throw(Error)
+        assert.throws(() => { node.so.acquire('x') }, Error)
         node.so = sotmp
       })
     })
@@ -144,24 +141,24 @@ describe('mqtt-node verify', () => {
     describe('#.geIObject(oid, iid)', () => {
       it('should throw if input arguments have wrong type', () => {
         node.so = myso
-        expect(node.so.acquire()).to.be.equal(undefined)
+        assert.strictEqual(node.so.acquire(), undefined)
 
-        expect(() => { node.so.acquire({}, 1) }).to.throw(TypeError)
-        expect(() => { node.so.acquire([], 1) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(true, 1) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(null, 1) }).to.throw(TypeError)
+        assert.throws(() => { node.so.acquire({}, 1) }, TypeError)
+        assert.throws(() => { node.so.acquire([], 1) }, TypeError)
+        assert.throws(() => { node.so.acquire(true, 1) }, TypeError)
+        assert.throws(() => { node.so.acquire(null, 1) }, TypeError)
 
-        expect(() => { node.so.acquire(1, {}) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(1, []) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(1, true) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(1, null) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(1, 2) }).not.to.throw(TypeError)
+        assert.throws(() => { node.so.acquire(1, {}) }, TypeError)
+        assert.throws(() => { node.so.acquire(1, []) }, TypeError)
+        assert.throws(() => { node.so.acquire(1, true) }, TypeError)
+        assert.throws(() => { node.so.acquire(1, null) }, TypeError)
+        assert.doesNotThrow(() => { node.so.acquire(1, 2) }, TypeError)
       })
 
       it('should throw if so not bound', () => {
         const sotmp = node.so
         node.so = null
-        expect(() => { node.so.acquire('x', 2) }).to.throw(Error)
+        assert.throws(() => { node.so.acquire('x', 2) }, Error)
         node.so = sotmp
       })
     })
@@ -169,50 +166,50 @@ describe('mqtt-node verify', () => {
     describe('#.getResource(oid, iid, rid)', () => {
       it('should throw if input arguments have wrong type', () => {
         node.so = myso
-        expect(node.so.acquire()).to.be.equal(undefined)
+        assert.strictEqual(node.so.acquire(), undefined)
 
-        expect(() => { node.so.acquire({}, 1, 2) }).to.throw(TypeError)
-        expect(() => { node.so.acquire([], 1, 2) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(true, 1, 2) }).to.throw(TypeError)
-        expect(() => { node.so.acquire(null, 1, 2) }).to.throw(TypeError)
+        assert.throws(() => { node.so.acquire({}, 1, 2) }, TypeError)
+        assert.throws(() => { node.so.acquire([], 1, 2) }, TypeError)
+        assert.throws(() => { node.so.acquire(true, 1, 2) }, TypeError)
+        assert.throws(() => { node.so.acquire(null, 1, 2) }, TypeError)
 
-        expect(() => { node.so.acquire('x', {}, 1) }).to.throw(TypeError)
-        expect(() => { node.so.acquire('x', [], 1) }).to.throw(TypeError)
-        expect(() => { node.so.acquire('x', true, 1) }).to.throw(TypeError)
-        expect(() => { node.so.acquire('x', null, 1) }).to.throw(TypeError)
+        assert.throws(() => { node.so.acquire('x', {}, 1) }, TypeError)
+        assert.throws(() => { node.so.acquire('x', [], 1) }, TypeError)
+        assert.throws(() => { node.so.acquire('x', true, 1) }, TypeError)
+        assert.throws(() => { node.so.acquire('x', null, 1) }, TypeError)
 
-        expect(() => { node.so.acquire('x', 0, {}) }).to.throw(TypeError)
-        expect(() => { node.so.acquire('x', 0, []) }).to.throw(TypeError)
-        expect(() => { node.so.acquire('x', 0, true) }).to.throw(TypeError)
-        expect(() => { node.so.acquire('x', 0, null) }).to.throw(TypeError)
+        assert.throws(() => { node.so.acquire('x', 0, {}) }, TypeError)
+        assert.throws(() => { node.so.acquire('x', 0, []) }, TypeError)
+        assert.throws(() => { node.so.acquire('x', 0, true) }, TypeError)
+        assert.throws(() => { node.so.acquire('x', 0, null) }, TypeError)
 
-        expect(() => { node.so.acquire('x', 2, 3) }).not.to.throw(Error)
-        expect(() => { node.so.acquire('f', 2, 'c') }).not.to.throw(Error)
+        assert.doesNotThrow(() => { node.so.acquire('x', 2, 3) }, Error)
+        assert.doesNotThrow(() => { node.so.acquire('f', 2, 'c') }, Error)
       })
 
       it('should throw if so not bound - no acquire method', () => {
         node.so = null
-        expect(() => { node.so.acquire('x', 2, 0) }).to.throw(Error)
+        assert.throws(() => { node.so.acquire('x', 2, 0) }, Error)
         node.so = myso
       })
     })
 
     describe('#.maintain', () => {
       it('should throw if cIds is not a string or not an array of strings', () => {
-        expect(() => { node.maintain({}) }).to.throw(TypeError)
-        expect(() => { node.maintain(true) }).to.throw(TypeError)
-        expect(() => { node.maintain(['ceed', {}]) }).to.throw(TypeError)
+        assert.throws(() => { node.maintain({}) }, TypeError)
+        assert.throws(() => { node.maintain(true) }, TypeError)
+        assert.throws(() => { node.maintain(['ceed', {}]) }, TypeError)
 
-        expect(() => { node.maintain('ceed') }).to.throw(TypeError)
-        expect(() => { node.maintain(['ceed', 'xxx']) }).to.throw(TypeError)
-        expect(() => { node.maintain(() => {}) }).not.to.throw(Error)
+        assert.throws(() => { node.maintain('ceed') }, TypeError)
+        assert.throws(() => { node.maintain(['ceed', 'xxx']) }, TypeError)
+        assert.doesNotThrow(() => { node.maintain(() => {}) }, Error)
       })
     })
 
     describe('#.dump()', () => {
       it('should should empty object if no so bound', () => {
         node.so = null
-        expect(node.dump().so).to.be.deep.equal({})
+        assert.deepStrictEqual(node.dump().so, {})
         node.so = myso
       })
     })
@@ -616,20 +613,20 @@ describe('mqtt-node verify', () => {
     })
   })
 
-  describe('Functional Check', () => {
+  describe('mqtt-node -> Functional Check', () => {
     const nodex = new MqttNode(fakeShp, cId, devAttrs)
     nodex.so = myso
 
     describe('#.bind smart object', () => {
       it('should has correct node and so', () => {
-        expect(nodex.so).to.be.equal(myso)
+        assert.strictEqual(nodex.so, myso)
       })
     })
 
     describe('#.getRootObject(oid)', () => {
       it('should pass equality test', () => {
-        expect(nodex.so.acquire(100)).to.be.equal(undefined)
-        expect(nodex.so.dumpSync('z')).to.deep.equal({
+        assert.strictEqual(nodex.so.acquire(100), undefined)
+        assert.deepStrictEqual(nodex.so.dumpSync('z'), {
           0: { z11: 'hello', z12: 'world' },
           1: { z11: 'hello', z12: 'world' }
         })
@@ -638,51 +635,51 @@ describe('mqtt-node verify', () => {
 
     describe('#.getIObject(oid, iid)', () => {
       it('should pass equality test', () => {
-        expect(nodex.so.acquire(100, 3)).to.be.equal(undefined)
-        expect(nodex.so.acquire('y', 7)).to.be.equal(undefined)
-        expect(nodex.so.dumpSync('z', 1)).be.deep.equal({ z11: 'hello', z12: 'world' })
-        expect(nodex.so.dumpSync('z', '1')).be.deep.equal({ z11: 'hello', z12: 'world' })
-        expect(nodex.so.dumpSync('x', '0')).be.deep.equal({ x1: 1, x2: 2 })
-        expect(nodex.so.dumpSync('x', 0)).be.deep.equal({ x1: 1, x2: 2 })
+        assert.strictEqual(nodex.so.acquire(100, 3), undefined)
+        assert.strictEqual(nodex.so.acquire('y', 7), undefined)
+        assert.deepStrictEqual(nodex.so.dumpSync('z', 1), { z11: 'hello', z12: 'world' })
+        assert.deepStrictEqual(nodex.so.dumpSync('z', '1'), { z11: 'hello', z12: 'world' })
+        assert.deepStrictEqual(nodex.so.dumpSync('x', '0'), { x1: 1, x2: 2 })
+        assert.deepStrictEqual(nodex.so.dumpSync('x', 0), { x1: 1, x2: 2 })
       })
     })
 
     describe('#.getResource(oid, iid, rid)', () => {
       it('should pass equality test', () => {
-        expect(nodex.so.acquire('y', 3, 'xq')).to.be.equal(undefined)
-        expect(nodex.so.acquire('y', 2, 'y31')).to.be.equal(undefined)
-        expect(nodex.so.acquire('xx', 3, 'y31')).to.be.equal(undefined)
-        expect(nodex.so.acquire('y', 7, 'y31')).to.be.equal(undefined)
+        assert.strictEqual(nodex.so.acquire('y', 3, 'xq'), undefined)
+        assert.strictEqual(nodex.so.acquire('y', 2, 'y31'), undefined)
+        assert.strictEqual(nodex.so.acquire('xx', 3, 'y31'), undefined)
+        assert.strictEqual(nodex.so.acquire('y', 7, 'y31'), undefined)
 
-        expect(nodex.so.acquire('x', 0, 'x1')).to.be.eql(1)
-        expect(nodex.so.acquire('x', 0, 'x2')).to.be.eql(2)
-        expect(nodex.so.acquire('x', 1, 'y1')).to.be.eql(3)
-        expect(nodex.so.acquire('x', 1, 'y2')).to.be.eql(4)
+        assert.strictEqual(nodex.so.acquire('x', 0, 'x1'), 1)
+        assert.strictEqual(nodex.so.acquire('x', 0, 'x2'), 2)
+        assert.strictEqual(nodex.so.acquire('x', 1, 'y1'), 3)
+        assert.strictEqual(nodex.so.acquire('x', 1, 'y2'), 4)
 
-        expect(nodex.so.acquire('y', 3, 'y31')).to.be.eql('hi')
-        expect(nodex.so.acquire('y', 3, 'y31')).to.be.eql('hi')
+        assert.strictEqual(nodex.so.acquire('y', 3, 'y31'), 'hi')
+        assert.strictEqual(nodex.so.acquire('y', 3, 'y31'), 'hi')
 
-        expect(nodex.so.acquire('z', 0, 'z11')).to.be.eql('hello')
-        expect(nodex.so.acquire('z', 0, 'z12')).to.be.eql('world')
-        expect(nodex.so.acquire('z', 1, 'z11')).to.be.eql('hello')
-        expect(nodex.so.acquire('z', 1, 'z12')).to.be.eql('world')
+        assert.strictEqual(nodex.so.acquire('z', 0, 'z11'), 'hello')
+        assert.strictEqual(nodex.so.acquire('z', 0, 'z12'), 'world')
+        assert.strictEqual(nodex.so.acquire('z', 1, 'z11'), 'hello')
+        assert.strictEqual(nodex.so.acquire('z', 1, 'z12'), 'world')
       })
     })
 
     describe('#.enableLifeChecker()', () => {
       it('should pass equality test', () => {
-        expect(nodex.lifeChecker).to.be.equal(null)
-        expect(nodex.enableLifeChecker()).to.be.equal(nodex)
-        expect(nodex.lifeChecker).not.to.be.equal(null)
-        expect(nodex.lifeChecker).not.to.be.equal(undefined)
+        assert.strictEqual(nodex.lifeChecker, null)
+        assert.strictEqual(nodex.enableLifeChecker(), nodex)
+        assert.notStrictEqual(nodex.lifeChecker, null)
+        assert.notStrictEqual(nodex.lifeChecker, undefined)
       })
     })
 
     describe('#.disableLifeChecker()', () => {
       it('should pass equality test', () => {
-        expect(nodex.lifeChecker).not.to.be.equal(null)
-        expect(nodex.disableLifeChecker()).to.be.equal(nodex)
-        expect(nodex.lifeChecker).to.be.equal(null)
+        assert.notStrictEqual(nodex.lifeChecker, null)
+        assert.strictEqual(nodex.disableLifeChecker(), nodex)
+        assert.strictEqual(nodex.lifeChecker, null)
       })
     })
 
@@ -702,7 +699,7 @@ describe('mqtt-node verify', () => {
             z: smObj2.z
           }
         }
-        expect(nodex.dump()).to.be.deep.equal(dumped)
+        assert.deepStrictEqual(nodex.dump(), dumped)
       })
     })
 

@@ -1,16 +1,11 @@
 /* eslint-env mocha */
 const fs = require('fs')
 const path = require('path')
+const assert = require('assert')
 const _ = require('busyman')
 const Q = require('q')
 const debug = require('debug')
-const chai = require('chai')
 const sinon = require('sinon')
-const sinonChai = require('sinon-chai')
-
-const { expect } = chai
-
-chai.use(sinonChai)
 
 const Shepherd = require('../index.js')
 const config = require('../lib/config.js')
@@ -35,7 +30,7 @@ after((done) => {
   })
 })
 
-describe('Top Level of Tests', () => {
+describe('mqtt-shepherd -> Top Level of Tests', () => {
   before((done) => {
     let unlink1 = false
     let unlink2 = false
@@ -73,29 +68,29 @@ describe('Top Level of Tests', () => {
     })
   })
 
-  describe('Constructor Check', () => {
+  describe('mqtt-shepherd -> Constructor Check', () => {
     let shepherd
     before(() => {
       shepherd = new Shepherd('test1', { dbPath: `${__dirname}/database/mqtt1.db` })
     })
 
     it('should has all correct members after new', () => {
-      expect(shepherd.clientId).to.be.equal('test1')
-      expect(shepherd.brokerSettings).to.be.equal(config.brokerSettings)
-      expect(shepherd.defaultAccount).to.be.equal(null)
-      expect(shepherd.clientConnOptions).to.be.equal(config.clientConnOptions)
-      expect(shepherd.reqTimeout).to.be.equal(config.reqTimeout)
-      expect(shepherd._dbPath).to.be.equal(`${__dirname}/database/mqtt1.db`)
-      expect(shepherd._mqdb).to.be.an('object')
-      expect(shepherd._nodebox).to.be.an('object')
-      expect(shepherd._joinable).to.be.equal(false)
-      expect(shepherd._enabled).to.be.equal(false)
-      expect(shepherd._permitJoinTime).to.be.equal(0)
-      expect(shepherd._startTime).to.be.equal(0)
-      expect(shepherd._net).to.be.deep.equal({
+      assert.strictEqual(shepherd.clientId, 'test1')
+      assert.deepStrictEqual(shepherd.brokerSettings, config.brokerSettings)
+      assert.deepStrictEqual(shepherd.defaultAccount, null)
+      assert.deepStrictEqual(shepherd.clientConnOptions, config.clientConnOptions)
+      assert.deepStrictEqual(shepherd.reqTimeout, config.reqTimeout)
+      assert.strictEqual(shepherd._dbPath, `${__dirname}/database/mqtt1.db`)
+      assert.strictEqual(typeof shepherd._mqdb, 'object')
+      assert.strictEqual(typeof shepherd._nodebox, 'object')
+      assert.strictEqual(shepherd._joinable, false)
+      assert.strictEqual(shepherd._enabled, false)
+      assert.strictEqual(shepherd._permitJoinTime, 0)
+      assert.strictEqual(shepherd._startTime, 0)
+      assert.deepStrictEqual(shepherd._net, {
         intf: '', ip: '', mac: '', routerIp: ''
       })
-      expect(shepherd._channels).to.be.deep.equal({
+      assert.deepStrictEqual(shepherd._channels, {
         'register/#': 0,
         'deregister/#': 0,
         'notify/#': 1,
@@ -107,45 +102,45 @@ describe('Top Level of Tests', () => {
         'request/#': 0,
         'announce/#': 0
       })
-      expect(shepherd._areq).to.be.an('object')
+      assert.strictEqual(typeof shepherd._areq, 'object')
 
-      expect(shepherd.mBroker).to.be.equal(null)
-      expect(shepherd.mClient).to.be.equal(null)
+      assert.deepStrictEqual(shepherd.mBroker, null)
+      assert.deepStrictEqual(shepherd.mClient, null)
 
-      expect(shepherd.authPolicy).to.be.an('object')
-      expect(shepherd.authPolicy.authenticate).to.be.equal(null)
-      expect(shepherd.authPolicy.authorizePublish).to.be.a('function')
-      expect(shepherd.authPolicy.authorizeSubscribe).to.be.a('function')
-      expect(shepherd.authPolicy.authorizeForward).to.be.a('function')
+      assert.strictEqual(typeof shepherd.authPolicy, 'object')
+      assert.deepStrictEqual(shepherd.authPolicy.authenticate, null)
+      assert.strictEqual(typeof shepherd.authPolicy.authorizePublish, 'function')
+      assert.strictEqual(typeof shepherd.authPolicy.authorizeSubscribe, 'function')
+      assert.strictEqual(typeof shepherd.authPolicy.authorizeForward, 'function')
 
-      expect(shepherd.encrypt).to.be.a('function')
-      expect(shepherd.decrypt).to.be.a('function')
-      expect(shepherd.nextTransId).to.be.a('function')
-      expect(shepherd.permitJoin).to.be.a('function')
+      assert.strictEqual(typeof shepherd.encrypt, 'function')
+      assert.strictEqual(typeof shepherd.decrypt, 'function')
+      assert.strictEqual(typeof shepherd.nextTransId, 'function')
+      assert.strictEqual(typeof shepherd.permitJoin, 'function')
     })
 
     it('should throw if name is given but not a string', () => {
-      expect(() => new Shepherd({}, {})).to.throw(TypeError)
-      expect(() => new Shepherd([], {})).to.throw(TypeError)
-      expect(() => new Shepherd(1, {})).to.throw(TypeError)
-      expect(() => new Shepherd(true, {})).to.throw(TypeError)
-      expect(() => new Shepherd(NaN, {})).to.throw(TypeError)
+      assert.throws(() => new Shepherd({}, {}), TypeError)
+      assert.throws(() => new Shepherd([], {}), TypeError)
+      assert.throws(() => new Shepherd(1, {}), TypeError)
+      assert.throws(() => new Shepherd(true, {}), TypeError)
+      assert.throws(() => new Shepherd(NaN, {}), TypeError)
 
-      expect(() => new Shepherd()).not.to.throw(Error)
-      expect(() => new Shepherd('xxx')).not.to.throw(Error)
-      expect(() => new Shepherd({})).not.to.throw(Error)
+      assert.doesNotThrow(() => new Shepherd(), Error)
+      assert.doesNotThrow(() => new Shepherd('xxx'), Error)
+      assert.doesNotThrow(() => new Shepherd({}), Error)
     })
 
     it('should throw if setting is given but not an object', () => {
-      expect(() => new Shepherd([])).to.throw(TypeError)
+      assert.throws(() => new Shepherd([]), TypeError)
 
-      expect(() => new Shepherd('xxx', [])).to.throw(TypeError)
-      expect(() => new Shepherd('xxx', 1)).to.throw(TypeError)
-      expect(() => new Shepherd('xxx', true)).to.throw(TypeError)
+      assert.throws(() => new Shepherd('xxx', []), TypeError)
+      assert.throws(() => new Shepherd('xxx', 1), TypeError)
+      assert.throws(() => new Shepherd('xxx', true), TypeError)
     })
   })
 
-  describe('Signature Check', () => {
+  describe('mqtt-shepherd -> Signature Check', () => {
     // var shepherd = new Shepherd('test2', { dbPath:  __dirname + '/database/mqtt1.db' });
 
     let shepherd
@@ -155,115 +150,115 @@ describe('Top Level of Tests', () => {
 
     describe('#.permitJoin', () => {
       it('should throw if time is given but not a number', () => {
-        expect(() => { shepherd.permitJoin({}) }).to.throw(TypeError)
-        expect(() => { shepherd.permitJoin(true) }).to.throw(TypeError)
+        assert.throws(() => { shepherd.permitJoin({}) }, TypeError)
+        assert.throws(() => { shepherd.permitJoin(true) }, TypeError)
       })
     })
 
     describe('#.find', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.find({}) }).to.throw(TypeError)
-        expect(() => { shepherd.find(true) }).to.throw(TypeError)
-        expect(() => { shepherd.find('ceed') }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.find({}) }, TypeError)
+        assert.throws(() => { shepherd.find(true) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.find('ceed') }, TypeError)
       })
     })
 
     describe('#.findByMac', () => {
       it('should throw if macAddr is not a string', () => {
-        expect(() => { shepherd.findByMac({}) }).to.throw(TypeError)
-        expect(() => { shepherd.findByMac(true) }).to.throw(TypeError)
-        expect(() => { shepherd.findByMac('ceed') }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.findByMac({}) }, TypeError)
+        assert.throws(() => { shepherd.findByMac(true) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.findByMac('ceed') }, TypeError)
       })
     })
 
     describe('#.remove', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.remove({}) }).to.throw(TypeError)
-        expect(() => { shepherd.remove(true) }).to.throw(TypeError)
-        expect(() => { shepherd.remove('ceed') }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.remove({}) }, TypeError)
+        assert.throws(() => { shepherd.remove(true) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.remove('ceed') }, TypeError)
       })
     })
 
     describe('#._responseSender', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd._responseSender('register', {}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd._responseSender('register', true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd._responseSender('register', 'ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd._responseSender('register', {}, {}) }, TypeError)
+        assert.throws(() => { shepherd._responseSender('register', true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd._responseSender('register', 'ceed', {}) }, TypeError)
       })
     })
 
     describe('#._requestSender', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd._requestSender('register', {}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd._requestSender('register', true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd._requestSender('register', 'ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd._requestSender('register', {}, {}) }, TypeError)
+        assert.throws(() => { shepherd._requestSender('register', true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd._requestSender('register', 'ceed', {}) }, TypeError)
       })
     })
 
     describe('#.readReq', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.readReq({}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.readReq(true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.readReq('ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.readReq({}, {}) }, TypeError)
+        assert.throws(() => { shepherd.readReq(true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.readReq('ceed', {}) }, TypeError)
       })
     })
 
     describe('#.writeReq', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.writeReq({}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.writeReq(true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.writeReq('ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.writeReq({}, {}) }, TypeError)
+        assert.throws(() => { shepherd.writeReq(true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.writeReq('ceed', {}) }, TypeError)
       })
     })
 
     describe('#.writeAttrsReq', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.writeAttrsReq({}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.writeAttrsReq(true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.writeAttrsReq('ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.writeAttrsReq({}, {}) }, TypeError)
+        assert.throws(() => { shepherd.writeAttrsReq(true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.writeAttrsReq('ceed', {}) }, TypeError)
       })
     })
 
     describe('#.discoverReq', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.discoverReq({}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.discoverReq(true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.discoverReq('ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.discoverReq({}, {}) }, TypeError)
+        assert.throws(() => { shepherd.discoverReq(true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.discoverReq('ceed', {}) }, TypeError)
       })
     })
 
     describe('#.executeReq', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.executeReq({}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.executeReq(true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.executeReq('ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.executeReq({}, {}) }, TypeError)
+        assert.throws(() => { shepherd.executeReq(true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.executeReq('ceed', {}) }, TypeError)
       })
     })
 
     describe('#.observeReq', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.observeReq({}, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.observeReq(true, {}) }).to.throw(TypeError)
-        expect(() => { shepherd.observeReq('ceed', {}) }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.observeReq({}, {}) }, TypeError)
+        assert.throws(() => { shepherd.observeReq(true, {}) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.observeReq('ceed', {}) }, TypeError)
       })
     })
 
     describe('#.pingReq', () => {
       it('should throw if clientId is not a string', () => {
-        expect(() => { shepherd.pingReq({}) }).to.throw(TypeError)
-        expect(() => { shepherd.pingReq(true) }).to.throw(TypeError)
-        expect(() => { shepherd.pingReq('ceed') }).not.to.throw(TypeError)
+        assert.throws(() => { shepherd.pingReq({}) }, TypeError)
+        assert.throws(() => { shepherd.pingReq(true) }, TypeError)
+        assert.doesNotThrow(() => { shepherd.pingReq('ceed') }, TypeError)
       })
     })
 
     describe('#.list', () => {
       it('should throw if cIds is not an array of strings', () => {
-        expect(() => { shepherd.list({}) }).to.throw(TypeError)
-        expect(() => { shepherd.list(true) }).to.throw(TypeError)
-        expect(() => { shepherd.list(['ceed', {}]) }).to.throw(TypeError)
+        assert.throws(() => { shepherd.list({}) }, TypeError)
+        assert.throws(() => { shepherd.list(true) }, TypeError)
+        assert.throws(() => { shepherd.list(['ceed', {}]) }, TypeError)
 
-        expect(() => { shepherd.list('ceed') }).not.to.throw(Error)
-        expect(() => { shepherd.list(['ceed', 'xxx']) }).not.to.throw(Error)
+        assert.doesNotThrow(() => { shepherd.list('ceed') }, Error)
+        assert.doesNotThrow(() => { shepherd.list(['ceed', 'xxx']) }, Error)
       })
     })
   })
@@ -282,7 +277,7 @@ describe('Top Level of Tests', () => {
 
     describe('#.permitJoin', () => {
       it('should not throw if shepherd is not enabled when permitJoin invoked - shepherd is disabled.', () => {
-        expect(shepherd.permitJoin(3)).to.be.equal(false)
+        assert.strictEqual(shepherd.permitJoin(3), false)
       })
 
       it('should trigger permitJoin counter and event when permitJoin invoked - shepherd is enabled.', (done) => {
@@ -335,13 +330,13 @@ describe('Top Level of Tests', () => {
 
     describe('#.find', () => {
       it('should find nothing', () => {
-        expect(shepherd.find('nothing')).to.be.equal(undefined)
+        assert.strictEqual(shepherd.find('nothing'), undefined)
       })
     })
 
     describe('#.findByMac', () => {
       it('should find nothing - empty array', () => {
-        expect(shepherd.findByMac('no_mac')).to.be.deep.equal([])
+        assert.deepStrictEqual(shepherd.findByMac('no_mac'), [])
       })
     })
 
@@ -356,7 +351,7 @@ describe('Top Level of Tests', () => {
         shepherd.on('_registered', (qnode) => {
           _clientObjectDetailReqStub.restore()
           _responseSenderSpy.restore()
-          expect(_responseSenderSpy).to.have.been.calledWith('register', 'test01')
+          sinon.assert.calledWith(_responseSenderSpy, 'register', 'test01')
           if (shepherd.find('test01') === qnode && shepherd.findByMac('foo:mac')[0] === qnode) done()
         })
 
@@ -375,21 +370,21 @@ describe('Top Level of Tests', () => {
 
       it('should get correct info about the shepherd', () => {
         const shpInfo = shepherd.info()
-        expect(shpInfo.devNum).to.be.equal(1)
-        expect(shpInfo.enabled).to.be.equal(true)
-        expect(shpInfo.name).to.be.equal('shp_test')
+        assert.strictEqual(shpInfo.devNum, 1)
+        assert.strictEqual(shpInfo.enabled, true)
+        assert.strictEqual(shpInfo.name, 'shp_test')
       })
 
       it('should list only one device', () => {
         const devList = shepherd.list()
-        expect(devList.length).to.be.equal(1)
-        expect(devList[0].clientId).to.be.equal('test01')
-        expect(devList[0].lifetime).to.be.equal(123456)
-        expect(devList[0].ip).to.be.equal('127.0.0.2')
-        expect(devList[0].mac).to.be.equal('foo:mac')
-        expect(devList[0].version).to.be.equal('0.0.1')
-        expect(devList[0].objList).to.be.deep.equal({ 0: [1, 2, 3], 1: [4, 5, 6] })
-        expect(devList[0].status).to.be.equal('online')
+        assert.strictEqual(devList.length, 1)
+        assert.strictEqual(devList[0].clientId, 'test01')
+        assert.strictEqual(devList[0].lifetime, 123456)
+        assert.strictEqual(devList[0].ip, '127.0.0.2')
+        assert.strictEqual(devList[0].mac, 'foo:mac')
+        assert.strictEqual(devList[0].version, '0.0.1')
+        assert.deepStrictEqual(devList[0].objList, { 0: [1, 2, 3], 1: [4, 5, 6] })
+        assert.strictEqual(devList[0].status, 'online')
       })
     })
 
@@ -397,7 +392,7 @@ describe('Top Level of Tests', () => {
       it('should announce properly', (done) => {
         const annCb = sinon.spy()
         shepherd.announce('hello').then(annCb).done(() => {
-          expect(annCb).to.be.callCount(1)
+          sinon.assert.callCount(annCb, 1)
           done()
         })
       })
@@ -409,8 +404,8 @@ describe('Top Level of Tests', () => {
         const readReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.readReq('0/1/x1').then(readReqCb).done(() => {
-          expect(readReqCb).to.be.callCount(1)
-          expect(readReqCb).to.be.calledWith({ status: 205, data: 'world' })
+          sinon.assert.callCount(readReqCb, 1)
+          sinon.assert.calledWith(readReqCb, { status: 205, data: 'world' })
           done()
         })
 
@@ -431,8 +426,8 @@ describe('Top Level of Tests', () => {
         const readReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.readReq('0/1/x1').then(readReqCb).done(() => {
-          expect(readReqCb).to.be.callCount(1)
-          expect(readReqCb).to.be.calledWith({ status: 205, data: 'world' })
+          sinon.assert.callCount(readReqCb, 1)
+          sinon.assert.calledWith(readReqCb, { status: 205, data: 'world' })
           done()
         })
 
@@ -453,8 +448,8 @@ describe('Top Level of Tests', () => {
         const readReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.readReq('0/1').then(readReqCb).done(() => {
-          expect(readReqCb).to.be.callCount(1)
-          expect(readReqCb).to.be.calledWith({ status: 205, data: { x1: 'hi world', x11: 'yap' } })
+          sinon.assert.callCount(readReqCb, 1)
+          sinon.assert.calledWith(readReqCb, { status: 205, data: { x1: 'hi world', x11: 'yap' } })
           done()
         })
 
@@ -474,8 +469,8 @@ describe('Top Level of Tests', () => {
         const readReqCb = sinon.spy() // (clientId, reqObj, callback)
         //  { oid: 0, data: { 1: { x1: 'hi' }, 2: { x2: 'hello' }, 3: { x3: 'hey' } }},
         qnode.readReq('0').then(readReqCb).done(() => {
-          expect(readReqCb).to.be.callCount(1)
-          expect(readReqCb).to.be.calledWith({
+          sinon.assert.callCount(readReqCb, 1)
+          sinon.assert.calledWith(readReqCb, {
             status: 205,
             data: {
               1: { x1: 'bro' },
@@ -508,8 +503,8 @@ describe('Top Level of Tests', () => {
         const writeReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.writeReq('0/1/x1', 'new_x1_value').then(writeReqCb).done(() => {
-          expect(writeReqCb).to.be.callCount(1)
-          expect(writeReqCb).to.be.calledWith({ status: 204, data: 'new_x1_value' })
+          sinon.assert.callCount(writeReqCb, 1)
+          sinon.assert.calledWith(writeReqCb, { status: 204, data: 'new_x1_value' })
 
           setTimeout(() => {
             done()
@@ -547,8 +542,8 @@ describe('Top Level of Tests', () => {
 
         // x60 has no effect
         qnode.writeReq('0/1', { x1: 'new_x1_value2', x60: 3 }).then(writeReqCb).done(() => {
-          expect(writeReqCb).to.be.callCount(1)
-          expect(writeReqCb).to.be.calledWith({ status: 204, data: { x1: 'new_x1_value2' } })
+          sinon.assert.callCount(writeReqCb, 1)
+          sinon.assert.calledWith(writeReqCb, { status: 204, data: { x1: 'new_x1_value2' } })
 
           setTimeout(() => {
             done()
@@ -587,8 +582,8 @@ describe('Top Level of Tests', () => {
         qnode.writeAttrsReq('0/1/x1', {
           pmin: 11, pmax: 66, gt: 100, lt: 10, stp: 99
         }).then(writeAttrsReqCb).done(() => {
-          expect(writeAttrsReqCb).to.be.callCount(1)
-          expect(writeAttrsReqCb).to.be.calledWith({ status: 200 })
+          sinon.assert.callCount(writeAttrsReqCb, 1)
+          sinon.assert.calledWith(writeAttrsReqCb, { status: 200 })
           done()
         })
 
@@ -611,8 +606,8 @@ describe('Top Level of Tests', () => {
         qnode.writeAttrsReq('0/1', {
           pmin: 11, pmax: 66, gt: 100, lt: 10, stp: 99
         }).then(writeAttrsReqCb).done(() => {
-          expect(writeAttrsReqCb).to.be.callCount(1)
-          expect(writeAttrsReqCb).to.be.calledWith({ status: 200 })
+          sinon.assert.callCount(writeAttrsReqCb, 1)
+          sinon.assert.calledWith(writeAttrsReqCb, { status: 200 })
           done()
         })
 
@@ -634,8 +629,8 @@ describe('Top Level of Tests', () => {
         const execReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.executeReq('0/1/x1', []).then(execReqCb).done(() => {
-          expect(execReqCb).to.be.callCount(1)
-          expect(execReqCb).to.be.calledWith({ status: 204, data: 'foo_result' })
+          sinon.assert.callCount(execReqCb, 1)
+          sinon.assert.calledWith(execReqCb, { status: 204, data: 'foo_result' })
           done()
         })
 
@@ -658,8 +653,8 @@ describe('Top Level of Tests', () => {
         const obsvReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.observeReq('0/1/x1').then(obsvReqCb).done(() => {
-          expect(obsvReqCb).to.be.callCount(1)
-          expect(obsvReqCb).to.be.calledWith({ status: 205 })
+          sinon.assert.callCount(obsvReqCb, 1)
+          sinon.assert.calledWith(obsvReqCb, { status: 205 })
           done()
         })
 
@@ -681,8 +676,8 @@ describe('Top Level of Tests', () => {
         const dscvReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.discoverReq('0/1/x1').then(dscvReqCb).done(() => {
-          expect(dscvReqCb).to.be.callCount(1)
-          expect(dscvReqCb).to.be.calledWith({ status: 205, data: { pmin: 2, pmax: 10 } })
+          sinon.assert.callCount(dscvReqCb, 1)
+          sinon.assert.calledWith(dscvReqCb, { status: 205, data: { pmin: 2, pmax: 10 } })
           done()
         })
 
@@ -703,8 +698,8 @@ describe('Top Level of Tests', () => {
         const dscvReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.discoverReq('0/1').then(dscvReqCb).done(() => {
-          expect(dscvReqCb).to.be.callCount(1)
-          expect(dscvReqCb).to.be.calledWith({ status: 205, data: { pmin: 21, pmax: 110 } })
+          sinon.assert.callCount(dscvReqCb, 1)
+          sinon.assert.calledWith(dscvReqCb, { status: 205, data: { pmin: 21, pmax: 110 } })
           done()
         })
 
@@ -724,8 +719,8 @@ describe('Top Level of Tests', () => {
         const dscvReqCb = sinon.spy() // (clientId, reqObj, callback)
 
         qnode.discoverReq('0').then(dscvReqCb).done(() => {
-          expect(dscvReqCb).to.be.callCount(1)
-          expect(dscvReqCb).to.be.calledWith({
+          sinon.assert.callCount(dscvReqCb, 1)
+          sinon.assert.calledWith(dscvReqCb, {
             status: 205,
             data: {
               pmin: 2,
@@ -814,7 +809,7 @@ describe('Top Level of Tests', () => {
         const qnode = shepherd.find('test01') // { '0': [ 1, 2, 3 ], '1': [ 4, 5, 6 ] } }
         const dumped = qnode.dump()
         delete dumped.joinTime
-        expect(dumped).to.be.deep.equal({
+        assert.deepStrictEqual(dumped, {
           clientId: 'test01',
           so: {
             lwm2mSecurity: {
@@ -856,7 +851,7 @@ describe('Top Level of Tests', () => {
         shepherd.on('_registered', (qnode) => {
           _clientObjectDetailReqStub.restore()
           _responseSenderSpy.restore()
-          expect(_responseSenderSpy).to.have.been.calledWith('register', 'test02')
+          sinon.assert.calledWith(_responseSenderSpy, 'register', 'test02')
           if (shepherd.find('test02') === qnode && shepherd.findByMac('foo:mac:bar')[0] === qnode) done()
         })
 
@@ -875,33 +870,33 @@ describe('Top Level of Tests', () => {
 
       it('should list 2 qnodes', () => {
         const devList = shepherd.list()
-        expect(shepherd.info().devNum).to.be.equal(2)
-        expect(devList.length).to.be.equal(2)
-        expect(devList[0].clientId).to.be.equal('test01')
-        expect(devList[0].mac).to.be.equal('foo:mac')
+        assert.strictEqual(shepherd.info().devNum, 2)
+        assert.strictEqual(devList.length, 2)
+        assert.strictEqual(devList[0].clientId, 'test01')
+        assert.strictEqual(devList[0].mac, 'foo:mac')
 
-        expect(devList[1].clientId).to.be.equal('test02')
-        expect(devList[1].mac).to.be.equal('foo:mac:bar')
+        assert.strictEqual(devList[1].clientId, 'test02')
+        assert.strictEqual(devList[1].mac, 'foo:mac:bar')
       })
 
       it('should find test01', () => {
         const test01 = shepherd.find('test01')
-        expect(test01.clientId).to.be.equal('test01')
+        assert.strictEqual(test01.clientId, 'test01')
       })
 
       it('should find test02', () => {
         const test02 = shepherd.find('test02')
-        expect(test02.clientId).to.be.equal('test02')
+        assert.strictEqual(test02.clientId, 'test02')
       })
 
       it('should findByMac test01', () => {
         const test01 = shepherd.findByMac('foo:mac')[0]
-        expect(test01.clientId).to.be.equal('test01')
+        assert.strictEqual(test01.clientId, 'test01')
       })
 
       it('should findByMac test02', () => {
         const test02 = shepherd.findByMac('foo:mac:bar')[0]
-        expect(test02.clientId).to.be.equal('test02')
+        assert.strictEqual(test02.clientId, 'test02')
       })
     })
 
@@ -938,7 +933,7 @@ describe('Top Level of Tests', () => {
           _clientObjectDetailReqStub.restore()
           _acceptDevIncomingStub.restore()
           _responseSenderSpy.restore()
-          expect(_responseSenderSpy).to.have.been.calledWith('register', 'test03')
+          sinon.assert.calledWith(_responseSenderSpy, 'register', 'test03')
           if (shepherd.find('test03') === qnode && shepherd.findByMac('foo:mac:bar:xyz')[0] === qnode) done()
         })
 
