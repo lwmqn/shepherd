@@ -293,7 +293,7 @@ describe('mqtt-shepherd -> Top Level of Tests', () => {
     describe('#.start', function () {
       this.timeout(6000)
 
-      it('should start ok, _ready and reday should be fired, _enabled,', (done) => {
+      it('should start ok, _ready and ready should be fired, _enabled,', (done) => {
         let _readyCbCalled = false
         let readyCbCalled = false
         let startCbCalled = false
