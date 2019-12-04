@@ -3,13 +3,13 @@
 <div align="center">
 
 **mqtt-shepherd** is a network server and manager for the lightweight MQTT machine network (LWMQN)
-  
+
 [![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/mqtt-shepherd.svg?style=flat-square)](https://greenkeeper.io/)
 [![NPM version](https://img.shields.io/npm/v/mqtt-shepherd.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-shepherd)
 [![NPM downloads](https://img.shields.io/npm/dm/mqtt-shepherd.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-shepherd)
 [![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-shepherd/master.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/lwmqn/mqtt-shepherd)
 [![Coverage Status](https://coveralls.io/repos/github/lwmqn/mqtt-shepherd/badge.svg?branch=master&style=flat-square)](https://coveralls.io/github/lwmqn/mqtt-shepherd?branch=master)
-[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg?style=flat-square)](https://gitter.im/lwmqn/Lobby) 
+[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg?style=flat-square)](https://gitter.im/lwmqn/Lobby)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 ![pr-welcoming-image](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
 
@@ -19,10 +19,10 @@
 
 ## What is LWMQN
 
-Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
+Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
 
 ### Server-side and Client-side Libraries:
-   - LWMQN project provides you with this machine-side **mqtt-node** library and a server-side [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd) library to build your machine network with JavaScript and node.js easily. 
+   - LWMQN project provides you with this machine-side **mqtt-node** library and a server-side [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd) library to build your machine network with JavaScript and node.js easily.
 
 * Server-side library: **mqtt-shepherd** (this module)
 * Client-side library: [**mqtt-node**](https://github.com/lwmqn/mqtt-node)
@@ -41,10 +41,10 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 #### Acronyms and Abbreviations
 * **Server**: LWMQN server
 * **Client** or **Client Device**: LWMQN client (machine)
-* **MqttShepherd**: Class exposed by `require('mqtt-shepherd')`  
+* **MqttShepherd**: Class exposed by `require('mqtt-shepherd')`
 * **MqttNode**: Class to create a software endpoint(proxy) of a remote Client Device on the server
-* **qserver**: Instance of MqttShepherd Class 
-* **qnode**: Instance of MqttNode Class  
+* **qserver**: Instance of MqttShepherd Class
+* **qnode**: Instance of MqttNode Class
 
 -------
 
@@ -61,20 +61,18 @@ $ npm install mqtt-shepherd
 ## Basic Usage
 
 ```js
-var MqttShepherd = require('mqtt-shepherd');
-var qserver = new MqttShepherd();   // create a LWMQN server
+const MqttShepherd = require('mqtt-shepherd')
+const qserver = new MqttShepherd() // create a LWMQN server
 
 qserver.on('ready', function () {
-    console.log('Server is ready.');
+  console.log('Server is ready.')
+  // when server is ready, allow devices to join the network within 180 secs
+  qserver.permitJoin(180)
+})
 
-    // when server is ready, allow devices to join the network within 180 secs
-    qserver.permitJoin(180);
-});
-
-qserver.start(function (err) {      // start the sever
-    if (err)
-        console.log(err);
-});
+qserver.start(function (err) { // start the sever
+  if (err) console.log(err)
+})
 
 // That's all to start a LWMQN server.
 // Now qserver is going to automatically tackle most of the network managing things.

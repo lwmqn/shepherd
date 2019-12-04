@@ -18,22 +18,20 @@ The default implementation authenticates all Clients.
 
 ```js
 qserver.authPolicy.authenticate = function (client, username, password, cb) {
-    var authorized = false,
-        clientId = client.id;
+  // This is just an example.
+  queryUserFromSomewhere(username, function (err, user) { // maybe query from a local database
+    let authorized = false
+    if (err) return cb(err)
 
-    // This is just an example.
-    queryUserFromSomewhere(username, function (err, user) {     // maybe query from a local database
-        if (err) {
-            cb(err);
-        } else if (username === user.name && password === user.password) {
-            client.user = username;
-            authorized = true;
-            cb(null, authorized);
-        } else {
-            cb(null, authorized);
-        }
-    });
-};
+    if (username === user.name && password === user.password) {
+      client.user = username
+      authorized = true
+      cb(null, authorized)
+    } else {
+      cb(null, authorized)
+    }
+  })
+}
 ```
 
 ***********************************************
@@ -52,15 +50,11 @@ The default implementation authorizes every Client, that was successfully regist
 
 ```js
 qserver.authPolicy.authorizePublish = function (client, topic, payload, cb) {
-    var authorized = false,
-        clientId = client.id,
-        username = client.user;
-
-    // This is just an example.
-    passToMyAuthorizePublishSystem(clientId, username, topic, function (err, authorized) {
-        cb(err, authorized);
-    });
-};
+  // This is just an example.
+  passToMyAuthorizePublishSystem(client.id, client.user, topic, function (err, authorized) {
+    cb(err, authorized)
+  })
+}
 ```
 
 ***********************************************
@@ -78,15 +72,11 @@ The default implementation authorizes every Client, that was successfully regist
 
 ```js
 qserver.authPolicy.authorizeSubscribe = function (client, topic, cb) {
-    var authorized = false,
-        clientId = client.id,
-        username = client.user;
-
-    // This is just an example.
-    passToMyAuthorizeSubscribeSystem(clientId, username, topic, function (err, authorized) {
-        cb(err, authorized);
-    });
-};
+  // This is just an example.
+  passToMyAuthorizeSubscribeSystem(client.id, client.user, topic, function (err, authorized) {
+    cb(err, authorized)
+  })
+}
 ```
 
 Please refer to Mosca Wiki to learn more about [Authentication & Authorization](https://github.com/mcollina/mosca/wiki/Authentication-&-Authorization)

@@ -31,56 +31,60 @@ Fired when there is an incoming indication message. The `msg` is an object with 
 
 
 * ##### devIncoming
-    Fired when there is a qnode incoming to the network. The qnode can be either a new registered one or an old one that logs in again.
 
-    * msg.type: `'devIncoming'`
-    * msg.qnode: `qnode`
-    * msg.data: `undefined`
-    * message examples
-    ```js
-    // example of an Object Instance notification
-    {
-        type: 'devIncoming',
-        qnode: qnode instance
-    }
-    ```
+  Fired when there is a qnode incoming to the network. The qnode can be either a new registered one or an old one that logs in again.
+
+  * msg.type: `'devIncoming'`
+  * msg.qnode: `qnode`
+  * msg.data: `undefined`
+  * message examples
+  ```js
+  // example of an Object Instance notification
+  {
+    type: 'devIncoming',
+    qnode: qnode instance
+  }
+  ```
 
 * ##### devLeaving
-    Fired when there is a qnode leaving the network.
 
-    * msg.type: `'devLeaving'`
-    * msg.qnode: `'foo_clientId'`, the clientId of which qnode is leaving
-    * msg.data: `9e:65:f9:0b:24:b8`, the mac address of which qnode is leaving.
-    * message examples
-    ```js
-    // example of an Object Instance notification
-    {
-        type: 'devLeaving',
-        qnode: 'foo_clientId',
-        data: '9e:65:f9:0b:24:b8'
-    }
-    ```
+  Fired when there is a qnode leaving the network.
+
+  * msg.type: `'devLeaving'`
+  * msg.qnode: `'foo_clientId'`, the clientId of which qnode is leaving
+  * msg.data: `9e:65:f9:0b:24:b8`, the mac address of which qnode is leaving.
+  * message examples
+  ```js
+  // example of an Object Instance notification
+  {
+    type: 'devLeaving',
+    qnode: 'foo_clientId',
+    data: '9e:65:f9:0b:24:b8'
+  }
+  ```
 
 * ##### devUpdate
-    Fired when there is a qnode that publishes an update of its device attribute(s).
 
-    * msg.type: `'devUpdate'`
-    * msg.qnode: `qnode`
-    * msg.data: An object that contains the updated attribute(s). There may be fields of `status`, `lifetime`, `ip`, and `version` in this object.
-    * message examples
-    ```js
-    // example of an Object Instance notification
-    {
-        type: 'devUpdate',
-        qnode: qnode instance,
-        data: {
-            ip: '192.168.0.36',
-            lifetime: 82000
-        }
+  Fired when there is a qnode that publishes an update of its device attribute(s).
+
+  * msg.type: `'devUpdate'`
+  * msg.qnode: `qnode`
+  * msg.data: An object that contains the updated attribute(s). There may be fields of `status`, `lifetime`, `ip`, and `version` in this object.
+  * message examples
+  ```js
+  // example of an Object Instance notification
+  {
+    type: 'devUpdate',
+    qnode: qnode instance,
+    data: {
+      ip: '192.168.0.36',
+      lifetime: 82000
     }
-    ```
+  }
+  ```
 
 * ##### devNotify
+
     Fired when there is qnode that publishes a notification of its _Object Instance_ or _Resource_.
 
     * msg.type: `'devNotify'`
@@ -92,31 +96,32 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     ```js
     // example of an Object Instance notification
     {
-        type: 'devNotify',
-        qnode: qnode instance,
-        data: {
-            oid: 'humidity',
-            iid: 0,
-            data: {             // Object Instance
-                sensorValue: 32
-            }
+      type: 'devNotify',
+      qnode: qnode instance,
+      data: {
+        oid: 'humidity',
+        iid: 0,
+        data: {             // Object Instance
+          sensorValue: 32
         }
+      }
     }
 
     // example of a Resource notification
     {
-        type: 'devNotify',
-        qnode: qnode instance,
-        data: {
-            oid: 'humidity',
-            iid: 0,
-            rid: 'sensorValue',
-            data: 32            // Resource value
-        }
+      type: 'devNotify',
+      qnode: qnode instance,
+      data: {
+        oid: 'humidity',
+        iid: 0,
+        rid: 'sensorValue',
+        data: 32            // Resource value
+      }
     }
     ```
 
 * ##### devChange
+
     Fired when the Server perceives that there is any change of _Resources_ from notifications or read/write responses.
 
     * msg.type: `'devChange'`
@@ -128,28 +133,28 @@ Fired when there is an incoming indication message. The `msg` is an object with 
     ```js
     // changes of an Object Instance
     {
-        type: 'devChange',
-        qnode: qnode instance,
+      type: 'devChange',
+      qnode: qnode instance,
+      data: {
+        oid: 'temperature',
+        iid: 0,
         data: {
-            oid: 'temperature',
-            iid: 0,
-            data: {
-                sensorValue: 12,
-                minMeaValue: 12
-            }
+          sensorValue: 12,
+          minMeaValue: 12
         }
+      }
     }
 
     // change of a Resource
     {
-        type: 'devChange',
-        qnode: qnode instance,
-        data: {
-            oid: 'temperature',
-            iid: 1,
-            rid: 'sensorValue',
-            data: 18
-        }
+      type: 'devChange',
+      qnode: qnode instance,
+      data: {
+        oid: 'temperature',
+        iid: 1,
+        rid: 'sensorValue',
+        data: 18
+      }
     }
     ```
 
@@ -158,20 +163,21 @@ Fired when there is an incoming indication message. The `msg` is an object with 
         - If qserver does notice there is really something changed, it will then fire `'devChange'` to report the change(s). It is suggested to use `'devChange'` indication to update your GUI views, and to use `'devNotify'` indication to log data.
 
 * ##### devStatus
-    Fired when there is a qnode going online, going offline, or going to sleep.
 
-    * msg.type: `'devStatus'`
-    * msg.qnode: `qnode`
-    * msg.data: `'online'`, `'sleep'`, or `'offline'`
-    * message examples
-    ```js
-    // example of an Object Instance notification
-    {
-        type: 'devStatus',
-        qnode: qnode instance,
-        data: 'online'
-    }
-    ```
+  Fired when there is a qnode going online, going offline, or going to sleep.
+
+  * msg.type: `'devStatus'`
+  * msg.qnode: `qnode`
+  * msg.data: `'online'`, `'sleep'`, or `'offline'`
+  * message examples
+  ```js
+  // example of an Object Instance notification
+  {
+    type: 'devStatus',
+    qnode: qnode instance,
+    data: 'online'
+  }
+  ```
 
 ********************************************
 ### Event: 'message'

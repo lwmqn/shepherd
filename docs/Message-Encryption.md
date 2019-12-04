@@ -30,35 +30,35 @@ Method of decryption. Overridable.
 **Encryption/Decryption Example:**
 
 ```js
-var qserver = new MqttShepherd('my_iot_server');
+const qserver = new MqttShepherd('my_iot_server')
 
 // In this example, I simply encrypt the message with a constant password 'mysecrete'.
 // You may like to get the password according to different qnodes by `clientId` if you have
 // a security subsystem.
 
 qserver.encrypt = function (msg, clientId, cb) {
-    var msgBuf = new Buffer(msg),
-        cipher = crypto.createCipher('aes128', 'mysecrete'),
-        encrypted = cipher.update(msgBuf, 'binary', 'base64');
+  const msgBuf = new Buffer(msg)
+  const cipher = crypto.createCipher('aes128', 'mysecrete')
+  let encrypted = cipher.update(msgBuf, 'binary', 'base64')
 
-    try {
-        encrypted += cipher.final('base64');
-        cb(null, encrypted);
-    } catch (err) {
-        cb(err);
-    }
-};
+  try {
+    encrypted += cipher.final('base64')
+    cb(null, encrypted)
+  } catch (err) {
+    cb(err)
+  }
+}
 
 qserver.decrypt = function (msg, clientId, cb) {
-    msg = msg.toString();
-    var decipher = crypto.createDecipher('aes128', 'mysecrete'),
-        decrypted = decipher.update(msg, 'base64', 'utf8');
+  msg = msg.toString()
+  const decipher = crypto.createDecipher('aes128', 'mysecrete')
+  let decrypted = decipher.update(msg, 'base64', 'utf8')
 
-    try {
-        decrypted += decipher.final('utf8');
-        cb(null, decrypted);
-    } catch (err) {
-        cb(err);
-    }
-};
+  try {
+    decrypted += decipher.final('utf8')
+    cb(null, decrypted)
+  } catch (err) {
+    cb(err)
+  }
+}
 ```

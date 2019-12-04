@@ -30,45 +30,45 @@ Create a server instance of the `MqttShepherd` class. This document will use `qs
 * Create a server and name it
 
 ```js
-var MqttShepherd = require('mqtt-shepherd');
-var qserver = new MqttShepherd('my_iot_server');
+const MqttShepherd = require('mqtt-shepherd')
+const qserver = new MqttShepherd('my_iot_server')
 ```
 
 * Create a server that starts on a specified port
 
 ```js
-var qserver = new MqttShepherd('my_iot_server', {
-    broker: {
-        port: 9000
-    }
-});
+const qserver = new MqttShepherd('my_iot_server', {
+  broker: {
+    port: 9000
+  }
+})
 ```
 
 * Create a server with other backend ([example from Mosca wiki](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage#--mongodb))
 
 ```js
-var qserver = new MqttShepherd('my_iot_server', {
-    broker: {
-        port: 1883,
-        backend: {  // backend is the pubsubsettings seen in Mosca wiki page
-            type: 'mongo',
-            url: 'mongodb://localhost:27017/mqtt',
-            pubsubCollection: 'ascoltatori',
-            mongo: {}
-        }
+const qserver = new MqttShepherd('my_iot_server', {
+  broker: {
+    port: 1883,
+    backend: { // backend is the pubsubsettings seen in Mosca wiki page
+      type: 'mongo',
+      url: 'mongodb://localhost:27017/mqtt',
+      pubsubCollection: 'ascoltatori',
+      mongo: {}
     }
-});
+  }
+})
 ```
 
 * Create a server with a default account. Only Clients connecting with this account is authenticated if you don't have an authentication subsystem.
 
 ```js
-var qserver = new MqttShepherd('my_iot_server', {
-    account: {
-        username: 'skynyrd',
-        password: 'lynyrd'
-    }
-});
+const qserver = new MqttShepherd('my_iot_server', {
+  account: {
+    username: 'skynyrd',
+    password: 'lynyrd'
+  }
+})
 ```
 
 ********************************************
@@ -89,14 +89,13 @@ Start qserver.
 ```js
 // callback style
 qserver.start(function (err) {
-    if (!err)
-        console.log('server initialized.');
-});
+  if (!err) console.log('server initialized.')
+})
 
 // promise style
-qserver.start().then(function() {
-    console.log('server initialized.');
-}).done();
+qserver.start().then(function () {
+  console.log('server initialized.')
+}).done()
 ```
 
 ********************************************
@@ -116,9 +115,8 @@ Stop qserver.
 
 ```js
 qserver.stop(function (err) {
-    if (!err)
-        console.log('server stopped.');
-});
+  if (!err) console.log('server stopped.')
+})
 ```
 
 ********************************************
@@ -138,20 +136,18 @@ Reset qserver. After qserver restarted, a `'ready'` event will be fired. A hard 
 
 ```js
 qserver.on('ready', function () {
-    console.log('server is ready');
-});
+  console.log('server is ready')
+})
 
 // default is soft reset
 qserver.reset(function (err) {
-    if (!err)
-        console.log('server restarted.');
-});
+  if (!err) console.log('server restarted.')
+})
 
 // hard reset
 qserver.reset(true, function (err) {
-    if (!err)
-        console.log('server restarted.');
-});
+  if (!err) console.log('server restarted.')
+})
 ```
 
 ********************************************
@@ -171,12 +167,12 @@ Allow or disallow devices to join the network. A 'permitJoining` event will be f
 
 ```js
 qserver.on('permitJoining', function (joinTimeLeft) {
-    console.log(joinTimeLeft);
-});
+  console.log(joinTimeLeft)
+})
 
 // allow devices to join for 180 seconds, this will also trigger
 // a 'permitJoining' event at each tick of countdown.
-qserver.permitJoin(180);    // true
+qserver.permitJoin(180) // true
 ```
 
 ********************************************
@@ -203,7 +199,7 @@ Returns qserver information.
 **Examples:**
 
 ```js
-qserver.info();
+qserver.info()
 
 /*
 {
@@ -248,7 +244,7 @@ List records of the registered qnode(s). This method always returns an array.
 **Examples:**
 
 ```js
-console.log(qserver.list([ 'foo_id', 'bar_id', 'no_such_id' ]));
+console.log(qserver.list(['foo_id', 'bar_id', 'no_such_id']))
 
 /*
 [
@@ -282,7 +278,7 @@ console.log(qserver.list([ 'foo_id', 'bar_id', 'no_such_id' ]));
 ]
 */
 
-console.log(qserver.list('foo_id'));
+console.log(qserver.list('foo_id'))
 
 /* An array will be returned even a single string is argumented.
 [
@@ -319,10 +315,10 @@ Find a registered qnode on qserver by clientId.
 **Examples:**
 
 ```js
-var qnode = qserver.find('foo_id');
+const qnode = qserver.find('foo_id')
 
 if (qnode) {
-    // do something upon the qnode, like qnode.readReq()
+  // do something upon the qnode, like qnode.readReq()
 }
 ```
 
@@ -342,10 +338,10 @@ Find registered **qnodes** by the specified mac address. This method always retu
 **Examples:**
 
 ```js
-var qnodes = qserver.findByMac('9e:65:f9:0b:24:b8');
+const qnodes = qserver.findByMac('9e:65:f9:0b:24:b8')
 
 if (qnodes.length) {
-    // do something upon the qnodes
+  // do something upon the qnodes
 }
 ```
 
@@ -366,9 +362,8 @@ Deregister and remove a qnode from the network by its clientId.
 
 ```js
 qserver.remove('foo', function (err, clientId) {
-    if (!err)
-        console.log(clientId);
-});
+  if (!err) console.log(clientId)
+})
 ```
 
 ********************************************
@@ -387,5 +382,5 @@ The qserver can use this method to announce(/broadcast) any message to all qnode
 **Examples:**
 
 ```js
-qserver.announce('Rock on!');
+qserver.announce('Rock on!')
 ```
