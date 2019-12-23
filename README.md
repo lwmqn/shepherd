@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**mqtt-shepherd** is a network server and manager for the lightweight MQTT machine network (LWMQN)
+**lwmqn-shepherd** is a network server and manager for the Lightweight Message Queuing Network (LwMQN)
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/lwmqn-shepherd.svg?style=flat-square)](https://greenkeeper.io/)
 [![NPM version](https://img.shields.io/npm/v/lwmqn-shepherd.svg?style=flat-square)](https://www.npmjs.com/package/lwmqn-shepherd)
