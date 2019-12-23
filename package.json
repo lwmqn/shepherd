@@ -1,6 +1,6 @@
 {
   "name": "@lwmqn/shepherd",
-  "version": "0.7.7",
+  "version": "0.8.0",
   "description": "Server & manager for the LwM2M-like Lightweight Message Queuing Network (LwMQN)",
   "main": "index.js",
   "scripts": {
