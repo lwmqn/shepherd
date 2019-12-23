@@ -1,17 +1,17 @@
 ## Basic APIs
 
-MqttShepherd is being exposed by `require('mqtt-shepherd')`
+LwmqnShepherd is being exposed by `require('lwmqn-shepherd')`
 
-* This class brings you a LWMQN Server with network managing facilities, i.e., permission of device joining, device authentication, reading resources, writing resources, observing resources, and executing procedures on remote devices. This document uses `qserver` to denote the instance of this class.
+* This class brings you a LwMQN Server with network managing facilities, i.e., permission of device joining, device authentication, reading resources, writing resources, observing resources, and executing procedures on remote devices. This document uses `qserver` to denote the instance of this class.
 * Each asynchronous API supports both callback style and promise backed by [q](https://github.com/kriskowal/q) 1.4.x.
 
 ********************************************
-### new MqttShepherd([name,] [settings])
-Create a server instance of the `MqttShepherd` class. This document will use `qserver` to denote the server.
+### new LwmqnShepherd([name,] [settings])
+Create a server instance of the `LwmqnShepherd` class. This document will use `qserver` to denote the server.
 
 **Arguments:**
 
-1. `name` (_String_): Server name. A default name `'mqtt-shepherd'` will be used if not given.
+1. `name` (_String_): Server name. A default name `'lwmqn-shepherd'` will be used if not given.
 2. `settings` (_Object_): Optional settings for qserver.
 
     | Property       | Type    | Description                                                                                                                                                                         |
@@ -30,14 +30,14 @@ Create a server instance of the `MqttShepherd` class. This document will use `qs
 * Create a server and name it
 
 ```js
-const MqttShepherd = require('mqtt-shepherd')
-const qserver = new MqttShepherd('my_iot_server')
+const LwmqnShepherd = require('lwmqn-shepherd')
+const qserver = new LwmqnShepherd('my_iot_server')
 ```
 
 * Create a server that starts on a specified port
 
 ```js
-const qserver = new MqttShepherd('my_iot_server', {
+const qserver = new LwmqnShepherd('my_iot_server', {
   broker: {
     port: 9000
   }
@@ -47,7 +47,7 @@ const qserver = new MqttShepherd('my_iot_server', {
 * Create a server with other backend ([example from Mosca wiki](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage#--mongodb))
 
 ```js
-const qserver = new MqttShepherd('my_iot_server', {
+const qserver = new LwmqnShepherd('my_iot_server', {
   broker: {
     port: 1883,
     backend: { // backend is the pubsubsettings seen in Mosca wiki page
@@ -63,7 +63,7 @@ const qserver = new MqttShepherd('my_iot_server', {
 * Create a server with a default account. Only Clients connecting with this account is authenticated if you don't have an authentication subsystem.
 
 ```js
-const qserver = new MqttShepherd('my_iot_server', {
+const qserver = new LwmqnShepherd('my_iot_server', {
   account: {
     username: 'skynyrd',
     password: 'lynyrd'
