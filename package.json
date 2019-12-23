@@ -1,7 +1,7 @@
 {
-  "name": "mqtt-shepherd",
+  "name": "@lwmqn/shepherd",
   "version": "0.7.7",
-  "description": "Network server and manager for the lightweight MQTT machine network (LWMQN)",
+  "description": "Server & manager for the LwM2M-like Lightweight Message Queuing Network (LwMQN)",
   "main": "index.js",
   "scripts": {
     "lint": "standard --env mocha | snazzy",
@@ -12,25 +12,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lwmqn/mqtt-shepherd.git"
+    "url": "https://github.com/lwmqn/shepherd.git"
   },
   "author": "Simen Li",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lwmqn/mqtt-shepherd/issues"
+    "url": "https://github.com/lwmqn/shepherd/issues"
   },
-  "homepage": "https://github.com/lwmqn/mqtt-shepherd",
+  "homepage": "https://github.com/lwmqn/shepherd",
   "dependencies": {
+    "@lwmqn/smartobject": "^1.6.0",
+    "@lwmqn/util": "^0.6.0",
     "areq": "^0.2.0",
     "busyman": "^0.3.0",
     "debug": "^2.6.9",
-    "lwmqn-util": "^0.5.1",
     "mosca": "^2.0.2",
     "mqtt": "^2.18.8",
     "nedb": "^1.8.0",
     "network": "^0.4.1",
-    "q": "^1.4.1",
-    "smartobject": "^1.5.0"
+    "q": "^1.4.1"
   },
   "devDependencies": {
     "coveralls": "^3.0.4",

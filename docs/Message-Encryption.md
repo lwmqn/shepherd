@@ -1,6 +1,6 @@
 ## Message Encryption
 
-By default, qserver won't encrypt the message. You can override the qserver.encrypt() and qserver.decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your [**remote Client Devices**](https://github.com/lwmqn/mqtt-node) as well.
+By default, qserver won't encrypt the message. You can override the qserver.encrypt() and qserver.decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your [**remote Client Devices**](https://github.com/lwmqn/qnode) as well.
 
 **Note**: You may like to distribute pre-configured keys to your Clients and utilize the [authentication](#Auth) approach to build your own security subsystem.
 

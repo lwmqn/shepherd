@@ -5,7 +5,7 @@ const fs = require('fs')
 const _ = require('busyman')
 const debug = require('debug')
 
-const MqttNode = require('../../lib/components/mqtt-node')
+const MqttNode = require('../../lib/components/qnode')
 const Mqdb = require('../../lib/components/mqdb')
 
 const cId = 'Im-client-node'
@@ -50,7 +50,7 @@ after((done) => {
   })
 })
 
-describe('mqtt-node -> verify', () => {
+describe('qnode -> verify', () => {
   const dbFolderY = path.resolve('./lib/database')
   const dbPathY = path.resolve('./lib/database/mqttNode.db')
 
@@ -75,7 +75,7 @@ describe('mqtt-node -> verify', () => {
     })
   })
 
-  describe('mqtt-node -> Constructor Check', () => {
+  describe('qnode -> Constructor Check', () => {
     it('should has all correct members after new', () => {
       const node = new MqttNode(fakeShp, cId, devAttrs)
       assert.deepStrictEqual(node.shepherd, fakeShp)
@@ -613,7 +613,7 @@ describe('mqtt-node -> verify', () => {
     })
   })
 
-  describe('mqtt-node -> Functional Check', () => {
+  describe('@lwmqn/qnode -> Functional Check', () => {
     const nodex = new MqttNode(fakeShp, cId, devAttrs)
     nodex.so = myso
 
