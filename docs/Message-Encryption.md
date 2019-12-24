@@ -30,7 +30,7 @@ Method of decryption. Overridable.
 **Encryption/Decryption Example:**
 
 ```js
-const qserver = new MqttShepherd('my_iot_server')
+const qserver = new Shepherd('my_iot_server')
 
 // In this example, I simply encrypt the message with a constant password 'mysecrete'.
 // You may like to get the password according to different qnodes by `clientId` if you have

@@ -1,14 +1,12 @@
-![LwMQN Network](https://raw.githubusercontent.com/lwmqn/documents/master/media/lwmqn_net.png)
+![LWMQN Network](https://raw.githubusercontent.com/lwmqn/shepherd/master/docs/images/lwmqn.png)
 
 <div align="center">
 
 **@lwmqn/shepherd** is a network server and manager for the Lightweight Message Queuing Network (LwMQN)
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/shepherd.svg?style=flat-square)](https://greenkeeper.io/)
 [![NPM version](https://img.shields.io/npm/v/shepherd.svg?style=flat-square)](https://www.npmjs.com/package/shepherd)
 [![NPM downloads](https://img.shields.io/npm/dm/shepherd.svg?style=flat-square)](https://www.npmjs.com/package/shepherd)
 [![Travis branch](https://img.shields.io/travis/lwmqn/shepherd/master.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/lwmqn/shepherd)
-[![Coverage Status](https://coveralls.io/repos/github/lwmqn/shepherd/badge.svg?branch=master&style=flat-square)](https://coveralls.io/github/lwmqn/shepherd?branch=master)
 [![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg?style=flat-square)](https://gitter.im/lwmqn/Lobby)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 ![pr-welcoming-image](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
@@ -38,6 +36,10 @@ Lightweight Message Queuing Network ([**LwMQN**](http://lwmqn.github.io)) is an 
 * Easy to query resources on a Client Device with the URI-style path, and everything has been well-organized to ease the pain for you to create RPC interfaces for your webapps, such as RESTful and websocket-based APIs.
 * LwMQN Server is your local machine gateway and application runner. But if you like to let your machines go up cloud, why not? It's Node.js!
 
+### Understanding Smart Objects and the IPSO Model
+
+![IPSO Model](https://raw.githubusercontent.com/lwmqn/shepherd/master/docs/images/ipso_model.png)
+
 #### Acronyms and Abbreviations
 * **Server**: LwMQN server
 * **Client** or **Client Device**: LwMQN client (machine)
@@ -55,6 +57,12 @@ Currently [Node.js 8.x LTS](https://nodejs.org/en/about/releases/) or higher is 
 ```bash
 $ npm install @lwmqn/shepherd
 ```
+
+### Compabitility table
+
+| Shepherd versions /<br>Node.js versions | 8.x<br>LTS | 10.x<br>LTS | 11.x | 12.x<br>LTS | 13.x |
+|--------------------------------------|------------|-------------|------|-------------|------|
+| v0.8.0 | ✔ | ✘ | ✘ | ✘ | ✘ |
 
 -------
 

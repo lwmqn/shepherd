@@ -30,14 +30,14 @@ Create a server instance of the `LwmqnShepherd` class. This document will use `q
 * Create a server and name it
 
 ```js
-const LwmqnShepherd = require('lwmqn-shepherd')
-const qserver = new LwmqnShepherd('my_iot_server')
+const Shepherd = require('lwmqn-shepherd')
+const qserver = new Shepherd('my_iot_server')
 ```
 
 * Create a server that starts on a specified port
 
 ```js
-const qserver = new LwmqnShepherd('my_iot_server', {
+const qserver = new Shepherd('my_iot_server', {
   broker: {
     port: 9000
   }
@@ -47,7 +47,7 @@ const qserver = new LwmqnShepherd('my_iot_server', {
 * Create a server with other backend ([example from Mosca wiki](https://github.com/mcollina/mosca/wiki/Mosca-advanced-usage#--mongodb))
 
 ```js
-const qserver = new LwmqnShepherd('my_iot_server', {
+const qserver = new Shepherd('my_iot_server', {
   broker: {
     port: 1883,
     backend: { // backend is the pubsubsettings seen in Mosca wiki page
@@ -63,7 +63,7 @@ const qserver = new LwmqnShepherd('my_iot_server', {
 * Create a server with a default account. Only Clients connecting with this account is authenticated if you don't have an authentication subsystem.
 
 ```js
-const qserver = new LwmqnShepherd('my_iot_server', {
+const qserver = new Shepherd('my_iot_server', {
   account: {
     username: 'skynyrd',
     password: 'lynyrd'
