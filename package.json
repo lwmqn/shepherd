@@ -29,7 +29,7 @@
     "mosca": "^2.0.2",
     "mqtt": "^2.18.8",
     "nedb": "^1.8.0",
-    "network": "^0.4.1",
+    "network": "^0.5.0",
     "q": "^1.4.1"
   },
   "devDependencies": {
