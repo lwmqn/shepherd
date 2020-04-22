@@ -33,7 +33,7 @@
     "q": "^1.4.1"
   },
   "devDependencies": {
-    "coveralls": "^3.0.4",
+    "coveralls": "^3.0.13",
     "mocha": "^4.1.0",
     "nyc": "^15.0.0",
     "sinon": "^8.0.1",
